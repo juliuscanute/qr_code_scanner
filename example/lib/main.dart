@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
-void main() => runApp(MaterialApp(home: TextViewExample()));
+void main() => runApp(MaterialApp(home: QRViewExample()));
 
-class TextViewExample extends StatefulWidget {
-  const TextViewExample({
+class QRViewExample extends StatefulWidget {
+  const QRViewExample({
     Key key,
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _TextViewExampleState();
+  State<StatefulWidget> createState() => _QRViewExampleState();
 }
 
-class _TextViewExampleState extends State<TextViewExample> {
+class _QRViewExampleState extends State<QRViewExample> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   var qrText = "";
   @override
@@ -26,11 +26,11 @@ class _TextViewExampleState extends State<TextViewExample> {
               key: qrKey,
               onQRViewCreated: _onQRViewCreated,
             ),
-            flex: 1,
+            flex: 4,
           ),
           Expanded(
             child: Text("This is the result of scan: $qrText"),
-            flex: 4,
+            flex: 1,
           )
         ],
       ),

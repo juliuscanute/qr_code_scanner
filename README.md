@@ -1,14 +1,11 @@
-# flutter_qr
+# qr_code_scanner
 This package wires the PlatformView corresponding to iOS and Android inside flutter.
 
+#Credits
+* Android: https://github.com/zxing/zxing
+* iOS: https://github.com/mikebuss/MTBBarcodeScanner
 
-## Getting Started
-
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.io/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
-
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.io/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+#TODO'S:
+* Add support to flip camera view.
+* iOS Native embedding is written to match what is supported in the framework as of the date of publication of this package. It needs to be improved as the framework support improves.
+* Finally, I welcome PR's to make it better :), thanks

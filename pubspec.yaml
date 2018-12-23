@@ -1,8 +1,8 @@
 name: qr_code_scanner
-description: QR code scanner natively embedded inside flutter.
-version: 0.0.1
+description: QR code scanner that can be embedded inside flutter. It uses zxing in Android and MTBBarcode scanner in iOS.
+version: 0.0.2
 author: Julius Canute<juliuscanute[*]touchcapture.net>
-homepage: https://medium.com/@juliuscanute
+homepage: https://github.com/juliuscanute/qr_code_scanner
 
 environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
