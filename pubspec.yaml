@@ -1,0 +1,17 @@
+name: qr_code_scanner
+description: QR code scanner natively embedded inside flutter.
+version: 0.0.1
+author: Julius Canute<juliuscanute[*]touchcapture.net>
+homepage: https://medium.com/@juliuscanute
+
+environment:
+  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  plugin:
+    androidPackage: net.touchcapture.qr.flutterqr
+    pluginClass: FlutterQrPlugin
