@@ -88,6 +88,7 @@ class QRView(context: Context, private val registrar: PluginRegistry.Registrar, 
     }
 
     override fun dispose() {
+        barcodeView.pause()
     }
 
     private inner class CameraRequestPermissionsListener : PluginRegistry.RequestPermissionsResultListener {
