@@ -1,3 +1,8 @@
+## 0.0.3
+
+* iOS library reference fix
+* Android pause/resume fix
+
 ## 0.0.2
 
 * Added documentation to cover how to use the plugin.
