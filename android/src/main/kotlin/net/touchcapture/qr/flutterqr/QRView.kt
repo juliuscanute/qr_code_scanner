@@ -43,8 +43,6 @@ class QRView(context: Context, private val registrar: PluginRegistry.Registrar, 
                 }
         )
 
-        init()
-
         activity.application.registerActivityLifecycleCallbacks(
                 object : Application.ActivityLifecycleCallbacks{
                     override fun onActivityPaused(p0: Activity?) {
@@ -84,7 +82,10 @@ class QRView(context: Context, private val registrar: PluginRegistry.Registrar, 
     }
 
     override fun getView(): View {
-        return barcodeView
+        barcodeView.pause()
+        return barcodeView.apply {
+            init()
+        }
     }
 
     override fun dispose() {
