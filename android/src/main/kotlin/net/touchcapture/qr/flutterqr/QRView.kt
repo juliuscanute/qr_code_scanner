@@ -42,34 +42,6 @@ class QRView(context: Context, private val registrar: PluginRegistry.Registrar, 
                     override fun possibleResultPoints(resultPoints: List<ResultPoint>) {}
                 }
         )
-
-        activity.application.registerActivityLifecycleCallbacks(
-                object : Application.ActivityLifecycleCallbacks{
-                    override fun onActivityPaused(p0: Activity?) {
-                        barcodeView.pause()
-                    }
-
-                    override fun onActivityResumed(p0: Activity?) {
-                        init()
-                    }
-
-                    override fun onActivityStarted(p0: Activity?) {
-                    }
-
-                    override fun onActivityDestroyed(p0: Activity?) {
-                    }
-
-                    override fun onActivitySaveInstanceState(p0: Activity?, p1: Bundle?) {
-                    }
-
-                    override fun onActivityStopped(p0: Activity?) {
-                    }
-
-                    override fun onActivityCreated(p0: Activity?, p1: Bundle?) {
-                       barcodeView.decoderFactory = DefaultDecoderFactory()
-                    }
-
-                })
     }
 
 
