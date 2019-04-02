@@ -1,3 +1,7 @@
+## 0.0.4
+
+* fix black screen orientation/unlock/focus
+
 ## 0.0.3
 
 * iOS library reference fix
