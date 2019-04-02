@@ -42,6 +42,15 @@ class QRView(context: Context, private val registrar: PluginRegistry.Registrar, 
                     override fun possibleResultPoints(resultPoints: List<ResultPoint>) {}
                 }
         )
+        barcodeView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewDetachedFromWindow(p0: View?) {
+                barcodeView.pause()
+            }
+
+            override fun onViewAttachedToWindow(p0: View?) {
+                barcodeView.resume()
+            }
+        })
     }
 
 
@@ -54,7 +63,6 @@ class QRView(context: Context, private val registrar: PluginRegistry.Registrar, 
     }
 
     override fun getView(): View {
-        barcodeView.pause()
         return barcodeView.apply {
             init()
         }
