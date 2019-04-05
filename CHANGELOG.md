@@ -1,3 +1,7 @@
+## 0.0.5
+
+* preview stretching after change screen orientation fix
+
 ## 0.0.4
 
 * fix black screen orientation/unlock/focus
