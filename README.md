@@ -4,7 +4,7 @@ This package wires the PlatformView corresponding to iOS and Android inside flut
 #Credits
 * Android: https://github.com/zxing/zxing
 * iOS: https://github.com/mikebuss/MTBBarcodeScanner
-* Special Thanks To: LeonDevLifeLog for his contributions towards improving it.
+* Special Thanks To: LeonDevLifeLog for his contributions towards improving this package.
 
 #TODO'S:
 * Add support to flip camera view.
