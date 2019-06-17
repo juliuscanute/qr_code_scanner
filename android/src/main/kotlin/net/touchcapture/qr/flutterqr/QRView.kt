@@ -19,7 +19,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.platform.PlatformView
 
-class QRView(context: Context, private val registrar: PluginRegistry.Registrar, id: Int) :
+class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
         PlatformView,MethodChannel.MethodCallHandler {
 
     companion object {

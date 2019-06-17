@@ -1,3 +1,8 @@
+## 0.0.8
+
+* migrated Android project to androidx (by Felipe César)
+* migrated iOS to Swift 5 (by Felipe César)
+
 ## 0.0.7
 
 * flash light support added
