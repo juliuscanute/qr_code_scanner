@@ -42,12 +42,16 @@ public class QRView:NSObject,FlutterPlatformView {
     public func view() -> UIView {
         channel.setMethodCallHandler({
             [weak self] (call: FlutterMethodCall, result: FlutterResult) -> Void in
-            guard call.method == "setDimensions" else {
-                result(FlutterMethodNotImplemented)
-                return
+            switch(call.method){
+                case "setDimensions":
+                    var arguments = call.arguments as! Dictionary<String, Double>
+                    self?.setDimensions(width: arguments["width"] ?? 0,height: arguments["height"] ?? 0)
+                case "flipCamera":
+                    self?.flipCamera()
+                default:
+                    result(FlutterMethodNotImplemented)
+                    return
             }
-            var arguments = call.arguments as! Dictionary<String, Double>
-            self?.setDimensions(width: arguments["width"] ?? 0,height: arguments["height"] ?? 0)
         })
         return previewView
     }
@@ -56,5 +60,9 @@ public class QRView:NSObject,FlutterPlatformView {
        previewView.frame = CGRect(x: 0, y: 0, width: width, height: height)
        scanner = MTBBarcodeScanner(previewView: previewView)
        MTBBarcodeScanner.requestCameraPermission(success: isCameraAvailable)
+    }
+    
+    func flipCamera(){
+        scanner?.flipCamera()
     }
 }

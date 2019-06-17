@@ -16,6 +16,7 @@ class QRViewExample extends StatefulWidget {
 class _QRViewExampleState extends State<QRViewExample> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   var qrText = "";
+  QRViewController controller;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +30,22 @@ class _QRViewExampleState extends State<QRViewExample> {
             flex: 4,
           ),
           Expanded(
-            child: Text("This is the result of scan: $qrText"),
+            child: Column(children:
+              <Widget>[
+                Text("This is the result of scan: $qrText"),
+                RaisedButton(
+                  onPressed: (){
+                    if(controller != null){
+                      controller.flipCamera();
+                    }
+                  },
+                  child: Text(
+                      'Flip',
+                      style: TextStyle(fontSize: 20)
+                  ),
+                )
+              ],
+            ),
             flex: 1,
           )
         ],
@@ -40,6 +56,7 @@ class _QRViewExampleState extends State<QRViewExample> {
   void _onQRViewCreated(QRViewController controller) {
     final channel = controller.channel;
     controller.init(qrKey);
+    this.controller = controller;
     channel.setMethodCallHandler((MethodCall call) async {
       switch (call.method) {
         case "onRecognizeQR":

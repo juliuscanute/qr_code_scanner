@@ -2,6 +2,7 @@ import Flutter
 import UIKit
 
 public class SwiftFlutterQrPlugin: NSObject, FlutterPlugin {
+
   var factory: QRViewFactory
   public init(with registrar: FlutterPluginRegistrar) {
     self.factory = QRViewFactory(withRegistrar: registrar)
@@ -13,10 +14,9 @@ public class SwiftFlutterQrPlugin: NSObject, FlutterPlugin {
   }
   
   public func applicationDidEnterBackground(_ application: UIApplication) {
-        
   }
 
   public func applicationWillTerminate(_ application: UIApplication) {
-        
   }
+
 }

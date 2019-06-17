@@ -7,6 +7,5 @@ This package wires the PlatformView corresponding to iOS and Android inside flut
 * Special Thanks To: LeonDevLifeLog for his contributions towards improving this package.
 
 #TODO'S:
-* Add support to flip camera view.
 * iOS Native embedding is written to match what is supported in the framework as of the date of publication of this package. It needs to be improved as the framework support improves.
 * Finally, I welcome PR's to make it better :), thanks

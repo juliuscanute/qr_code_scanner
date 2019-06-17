@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import com.google.zxing.ResultPoint
+import android.hardware.Camera.CameraInfo
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.BarcodeView
@@ -66,6 +67,19 @@ class QRView(context: Context, private val registrar: PluginRegistry.Registrar, 
         })
     }
 
+    fun flipCamera() {
+        barcodeView?.pause()
+        var settings = barcodeView?.cameraSettings
+
+        if(settings?.requestedCameraId == CameraInfo.CAMERA_FACING_FRONT)
+            settings?.requestedCameraId = CameraInfo.CAMERA_FACING_BACK
+        else
+            settings?.requestedCameraId = CameraInfo.CAMERA_FACING_FRONT
+
+        barcodeView?.cameraSettings = settings
+        barcodeView?.resume()
+    }
+
 
     override fun getView(): View {
         return initBarCodeView()?.apply {
@@ -119,6 +133,9 @@ class QRView(context: Context, private val registrar: PluginRegistry.Registrar, 
         when(call?.method){
             "checkAndRequestPermission" -> {
                 checkAndRequestPermission(result)
+            }
+            "flipCamera" -> {
+                flipCamera()
             }
         }
     }

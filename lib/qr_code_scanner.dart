@@ -82,4 +82,8 @@ class QRViewController {
           {"width": renderBox.size.width, "height": renderBox.size.height});
     }
   }
+
+  void flipCamera(){
+    channel.invokeMethod("flipCamera");
+  }
 }

@@ -1,3 +1,7 @@
+## 0.0.6
+
+* camera flip added
+
 ## 0.0.5
 
 * preview stretching after change screen orientation fix
