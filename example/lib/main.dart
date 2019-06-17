@@ -36,7 +36,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                 RaisedButton(
                   onPressed: (){
                     if(controller != null){
-                      controller.flipCamera();
+                      controller.flipFlash();
                     }
                   },
                   child: Text(

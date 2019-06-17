@@ -80,6 +80,13 @@ class QRView(context: Context, private val registrar: PluginRegistry.Registrar, 
         barcodeView?.resume()
     }
 
+    fun flipFlash() {
+        barcodeView?.pause()
+        var settings = barcodeView?.cameraSettings
+        settings?.isAutoTorchEnabled = ! (settings?.isAutoTorchEnabled?:false)
+        barcodeView?.resume()
+    }
+
 
     override fun getView(): View {
         return initBarCodeView()?.apply {
@@ -136,6 +143,9 @@ class QRView(context: Context, private val registrar: PluginRegistry.Registrar, 
             }
             "flipCamera" -> {
                 flipCamera()
+            }
+            "flipFlash" -> {
+                flipFlash()
             }
         }
     }

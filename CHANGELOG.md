@@ -1,3 +1,7 @@
+## 0.0.7
+
+* flash light support added
+
 ## 0.0.6
 
 * camera flip added

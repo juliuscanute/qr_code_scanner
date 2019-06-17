@@ -86,4 +86,9 @@ class QRViewController {
   void flipCamera(){
     channel.invokeMethod("flipCamera");
   }
+
+  void flipFlash(){
+    channel.invokeMethod("flipFlash");
+  }
+
 }

@@ -1,9 +1,9 @@
 # qr_code_scanner
 
 Demonstrates how to use the qr_code_scanner plugin.
-##iOS Support:
 
-###info.plist
+## iOS Support:
+### info.plist
 ```xml
 <dict>
     <key>io.flutter.embedded_views_preview</key>
@@ -19,7 +19,7 @@ Demonstrates how to use the qr_code_scanner plugin.
 
 ```
 
-##Example:
+## Example:
 ```dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
