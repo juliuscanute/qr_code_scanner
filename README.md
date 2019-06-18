@@ -14,12 +14,12 @@ Android
 <tr>
 <td>
 <p align="center">
-<img src="/.resources/android_back_camera_flash.gif" width="30%" height="30%">
+<img src="https://github.com/juliuscanute/qr_code_scanner/blob/master/.resources/android_back_camera_flash.gif" width="30%" height="30%">
 </p>
 </td>
 <td>
 <p align="center">
-<img src="/.resources/android_front_camera_scan.gif" width="30%" height="30%">
+<img src="https://github.com/juliuscanute/qr_code_scanner/blob/master/.resources/android_front_camera_scan.gif" width="30%" height="30%">
 </p>
 </td>
 </tr>
@@ -33,12 +33,12 @@ iOS
 <tr>
 <td>
 <p align="center">
-<img src="/.resources/ios_back_camera_flash.gif" width="30%" height="30%">
+<img src="https://github.com/juliuscanute/qr_code_scanner/blob/master/.resources/ios_back_camera_flash.gif" width="30%" height="30%">
 </p>
 </td>
 <td>
 <p align="center">
-<img src="/.resources/ios_front_camera_scan.gif" width="30%" height="30%">
+<img src="https://github.com/juliuscanute/qr_code_scanner/blob/master/.resources/ios_front_camera_scan.gif" width="30%" height="30%">
 </p>
 </td>
 </tr>

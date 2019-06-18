@@ -1,3 +1,11 @@
+## 0.0.10
+
+* update README.md
+
+## 0.0.9
+
+* update README.md
+
 ## 0.0.8
 
 * migrated Android project to androidx (by Felipe César)
