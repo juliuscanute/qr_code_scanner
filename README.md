@@ -14,18 +14,12 @@ Android
 <tr>
 <td>
 <p align="center">
-<figure>
 <img src="/.resources/android_back_camera_flash.gif" width="30%" height="30%">
-<figcaption>Back Camera Scan & Flash Test</figcaption>
-</figure>
 </p>
 </td>
 <td>
 <p align="center">
-<figure>
 <img src="/.resources/android_front_camera_scan.gif" width="30%" height="30%">
-<figcaption>Front Camera Scan</figcaption>
-</figure>
 </p>
 </td>
 </tr>
@@ -39,18 +33,12 @@ iOS
 <tr>
 <td>
 <p align="center">
-<figure>
 <img src="/.resources/ios_back_camera_flash.gif" width="30%" height="30%">
-<figcaption>Back Camera Scan & Flash Test</figcaption>
-</figure> 
 </p>
 </td>
 <td>
 <p align="center">
-<figure>
 <img src="/.resources/ios_front_camera_scan.gif" width="30%" height="30%">
-<figcaption>Front Camera Scan</figcaption>
-</figure>
 </p>
 </td>
 </tr>
