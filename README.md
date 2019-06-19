@@ -86,6 +86,14 @@ class _QRViewExampleState extends State<QRViewExample> {
   
 }
 ```
+
+## iOS Integration
+In order to use this plugin, add the following to your Info.plist file:
+```
+<key>io.flutter.embedded_views_preview</key>
+<true/>
+```
+
 ## Flip Camera (Back/Front)
 The default camera is the back camera.
 ```dart
