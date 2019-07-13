@@ -12,12 +12,14 @@ pool:
 steps:
 - script: |
     cd example
+    $(flutterPath)/flutter packages get
     $(flutterPath)/flutter build ios
   displayName: 'Test iOS -- Build'
   env:
     flutterPath: $(flutterPath)
 - script: |
     cd example
+    $(flutterPath)/flutter packages get
     $(flutterPath)/flutter build apk --target-platform android-arm,android-arm64 --split-per-abi
   displayName: 'Test Android -- Build'
   env:
