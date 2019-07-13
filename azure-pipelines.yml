@@ -7,13 +7,18 @@ trigger:
 - master
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: 'Default'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    cd example
+    $(flutterPath)/flutter build ios
+  displayName: 'Test iOS -- Build'
+  env:
+    flutterPath: $(flutterPath)
+- script: |
+    cd example
+    $(flutterPath)/flutter build apk --target-platform android-arm,android-arm64 --split-per-abi
+  displayName: 'Test Android -- Build'
+  env:
+    flutterPath: $(flutterPath)
