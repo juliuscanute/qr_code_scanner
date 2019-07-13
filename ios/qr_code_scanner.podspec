@@ -19,5 +19,6 @@ A new Flutter project.
   s.dependency 'MTBBarcodeScanner'
   s.ios.deployment_target = '8.0'
   s.swift_version = '5.0'
+  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '5.0' }
 end
 
