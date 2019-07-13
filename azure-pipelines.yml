@@ -17,7 +17,6 @@ pool:
 steps:
 - script: |
     cd example
-    pod install
     $(flutterPath)/flutter build ios
   displayName: 'Test iOS -- Build'
   env:
