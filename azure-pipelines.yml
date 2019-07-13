@@ -10,7 +10,9 @@ pool:
   name: 'Default'
 
 steps:
-- script: $(flutterPath)/flutter build apk
+- script: |
+    rm .packages
+    $(flutterPath)/flutter build apk
   displayName: 'Test Android -- Build'
   env:
     flutterPath: $(flutterPath)
