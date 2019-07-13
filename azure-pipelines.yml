@@ -13,7 +13,7 @@ steps:
 - script: |
     rm .packages
     cd example
-    $(flutterPath)/flutter build apk
+    $(flutterPath)/flutter build apk --target-platform android-arm,android-arm64 --split-per-abi
   displayName: 'Test Android -- Build'
   env:
     flutterPath: $(flutterPath)
