@@ -12,6 +12,7 @@ pool:
 steps:
 - script: |
     rm .packages
+    cd example
     $(flutterPath)/flutter build apk
   displayName: 'Test Android -- Build'
   env:
