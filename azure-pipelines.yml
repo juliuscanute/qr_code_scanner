@@ -29,7 +29,6 @@ steps:
   env:
     flutterPath: $(flutterPath)
 - script: |
-    cd example
     $(flutterPath)/flutter pub pub publish --dry-run
   displayName: 'Publish -- Dry Run'
   env:
