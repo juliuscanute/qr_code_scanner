@@ -1,3 +1,7 @@
+## 0.0.11
+
+* android build break fix
+
 ## 0.0.10
 
 * update README.md
