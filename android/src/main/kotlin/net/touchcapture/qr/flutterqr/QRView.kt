@@ -87,6 +87,17 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
         barcodeView?.resume()
     }
 
+    private fun pauseCamera() {
+        if (barcodeView!!.isPreviewActive) {
+            barcodeView?.pause()
+        }
+    }
+
+    private fun resumeCamera() {
+        if (!barcodeView!!.isPreviewActive) {
+            barcodeView?.resume()
+        }
+    }
 
     override fun getView(): View {
         return initBarCodeView()?.apply {
@@ -146,6 +157,12 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
             }
             "flipFlash" -> {
                 flipFlash()
+            }
+            "pauseCamera" -> {
+                pauseCamera()
+            }
+            "resumeCamera" -> {
+                resumeCamera()
             }
         }
     }

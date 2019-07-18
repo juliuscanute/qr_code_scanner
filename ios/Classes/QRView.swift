@@ -50,6 +50,10 @@ public class QRView:NSObject,FlutterPlatformView {
                     self?.flipCamera()
                 case "flipFlash":
                     self?.flipFlash()
+                case "pauseCamera":
+                    self?.pauseCamera()
+                case "resumeCamera":
+                    self?.resumeCamera()
                 default:
                     result(FlutterMethodNotImplemented)
                     return
@@ -76,6 +80,22 @@ public class QRView:NSObject,FlutterPlatformView {
         if let sc: MTBBarcodeScanner = scanner {
             if sc.hasTorch() {
                 sc.toggleTorch()
+            }
+        }
+    }
+    
+    func pauseCamera() {
+        if let sc: MTBBarcodeScanner = scanner {
+            if sc.isScanning() {
+                sc.freezeCapture()
+            }
+        }
+    }
+    
+    func resumeCamera() {
+        if let sc: MTBBarcodeScanner = scanner {
+            if !sc.isScanning() {
+                sc.unfreezeCapture()
             }
         }
     }
