@@ -30,6 +30,7 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
     private val activity = registrar.activity()
     var cameraPermissionContinuation: Runnable? = null
     var requestingPermission = false
+    private var isTorchOn: Boolean = false
     val channel: MethodChannel
 
     init {
@@ -80,13 +81,19 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
         barcodeView?.resume()
     }
 
-    fun flipFlash() {
-        barcodeView?.pause()
-        var settings = barcodeView?.cameraSettings
-        settings?.isAutoTorchEnabled = ! (settings?.isAutoTorchEnabled?:false)
-        barcodeView?.resume()
+    private fun toggleFlash() {
+        if (hasFlash()) {
+            barcodeView?.setTorch(!isTorchOn)
+            isTorchOn = !isTorchOn
+        }
+
     }
 
+
+    private fun hasFlash(): Boolean {
+        return registrar.activeContext().packageManager
+                .hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)
+    }
 
     override fun getView(): View {
         return initBarCodeView()?.apply {
@@ -132,7 +139,7 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
 
     private fun hasCameraPermission(): Boolean {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                activity.checkSelfPermission(Manifest.permission.CAMERA) === PackageManager.PERMISSION_GRANTED
+                activity.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
     }
 
 
@@ -144,8 +151,8 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
             "flipCamera" -> {
                 flipCamera()
             }
-            "flipFlash" -> {
-                flipFlash()
+            "toggleFlash" -> {
+                toggleFlash()
             }
         }
     }
