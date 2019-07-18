@@ -50,7 +50,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                       child: RaisedButton(
                         onPressed: () {
                           if (controller != null) {
-                            controller.flipFlash();
+                            controller.toggleFlash();
                             if (_isFlashOn(flashState))
                               setState(() {
                                 flashState = flash_off;

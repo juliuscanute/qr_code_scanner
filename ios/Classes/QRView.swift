@@ -48,8 +48,8 @@ public class QRView:NSObject,FlutterPlatformView {
                     self?.setDimensions(width: arguments["width"] ?? 0,height: arguments["height"] ?? 0)
                 case "flipCamera":
                     self?.flipCamera()
-                case "flipFlash":
-                    self?.flipFlash()
+                case "toggleFlash":
+                    self?.toggleFlash()
                 case "pauseCamera":
                     self?.pauseCamera()
                 case "resumeCamera":
@@ -76,7 +76,7 @@ public class QRView:NSObject,FlutterPlatformView {
         }
     }
     
-    func flipFlash(){
+    func toggleFlash(){
         if let sc: MTBBarcodeScanner = scanner {
             if sc.hasTorch() {
                 sc.toggleTorch()
