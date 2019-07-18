@@ -85,7 +85,31 @@ class _QRViewExampleState extends State<QRViewExample> {
                       ),
                     )
                   ],
-                )
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.only(bottom: 8.0),
+                      child: RaisedButton(
+                        onPressed: () {
+                          controller?.pauseCamera();
+                        },
+                        child: Text('pause', style: TextStyle(fontSize: 20)),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(bottom: 8.0),
+                      child: RaisedButton(
+                        onPressed: () {
+                          controller.resumeCamera();
+                        },
+                        child: Text('resume', style: TextStyle(fontSize: 20)),
+                      ),
+                    )
+                  ],
+                ),
               ],
             ),
             flex: 1,

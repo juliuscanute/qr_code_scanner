@@ -17,19 +17,19 @@ pool:
 steps:
 - script: |
     cd example
-    $(flutterPath)/flutter build ios
+    $flutterPath/flutter build ios
   displayName: 'Test iOS -- Build'
   env:
     flutterPath: $(flutterPath)
 - script: |
     cd example
-    $(flutterPath)/flutter packages get
-    $(flutterPath)/flutter build apk --target-platform android-arm,android-arm64 --split-per-abi
+    $flutterPath/flutter packages get
+    $flutterPath/flutter build apk --target-platform android-arm,android-arm64 --split-per-abi
   displayName: 'Test Android -- Build'
   env:
     flutterPath: $(flutterPath)
 - script: |
-    $(flutterPath)/flutter pub pub publish --dry-run
+    $flutterPath/flutter pub pub publish --dry-run
   displayName: 'Publish -- Dry Run'
   env:
     flutterPath: $(flutterPath)

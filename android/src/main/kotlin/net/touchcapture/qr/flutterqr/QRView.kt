@@ -89,6 +89,17 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
 
     }
 
+    private fun pauseCamera() {
+        if (barcodeView!!.isPreviewActive) {
+            barcodeView?.pause()
+        }
+    }
+
+    private fun resumeCamera() {
+        if (!barcodeView!!.isPreviewActive) {
+            barcodeView?.resume()
+        }
+    }
 
     private fun hasFlash(): Boolean {
         return registrar.activeContext().packageManager
@@ -153,6 +164,12 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
             }
             "toggleFlash" -> {
                 toggleFlash()
+            }
+            "pauseCamera" -> {
+                pauseCamera()
+            }
+            "resumeCamera" -> {
+                resumeCamera()
             }
         }
     }

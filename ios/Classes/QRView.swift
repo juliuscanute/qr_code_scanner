@@ -83,4 +83,20 @@ public class QRView:NSObject,FlutterPlatformView {
             }
         }
     }
+    
+    func pauseCamera() {
+        if let sc: MTBBarcodeScanner = scanner {
+            if sc.isScanning() {
+                sc.freezeCapture()
+            }
+        }
+    }
+    
+    func resumeCamera() {
+        if let sc: MTBBarcodeScanner = scanner {
+            if !sc.isScanning() {
+                sc.unfreezeCapture()
+            }
+        }
+    }
 }

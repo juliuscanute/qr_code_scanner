@@ -90,4 +90,12 @@ class QRViewController {
   void toggleFlash() {
     channel.invokeMethod("toggleFlash");
   }
+
+  void pauseCamera() {
+    channel.invokeMethod("pauseCamera");
+  }
+
+  void resumeCamera() {
+    channel.invokeMethod("resumeCamera");
+  }
 }
