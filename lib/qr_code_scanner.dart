@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,6 +19,7 @@ class QRView extends StatefulWidget {
 }
 
 class _QRViewState extends State<QRView> {
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   @override
   Widget build(BuildContext context) {
     var androidView = AndroidView(
@@ -45,7 +48,7 @@ class _QRViewState extends State<QRView> {
     if (widget.onQRViewCreated == null) {
       return;
     }
-    widget.onQRViewCreated(new QRViewController._(id));
+    widget.onQRViewCreated(QRViewController._(id, qrKey));
   }
 }
 
@@ -71,17 +74,32 @@ class _CreationParams {
 }
 
 class QRViewController {
-  QRViewController._(int id)
-      : channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id');
-  final MethodChannel channel;
+  static const scanMethodCall = "onRecognizeQR";
 
-  void init(GlobalKey qrKey) {
+  StreamController<String> _scanUpdateController = StreamController<String>();
+
+  Stream<String> get scannedData => _scanUpdateController.stream;
+
+  QRViewController._(int id, GlobalKey qrKey)
+      : channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id') {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       final RenderBox renderBox = qrKey.currentContext.findRenderObject();
       channel.invokeMethod("setDimensions",
           {"width": renderBox.size.width, "height": renderBox.size.height});
     }
+    channel.setMethodCallHandler(
+      (MethodCall call) async {
+        switch (call.method) {
+          case scanMethodCall:
+            if (call.arguments != null) {
+              _scanUpdateController.sink.add(call.arguments.toString());
+            }
+        }
+      },
+    );
   }
+
+  final MethodChannel channel;
 
   void flipCamera() {
     channel.invokeMethod("flipCamera");
@@ -97,5 +115,9 @@ class QRViewController {
 
   void resumeCamera() {
     channel.invokeMethod("resumeCamera");
+  }
+
+  void dispose() {
+    _scanUpdateController.close();
   }
 }

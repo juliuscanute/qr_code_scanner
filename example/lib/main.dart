@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 void main() => runApp(MaterialApp(home: QRViewExample()));
@@ -19,7 +18,6 @@ class QRViewExample extends StatefulWidget {
 }
 
 class _QRViewExampleState extends State<QRViewExample> {
-  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   var qrText = "";
   var flashState = flash_on;
   var cameraState = front_camera;
@@ -32,7 +30,6 @@ class _QRViewExampleState extends State<QRViewExample> {
         children: <Widget>[
           Expanded(
             child: QRView(
-              key: qrKey,
               onQRViewCreated: _onQRViewCreated,
             ),
             flex: 4,
@@ -128,17 +125,17 @@ class _QRViewExampleState extends State<QRViewExample> {
   }
 
   void _onQRViewCreated(QRViewController controller) {
-    final channel = controller.channel;
-    controller.init(qrKey);
     this.controller = controller;
-    channel.setMethodCallHandler((MethodCall call) async {
-      switch (call.method) {
-        case "onRecognizeQR":
-          dynamic arguments = call.arguments;
-          setState(() {
-            qrText = arguments.toString();
-          });
-      }
+    controller.scannedData.listen((scanData) {
+      setState(() {
+        qrText = scanData;
+      });
     });
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 }
