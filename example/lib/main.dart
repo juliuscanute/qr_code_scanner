@@ -22,6 +22,7 @@ class _QRViewExampleState extends State<QRViewExample> {
   var flashState = flash_on;
   var cameraState = front_camera;
   QRViewController controller;
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +31,7 @@ class _QRViewExampleState extends State<QRViewExample> {
         children: <Widget>[
           Expanded(
             child: QRView(
+              key: qrKey,
               onQRViewCreated: _onQRViewCreated,
             ),
             flex: 4,

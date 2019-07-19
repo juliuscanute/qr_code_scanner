@@ -8,8 +8,8 @@ typedef void QRViewCreatedCallback(QRViewController controller);
 
 class QRView extends StatefulWidget {
   const QRView({
-    Key key,
-    this.onQRViewCreated,
+    @required Key key,
+    @required this.onQRViewCreated,
   }) : super(key: key);
 
   final QRViewCreatedCallback onQRViewCreated;
@@ -19,7 +19,6 @@ class QRView extends StatefulWidget {
 }
 
 class _QRViewState extends State<QRView> {
-  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   @override
   Widget build(BuildContext context) {
     var androidView = AndroidView(
@@ -48,7 +47,7 @@ class _QRViewState extends State<QRView> {
     if (widget.onQRViewCreated == null) {
       return;
     }
-    widget.onQRViewCreated(QRViewController._(id, qrKey));
+    widget.onQRViewCreated(QRViewController._(id, widget.key));
   }
 }
 
