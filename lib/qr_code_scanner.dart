@@ -10,7 +10,9 @@ class QRView extends StatefulWidget {
   const QRView({
     @required Key key,
     @required this.onQRViewCreated,
-  }) : super(key: key);
+  })  : assert(key != null),
+        assert(onQRViewCreated != null),
+        super(key: key);
 
   final QRViewCreatedCallback onQRViewCreated;
 
@@ -75,18 +77,20 @@ class _CreationParams {
 class QRViewController {
   static const scanMethodCall = "onRecognizeQR";
 
+  final MethodChannel _channel;
+
   StreamController<String> _scanUpdateController = StreamController<String>();
 
-  Stream<String> get scannedData => _scanUpdateController.stream;
+  Stream<String> get scannedDataStream => _scanUpdateController.stream;
 
   QRViewController._(int id, GlobalKey qrKey)
-      : channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id') {
+      : _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id') {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       final RenderBox renderBox = qrKey.currentContext.findRenderObject();
-      channel.invokeMethod("setDimensions",
+      _channel.invokeMethod("setDimensions",
           {"width": renderBox.size.width, "height": renderBox.size.height});
     }
-    channel.setMethodCallHandler(
+    _channel.setMethodCallHandler(
       (MethodCall call) async {
         switch (call.method) {
           case scanMethodCall:
@@ -98,22 +102,20 @@ class QRViewController {
     );
   }
 
-  final MethodChannel channel;
-
   void flipCamera() {
-    channel.invokeMethod("flipCamera");
+    _channel.invokeMethod("flipCamera");
   }
 
   void toggleFlash() {
-    channel.invokeMethod("toggleFlash");
+    _channel.invokeMethod("toggleFlash");
   }
 
   void pauseCamera() {
-    channel.invokeMethod("pauseCamera");
+    _channel.invokeMethod("pauseCamera");
   }
 
   void resumeCamera() {
-    channel.invokeMethod("resumeCamera");
+    _channel.invokeMethod("resumeCamera");
   }
 
   void dispose() {

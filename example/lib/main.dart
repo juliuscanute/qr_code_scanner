@@ -37,79 +37,86 @@ class _QRViewExampleState extends State<QRViewExample> {
             flex: 4,
           ),
           Expanded(
-            child: Column(
-              children: <Widget>[
-                Text("This is the result of scan: $qrText"),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.all(8.0),
-                      child: RaisedButton(
-                        onPressed: () {
-                          if (controller != null) {
-                            controller.toggleFlash();
-                            if (_isFlashOn(flashState))
-                              setState(() {
-                                flashState = flash_off;
-                              });
-                            else
-                              setState(() {
-                                flashState = flash_on;
-                              });
-                          }
-                        },
-                        child: Text(flashState, style: TextStyle(fontSize: 20)),
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Text("This is the result of scan: $qrText"),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(8.0),
+                        child: RaisedButton(
+                          onPressed: () {
+                            if (controller != null) {
+                              controller.toggleFlash();
+                              if (_isFlashOn(flashState)) {
+                                setState(() {
+                                  flashState = flash_off;
+                                });
+                              } else {
+                                setState(() {
+                                  flashState = flash_on;
+                                });
+                              }
+                            }
+                          },
+                          child:
+                              Text(flashState, style: TextStyle(fontSize: 20)),
+                        ),
                       ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(8.0),
-                      child: RaisedButton(
-                        onPressed: () {
-                          if (controller != null) {
-                            controller.flipCamera();
-                            if (_isBackCamera(cameraState))
-                              setState(() {
-                                cameraState = front_camera;
-                              });
-                            else
-                              setState(() {
-                                cameraState = back_camera;
-                              });
-                          }
-                        },
-                        child:
-                            Text(cameraState, style: TextStyle(fontSize: 20)),
+                      Container(
+                        margin: EdgeInsets.all(8.0),
+                        child: RaisedButton(
+                          onPressed: () {
+                            if (controller != null) {
+                              controller.flipCamera();
+                              if (_isBackCamera(cameraState)) {
+                                setState(() {
+                                  cameraState = front_camera;
+                                });
+                              } else {
+                                setState(() {
+                                  cameraState = back_camera;
+                                });
+                              }
+                            }
+                          },
+                          child:
+                              Text(cameraState, style: TextStyle(fontSize: 20)),
+                        ),
+                      )
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(8.0),
+                        child: RaisedButton(
+                          onPressed: () {
+                            controller?.pauseCamera();
+                          },
+                          child: Text('pause', style: TextStyle(fontSize: 20)),
+                        ),
                       ),
-                    )
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.only(bottom: 8.0),
-                      child: RaisedButton(
-                        onPressed: () {
-                          controller?.pauseCamera();
-                        },
-                        child: Text('pause', style: TextStyle(fontSize: 20)),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(bottom: 8.0),
-                      child: RaisedButton(
-                        onPressed: () {
-                          controller.resumeCamera();
-                        },
-                        child: Text('resume', style: TextStyle(fontSize: 20)),
-                      ),
-                    )
-                  ],
-                ),
-              ],
+                      Container(
+                        margin: EdgeInsets.all(8.0),
+                        child: RaisedButton(
+                          onPressed: () {
+                            controller?.resumeCamera();
+                          },
+                          child: Text('resume', style: TextStyle(fontSize: 20)),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
             ),
             flex: 1,
           )
@@ -128,7 +135,7 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
-    controller.scannedData.listen((scanData) {
+    controller.scannedDataStream.listen((scanData) {
       setState(() {
         qrText = scanData;
       });

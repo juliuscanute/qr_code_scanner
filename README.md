@@ -60,31 +60,39 @@ class _QRViewExampleState extends State<QRViewExample> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
-                children: <Widget>[
-                    QRView(
-                      key: qrKey,
-                      onQRViewCreated: _onQRViewCreated,
-                    ),          
-                  ],
-                ),
-          );
+        children: <Widget>[
+          Expanded(
+            flex: 5,
+            child: QRView(
+              key: qrKey,
+              onQRViewCreated: _onQRViewCreated,
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Center(
+              child: Text('Scan result: $qrText'),
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   void _onQRViewCreated(QRViewController controller) {
-    final channel = controller.channel;
-    controller.init(qrKey);
     this.controller = controller;
-    channel.setMethodCallHandler((MethodCall call) async {
-      switch (call.method) {
-        case "onRecognizeQR":
-          dynamic arguments = call.arguments;
-          setState(() {
-            qrText = arguments.toString();
-          });
-      }
+    controller.scannedDataStream.listen((scanData) {
+      setState(() {
+        qrText = scanData;
+      });
     });
   }
-  
+
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
+  }
 }
 ```
 
@@ -104,8 +112,20 @@ controller.flipCamera();
 ## Flash (Off/On)
 By default, flash is OFF.
 ```dart
-controller.flipFlash();
+controller.toggleFlash();
 ```
+
+## Resume/Pause
+Pause camera stream and scanner.
+```dart
+controller.pause();
+```
+Resume camera stream and scanner.
+```dart
+controller.resume();
+```
+
+
 
 # TODO'S:
 * iOS Native embedding is written to match what is supported in the framework as of the date of publication of this package. It needs to be improved as the framework support improves.
