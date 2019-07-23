@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 void main() => runApp(MaterialApp(home: QRViewExample()));
@@ -19,11 +18,11 @@ class QRViewExample extends StatefulWidget {
 }
 
 class _QRViewExampleState extends State<QRViewExample> {
-  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   var qrText = "";
   var flashState = flash_on;
   var cameraState = front_camera;
   QRViewController controller;
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
   @override
   Widget build(BuildContext context) {
@@ -38,79 +37,86 @@ class _QRViewExampleState extends State<QRViewExample> {
             flex: 4,
           ),
           Expanded(
-            child: Column(
-              children: <Widget>[
-                Text("This is the result of scan: $qrText"),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.all(8.0),
-                      child: RaisedButton(
-                        onPressed: () {
-                          if (controller != null) {
-                            controller.toggleFlash();
-                            if (_isFlashOn(flashState))
-                              setState(() {
-                                flashState = flash_off;
-                              });
-                            else
-                              setState(() {
-                                flashState = flash_on;
-                              });
-                          }
-                        },
-                        child: Text(flashState, style: TextStyle(fontSize: 20)),
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Text("This is the result of scan: $qrText"),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(8.0),
+                        child: RaisedButton(
+                          onPressed: () {
+                            if (controller != null) {
+                              controller.toggleFlash();
+                              if (_isFlashOn(flashState)) {
+                                setState(() {
+                                  flashState = flash_off;
+                                });
+                              } else {
+                                setState(() {
+                                  flashState = flash_on;
+                                });
+                              }
+                            }
+                          },
+                          child:
+                              Text(flashState, style: TextStyle(fontSize: 20)),
+                        ),
                       ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(8.0),
-                      child: RaisedButton(
-                        onPressed: () {
-                          if (controller != null) {
-                            controller.flipCamera();
-                            if (_isBackCamera(cameraState))
-                              setState(() {
-                                cameraState = front_camera;
-                              });
-                            else
-                              setState(() {
-                                cameraState = back_camera;
-                              });
-                          }
-                        },
-                        child:
-                            Text(cameraState, style: TextStyle(fontSize: 20)),
+                      Container(
+                        margin: EdgeInsets.all(8.0),
+                        child: RaisedButton(
+                          onPressed: () {
+                            if (controller != null) {
+                              controller.flipCamera();
+                              if (_isBackCamera(cameraState)) {
+                                setState(() {
+                                  cameraState = front_camera;
+                                });
+                              } else {
+                                setState(() {
+                                  cameraState = back_camera;
+                                });
+                              }
+                            }
+                          },
+                          child:
+                              Text(cameraState, style: TextStyle(fontSize: 20)),
+                        ),
+                      )
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(8.0),
+                        child: RaisedButton(
+                          onPressed: () {
+                            controller?.pauseCamera();
+                          },
+                          child: Text('pause', style: TextStyle(fontSize: 20)),
+                        ),
                       ),
-                    )
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.only(bottom: 8.0),
-                      child: RaisedButton(
-                        onPressed: () {
-                          controller?.pauseCamera();
-                        },
-                        child: Text('pause', style: TextStyle(fontSize: 20)),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(bottom: 8.0),
-                      child: RaisedButton(
-                        onPressed: () {
-                          controller.resumeCamera();
-                        },
-                        child: Text('resume', style: TextStyle(fontSize: 20)),
-                      ),
-                    )
-                  ],
-                ),
-              ],
+                      Container(
+                        margin: EdgeInsets.all(8.0),
+                        child: RaisedButton(
+                          onPressed: () {
+                            controller?.resumeCamera();
+                          },
+                          child: Text('resume', style: TextStyle(fontSize: 20)),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
             ),
             flex: 1,
           )
@@ -128,17 +134,17 @@ class _QRViewExampleState extends State<QRViewExample> {
   }
 
   void _onQRViewCreated(QRViewController controller) {
-    final channel = controller.channel;
-    controller.init(qrKey);
     this.controller = controller;
-    channel.setMethodCallHandler((MethodCall call) async {
-      switch (call.method) {
-        case "onRecognizeQR":
-          dynamic arguments = call.arguments;
-          setState(() {
-            qrText = arguments.toString();
-          });
-      }
+    controller.scannedDataStream.listen((scanData) {
+      setState(() {
+        qrText = scanData;
+      });
     });
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 }

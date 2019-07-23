@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,9 +8,11 @@ typedef void QRViewCreatedCallback(QRViewController controller);
 
 class QRView extends StatefulWidget {
   const QRView({
-    Key key,
-    this.onQRViewCreated,
-  }) : super(key: key);
+    @required Key key,
+    @required this.onQRViewCreated,
+  })  : assert(key != null),
+        assert(onQRViewCreated != null),
+        super(key: key);
 
   final QRViewCreatedCallback onQRViewCreated;
 
@@ -45,7 +49,7 @@ class _QRViewState extends State<QRView> {
     if (widget.onQRViewCreated == null) {
       return;
     }
-    widget.onQRViewCreated(new QRViewController._(id));
+    widget.onQRViewCreated(QRViewController._(id, widget.key));
   }
 }
 
@@ -71,31 +75,50 @@ class _CreationParams {
 }
 
 class QRViewController {
-  QRViewController._(int id)
-      : channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id');
-  final MethodChannel channel;
+  static const scanMethodCall = "onRecognizeQR";
 
-  void init(GlobalKey qrKey) {
+  final MethodChannel _channel;
+
+  StreamController<String> _scanUpdateController = StreamController<String>();
+
+  Stream<String> get scannedDataStream => _scanUpdateController.stream;
+
+  QRViewController._(int id, GlobalKey qrKey)
+      : _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id') {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       final RenderBox renderBox = qrKey.currentContext.findRenderObject();
-      channel.invokeMethod("setDimensions",
+      _channel.invokeMethod("setDimensions",
           {"width": renderBox.size.width, "height": renderBox.size.height});
     }
+    _channel.setMethodCallHandler(
+      (MethodCall call) async {
+        switch (call.method) {
+          case scanMethodCall:
+            if (call.arguments != null) {
+              _scanUpdateController.sink.add(call.arguments.toString());
+            }
+        }
+      },
+    );
   }
 
   void flipCamera() {
-    channel.invokeMethod("flipCamera");
+    _channel.invokeMethod("flipCamera");
   }
 
   void toggleFlash() {
-    channel.invokeMethod("toggleFlash");
+    _channel.invokeMethod("toggleFlash");
   }
 
   void pauseCamera() {
-    channel.invokeMethod("pauseCamera");
+    _channel.invokeMethod("pauseCamera");
   }
 
   void resumeCamera() {
-    channel.invokeMethod("resumeCamera");
+    _channel.invokeMethod("resumeCamera");
+  }
+
+  void dispose() {
+    _scanUpdateController.close();
   }
 }
