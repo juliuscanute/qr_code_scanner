@@ -12,6 +12,7 @@ class QRView extends StatefulWidget {
     @required this.onQRViewCreated,
     this.overlay,
   })  : assert(key != null),
+        assert(onQRViewCreated != null),
         super(key: key);
 
   final QRViewCreatedCallback onQRViewCreated;
@@ -95,14 +96,14 @@ class _CreationParams {
 class QRViewController {
   static const scanMethodCall = "onRecognizeQR";
 
+  final MethodChannel _channel;
+
   StreamController<String> _scanUpdateController = StreamController<String>();
 
-  Stream<String> get scannedData => _scanUpdateController.stream;
+  Stream<String> get scannedDataStream => _scanUpdateController.stream;
 
-  MethodChannel _channel;
-
-  QRViewController._(int id, GlobalKey qrKey) {
-    _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id');
+  QRViewController._(int id, GlobalKey qrKey)
+      : _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id') {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       final RenderBox renderBox = qrKey.currentContext.findRenderObject();
       _channel.invokeMethod("setDimensions",

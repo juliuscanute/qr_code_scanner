@@ -48,6 +48,7 @@ class _QRViewExampleState extends State<QRViewExample> {
             child: FittedBox(
               fit: BoxFit.contain,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   Text("This is the result of scan: $qrText"),
                   Row(
@@ -60,14 +61,15 @@ class _QRViewExampleState extends State<QRViewExample> {
                           onPressed: () {
                             if (controller != null) {
                               controller.toggleFlash();
-                              if (_isFlashOn(flashState))
+                              if (_isFlashOn(flashState)) {
                                 setState(() {
                                   flashState = flash_off;
                                 });
-                              else
+                              } else {
                                 setState(() {
                                   flashState = flash_on;
                                 });
+                              }
                             }
                           },
                           child:
@@ -80,14 +82,15 @@ class _QRViewExampleState extends State<QRViewExample> {
                           onPressed: () {
                             if (controller != null) {
                               controller.flipCamera();
-                              if (_isBackCamera(cameraState))
+                              if (_isBackCamera(cameraState)) {
                                 setState(() {
                                   cameraState = front_camera;
                                 });
-                              else
+                              } else {
                                 setState(() {
                                   cameraState = back_camera;
                                 });
+                              }
                             }
                           },
                           child:
@@ -97,11 +100,11 @@ class _QRViewExampleState extends State<QRViewExample> {
                     ],
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Container(
-                        margin: EdgeInsets.only(bottom: 8.0),
+                        margin: EdgeInsets.all(8.0),
                         child: RaisedButton(
                           onPressed: () {
                             controller?.pauseCamera();
@@ -110,10 +113,10 @@ class _QRViewExampleState extends State<QRViewExample> {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(bottom: 8.0),
+                        margin: EdgeInsets.all(8.0),
                         child: RaisedButton(
                           onPressed: () {
-                            controller.resumeCamera();
+                            controller?.resumeCamera();
                           },
                           child: Text('resume', style: TextStyle(fontSize: 20)),
                         ),
@@ -140,7 +143,7 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
-    controller.scannedData.listen((scanData) {
+    controller.scannedDataStream.listen((scanData) {
       setState(() {
         qrText = scanData;
       });
