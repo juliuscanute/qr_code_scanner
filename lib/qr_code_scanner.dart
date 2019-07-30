@@ -10,11 +10,14 @@ class QRView extends StatefulWidget {
   const QRView({
     @required Key key,
     @required this.onQRViewCreated,
+    this.overlay,
   })  : assert(key != null),
         assert(onQRViewCreated != null),
         super(key: key);
 
   final QRViewCreatedCallback onQRViewCreated;
+
+  final ShapeBorder overlay;
 
   @override
   State<StatefulWidget> createState() => _QRViewState();
@@ -23,26 +26,42 @@ class QRView extends StatefulWidget {
 class _QRViewState extends State<QRView> {
   @override
   Widget build(BuildContext context) {
-    var androidView = AndroidView(
-      viewType: 'net.touchcapture.qr.flutterqr/qrview',
-      onPlatformViewCreated: _onPlatformViewCreated,
+    return Stack(
+      children: [
+        _getPlatformQrView(),
+        widget.overlay != null
+            ? Container(
+                decoration: ShapeDecoration(
+                  shape: widget.overlay,
+                ),
+              )
+            : Container(),
+      ],
     );
+  }
 
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      return androidView;
+  Widget _getPlatformQrView() {
+    Widget _platformQrView;
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        _platformQrView = AndroidView(
+          viewType: 'net.touchcapture.qr.flutterqr/qrview',
+          onPlatformViewCreated: _onPlatformViewCreated,
+        );
+        break;
+      case TargetPlatform.iOS:
+        _platformQrView = UiKitView(
+          viewType: 'net.touchcapture.qr.flutterqr/qrview',
+          onPlatformViewCreated: _onPlatformViewCreated,
+          creationParams: _CreationParams.fromWidget(0, 0).toMap(),
+          creationParamsCodec: StandardMessageCodec(),
+        );
+        break;
+      default:
+        throw UnsupportedError(
+            "Trying to use the default webview implementation for $defaultTargetPlatform but there isn't a default one");
     }
-
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      return UiKitView(
-        viewType: 'net.touchcapture.qr.flutterqr/qrview',
-        onPlatformViewCreated: _onPlatformViewCreated,
-        creationParams: _CreationParams.fromWidget(0, 0).toMap(),
-        creationParamsCodec: StandardMessageCodec(),
-      );
-    }
-
-    return Text(
-        '$defaultTargetPlatform is not yet supported by the text_view plugin');
+    return _platformQrView;
   }
 
   void _onPlatformViewCreated(int id) {
