@@ -15,12 +15,12 @@ Android
 <tr>
 <td>
 <p align="center">
-<img src="https://github.com/juliuscanute/qr_code_scanner/blob/master/.resources/android_back_camera_flash.gif" width="30%" height="30%">
+<img src="https://github.com/juliuscanute/qr_code_scanner/blob/master/.resources/android-app-screen-one.jpg" width="30%" height="30%">
 </p>
 </td>
 <td>
 <p align="center">
-<img src="https://github.com/juliuscanute/qr_code_scanner/blob/master/.resources/android_front_camera_scan.gif" width="30%" height="30%">
+<img src="https://github.com/juliuscanute/qr_code_scanner/blob/master/.resources/android-app-screen-two.jpg" width="30%" height="30%">
 </p>
 </td>
 </tr>
@@ -34,12 +34,12 @@ iOS
 <tr>
 <td>
 <p align="center">
-<img src="https://github.com/juliuscanute/qr_code_scanner/blob/master/.resources/ios_back_camera_flash.gif" width="30%" height="30%">
+<img src="https://github.com/juliuscanute/qr_code_scanner/blob/master/.resources/ios-app-screen-one.png" width="30%" height="30%">
 </p>
 </td>
 <td>
 <p align="center">
-<img src="https://github.com/juliuscanute/qr_code_scanner/blob/master/.resources/ios_front_camera_scan.gif" width="30%" height="30%">
+<img src="https://github.com/juliuscanute/qr_code_scanner/blob/master/.resources/ios-app-screen-two.png" width="30%" height="30%">
 </p>
 </td>
 </tr>

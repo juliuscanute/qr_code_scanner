@@ -1,3 +1,10 @@
+## 0.0.12
+* Add optional parameter to use a camera overlay.
+* Simplfiy controller, expose scanDataStream.
+* Fix for Android flash toggle.
+* Add ability to pause/resume the camera.
+* Thanks! to Luis Thein for all the above contributions.
+
 ## 0.0.11
 
 * android build break fix
