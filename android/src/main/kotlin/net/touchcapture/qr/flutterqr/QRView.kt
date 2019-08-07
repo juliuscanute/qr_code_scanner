@@ -114,7 +114,19 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
 
     private fun initBarCodeView(): BarcodeView? {
         if (barcodeView == null) {
-            barcodeView = createBarCodeView()
+            try {
+                barcodeView = createBarCodeView()
+            } catch (e : java.lang.ArithmeticException) {
+                android.util.Log.e("Error", e.message);
+                android.os.Handler().run {
+                    postDelayed(
+                                {
+                                    initBarCodeView()
+                                },
+                                200
+                        )
+                }
+            }
         }
         return barcodeView
     }
