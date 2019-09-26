@@ -47,5 +47,6 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "com.journeyapps:zxing-android-embedded:4.0.2"
+    implementation('com.journeyapps:zxing-android-embedded:4.0.2') { transitive = false }
+    implementation 'com.google.zxing:core:3.3.0'
 }
