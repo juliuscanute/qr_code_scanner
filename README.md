@@ -96,6 +96,12 @@ class _QRViewExampleState extends State<QRViewExample> {
 }
 ```
 
+## Android Integration
+In order to use this plugin, add the following to your AndroidManifest.xml file:
+```
+<uses-sdk android:minSdkVersion="14" tools:overrideLibrary="com.google.zxing.client.android" />
+```
+
 ## iOS Integration
 In order to use this plugin, add the following to your Info.plist file:
 ```
