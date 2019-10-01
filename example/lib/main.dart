@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:qr_code_scanner/qr_scanner_overlay_shape.dart';
 
 void main() => runApp(MaterialApp(home: QRViewExample()));
 
