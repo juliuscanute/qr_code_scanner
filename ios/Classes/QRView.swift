@@ -26,8 +26,10 @@ public class QRView:NSObject,FlutterPlatformView {
                 try scanner?.startScanning(resultBlock: { codes in
                     if let codes = codes {
                         for code in codes {
-                            let stringValue = code.stringValue!
-                            self.channel.invokeMethod("onRecognizeQR", arguments: stringValue)
+                            if (code != nil && code.stringValue != nil) {
+                                let stringValue = code.stringValue!
+                                self.channel.invokeMethod("onRecognizeQR", arguments: stringValue)
+                            }
                         }
                     }
                 })
