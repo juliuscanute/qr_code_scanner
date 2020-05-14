@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-typedef void QRViewCreatedCallback(QRViewController controller);
+typedef QRViewCreatedCallback = void Function(QRViewController);
 
 class QRView extends StatefulWidget {
   const QRView({
@@ -29,13 +29,14 @@ class _QRViewState extends State<QRView> {
     return Stack(
       children: [
         _getPlatformQrView(),
-        widget.overlay != null
-            ? Container(
-                decoration: ShapeDecoration(
-                  shape: widget.overlay,
-                ),
-              )
-            : Container(),
+        if (widget.overlay != null)
+          Container(
+            decoration: ShapeDecoration(
+              shape: widget.overlay,
+            ),
+          )
+        else
+          Container(),
       ],
     );
   }
@@ -94,23 +95,15 @@ class _CreationParams {
 }
 
 class QRViewController {
-  static const scanMethodCall = "onRecognizeQR";
-
-  final MethodChannel _channel;
-
-  StreamController<String> _scanUpdateController = StreamController<String>();
-
-  Stream<String> get scannedDataStream => _scanUpdateController.stream;
-
   QRViewController._(int id, GlobalKey qrKey)
       : _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id') {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       final RenderBox renderBox = qrKey.currentContext.findRenderObject();
-      _channel.invokeMethod("setDimensions",
-          {"width": renderBox.size.width, "height": renderBox.size.height});
+      _channel.invokeMethod('setDimensions',
+          {'width': renderBox.size.width, 'height': renderBox.size.height});
     }
     _channel.setMethodCallHandler(
-      (MethodCall call) async {
+      (call) async {
         switch (call.method) {
           case scanMethodCall:
             if (call.arguments != null) {
@@ -121,20 +114,29 @@ class QRViewController {
     );
   }
 
+  static const scanMethodCall = 'onRecognizeQR';
+
+  final MethodChannel _channel;
+
+  final StreamController<String> _scanUpdateController =
+      StreamController<String>();
+
+  Stream<String> get scannedDataStream => _scanUpdateController.stream;
+
   void flipCamera() {
-    _channel.invokeMethod("flipCamera");
+    _channel.invokeMethod('flipCamera');
   }
 
   void toggleFlash() {
-    _channel.invokeMethod("toggleFlash");
+    _channel.invokeMethod('toggleFlash');
   }
 
   void pauseCamera() {
-    _channel.invokeMethod("pauseCamera");
+    _channel.invokeMethod('pauseCamera');
   }
 
   void resumeCamera() {
-    _channel.invokeMethod("resumeCamera");
+    _channel.invokeMethod('resumeCamera');
   }
 
   void dispose() {

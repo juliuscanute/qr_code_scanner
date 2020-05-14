@@ -22,4 +22,4 @@ jobs:
     - name: Format
       run: dartfmt -n --set-exit-if-changed .
     - name: Linter
-      run: dartanalyzer . --fatal-hints
+      run: dartanalyzer . --options=analysis_options.yaml --fatal-hints
