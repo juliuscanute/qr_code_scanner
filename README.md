@@ -101,6 +101,8 @@ In order to use this plugin, add the following to your Info.plist file:
 ```
 <key>io.flutter.embedded_views_preview</key>
 <true/>
+<key>NSCameraUsageDescription</key>
+<string>This app needs camera access to scan QR codes</string>
 ```
 
 ## Flip Camera (Back/Front)
