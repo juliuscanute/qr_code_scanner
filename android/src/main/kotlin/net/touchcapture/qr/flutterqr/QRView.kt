@@ -124,7 +124,8 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
         barcode.decodeContinuous(
                 object : BarcodeCallback {
                     override fun barcodeResult(result: BarcodeResult) {
-                        channel.invokeMethod("onRecognizeQR", result.text)
+                        val code = mapOf("code" to result.text, "type" to result.barcodeFormat.name)
+                        channel.invokeMethod("onRecognizeQR", code)
                     }
 
                     override fun possibleResultPoints(resultPoints: List<ResultPoint>) {}

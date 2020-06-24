@@ -26,8 +26,37 @@ public class QRView:NSObject,FlutterPlatformView {
                 try scanner?.startScanning(resultBlock: { codes in
                     if let codes = codes {
                         for code in codes {
+                            var typeString: String;
+                            switch(code.type) {
+                                case AVMetadataObject.ObjectType.aztec:
+                                   typeString = "AZTEC"
+                                case AVMetadataObject.ObjectType.code39:
+                                    typeString = "CODE_39"
+                                case AVMetadataObject.ObjectType.code93:
+                                    typeString = "CODE_93"
+                                case AVMetadataObject.ObjectType.code128:
+                                    typeString = "CODE_128"
+                                case AVMetadataObject.ObjectType.dataMatrix:
+                                    typeString = "DATA_MATRIX"
+                                case AVMetadataObject.ObjectType.ean8:
+                                    typeString = "EAN_8"
+                                case AVMetadataObject.ObjectType.ean13:
+                                    typeString = "EAN_13"
+                                case AVMetadataObject.ObjectType.itf14:
+                                    typeString = "ITF"
+                                case AVMetadataObject.ObjectType.pdf417:
+                                    typeString = "PDF_417"
+                                case AVMetadataObject.ObjectType.qr:
+                                    typeString = "QR_CODE"
+                                case AVMetadataObject.ObjectType.upce:
+                                    typeString = "UPC_E"
+                                default:
+                                    return
+                            }
+
                             guard let stringValue = code.stringValue else { continue }
-                            self.channel.invokeMethod("onRecognizeQR", arguments: stringValue)
+                            let result = ["code": stringValue, "type": typeString]
+                            self.channel.invokeMethod("onRecognizeQR", arguments: result)
                         }
                     }
                 })

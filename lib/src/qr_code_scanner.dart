@@ -6,6 +6,86 @@ import 'package:flutter/services.dart';
 
 typedef QRViewCreatedCallback = void Function(QRViewController);
 
+enum BarcodeFormat {
+  /// Aztec 2D barcode format.
+  aztec,
+
+  /// CODABAR 1D format.
+  codabar,
+
+  /// Code 39 1D format.
+  code39,
+
+  /// Code 93 1D format.
+  code93,
+
+  /// Code 128 1D format.
+  code128,
+
+  /// Data Matrix 2D barcode format.
+  dataMatrix,
+
+  /// EAN-8 1D format.
+  ean8,
+
+  /// EAN-13 1D format.
+  ean13,
+
+  /// ITF (Interleaved Two of Five) 1D format.
+  itf,
+
+  /// MaxiCode 2D barcode format.
+  maxicode,
+
+  /// PDF417 format.
+  pdf417,
+
+  /// QR Code 2D barcode format.
+  qrcode,
+
+  /// RSS 14
+  rss14,
+
+  /// RSS EXPANDED
+  rssExpanded,
+
+  /// UPC-A 1D format.
+  upcA,
+
+  /// UPC-E 1D format.
+  upcE,
+
+  /// UPC/EAN extension format. Not a stand-alone format.
+  upcEanExtension
+}
+
+const _formatNames = <String, BarcodeFormat>{
+  'AZTEC': BarcodeFormat.aztec,
+  'CODABAR': BarcodeFormat.codabar,
+  'CODE_39': BarcodeFormat.code39,
+  'CODE_93': BarcodeFormat.code93,
+  'CODE_128': BarcodeFormat.code128,
+  'DATA_MATRIX': BarcodeFormat.dataMatrix,
+  'EAN_8': BarcodeFormat.ean8,
+  'EAN_13': BarcodeFormat.ean13,
+  'ITF': BarcodeFormat.itf,
+  'MAXICODE': BarcodeFormat.maxicode,
+  'PDF_417': BarcodeFormat.pdf417,
+  'QR_CODE': BarcodeFormat.qrcode,
+  'RSS_14': BarcodeFormat.rss14,
+  'RSS_EXPANDED': BarcodeFormat.rssExpanded,
+  'UPC_A': BarcodeFormat.upcA,
+  'UPC_E': BarcodeFormat.upcE,
+  'UPC_EAN_EXTENSION': BarcodeFormat.upcEanExtension,
+};
+
+class Barcode {
+  Barcode(this.code, this.format);
+
+  final String code;
+  final BarcodeFormat format;
+}
+
 class QRView extends StatefulWidget {
   const QRView({
     @required Key key,
@@ -107,7 +187,16 @@ class QRViewController {
         switch (call.method) {
           case scanMethodCall:
             if (call.arguments != null) {
-              _scanUpdateController.sink.add(call.arguments.toString());
+              final args = call.arguments as Map;
+              final code = args['code'] as String;
+              final rawType = args['type'] as String;
+              final format = _formatNames[rawType];
+              if (format != null) {
+                final barcode = Barcode(code, format);
+                _scanUpdateController.sink.add(barcode);
+              } else {
+                throw Exception('Unexpected barcode type $rawType');
+              }
             }
         }
       },
@@ -118,10 +207,10 @@ class QRViewController {
 
   final MethodChannel _channel;
 
-  final StreamController<String> _scanUpdateController =
-      StreamController<String>();
+  final StreamController<Barcode> _scanUpdateController =
+      StreamController<Barcode>();
 
-  Stream<String> get scannedDataStream => _scanUpdateController.stream;
+  Stream<Barcode> get scannedDataStream => _scanUpdateController.stream;
 
   void flipCamera() {
     _channel.invokeMethod('flipCamera');
