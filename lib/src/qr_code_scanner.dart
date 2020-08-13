@@ -141,7 +141,7 @@ class QRViewController {
 
   void updateDimensions(GlobalKey key) {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      final RenderBox renderBox =  key.currentContext.findRenderObject();
+      final RenderBox renderBox = key.currentContext.findRenderObject();
       _channel.invokeMethod('setDimensions',
           {'width': renderBox.size.width, 'height': renderBox.size.height});
     }
