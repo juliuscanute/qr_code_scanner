@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
@@ -31,17 +33,7 @@ class _QRViewExampleState extends State<QRViewExample> {
         children: <Widget>[
           Expanded(
             flex: 4,
-            child: QRView(
-              key: qrKey,
-              onQRViewCreated: _onQRViewCreated,
-              overlay: QrScannerOverlayShape(
-                borderColor: Colors.red,
-                borderRadius: 10,
-                borderLength: 30,
-                borderWidth: 10,
-                cutOutSize: 300,
-              ),
-            ),
+            child: _buildQrView(context)
           ),
           Expanded(
             flex: 1,
@@ -153,5 +145,27 @@ class _QRViewExampleState extends State<QRViewExample> {
   void dispose() {
     controller.dispose();
     super.dispose();
+  }
+
+  Widget _buildQrView(BuildContext context) {
+    // To ensure the Scanner view is properly sizes after rotation
+    // we need to listen for Flutter SizeChanged notifiation and update controller
+    return NotificationListener<SizeChangedLayoutNotification>(onNotification: (notification) {
+      Future.microtask(() => controller?.updateDimensions(qrKey));
+      return false;
+    }, child: SizeChangedLayoutNotifier(
+      key: const Key('qr-size-notifier'), 
+      child: QRView(
+        key: qrKey,
+        onQRViewCreated: _onQRViewCreated,
+        overlay: QrScannerOverlayShape(
+          borderColor: Colors.red,
+          borderRadius: 10,
+          borderLength: 30,
+          borderWidth: 10,
+          cutOutSize: 300,
+        ),
+      ))
+    );
   }
 }
