@@ -40,6 +40,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                 borderLength: 30,
                 borderWidth: 10,
                 cutOutSize: 300,
+                cutOutBottomOffset: 24,
               ),
             ),
           ),
