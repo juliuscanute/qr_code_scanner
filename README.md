@@ -1,10 +1,12 @@
 # QR Code Scanner
+
 [![GH Actions](https://github.com/juliuscanute/qr_code_scanner/workflows/dart/badge.svg)](https://github.com/juliuscanute/qr_code_scanner/actions)
 
 A QR code scanner that works on both iOS and Android by natively embedding the platform view within Flutter. The integration with Flutter is seamless, much better than jumping into a native Activity or a ViewController to perform the scan.
 
 
 ## Screenshots
+
 <table>
 <tr>
 <th colspan="2">
@@ -15,12 +17,12 @@ Android
 <tr>
 <td>
 <p align="center">
-<img src="https://github.com/juliuscanute/qr_code_scanner/blob/master/.resources/android-app-screen-one.jpg" width="30%" height="30%">
+<img src="https://raw.githubusercontent.com/juliuscanute/qr_code_scanner/master/.resources/android-app-screen-one.jpg" width="30%" height="30%">
 </p>
 </td>
 <td>
 <p align="center">
-<img src="https://github.com/juliuscanute/qr_code_scanner/blob/master/.resources/android-app-screen-two.jpg" width="30%" height="30%">
+<img src="https://raw.githubusercontent.com/juliuscanute/qr_code_scanner/master/.resources/android-app-screen-two.jpg" width="30%" height="30%">
 </p>
 </td>
 </tr>
@@ -34,12 +36,12 @@ iOS
 <tr>
 <td>
 <p align="center">
-<img src="https://github.com/juliuscanute/qr_code_scanner/blob/master/.resources/ios-app-screen-one.png" width="30%" height="30%">
+<img src="https://raw.githubusercontent.com/juliuscanute/qr_code_scanner/master/.resources/ios-app-screen-one.png" width="30%" height="30%">
 </p>
 </td>
 <td>
 <p align="center">
-<img src="https://github.com/juliuscanute/qr_code_scanner/blob/master/.resources/ios-app-screen-two.png" width="30%" height="30%">
+<img src="https://raw.githubusercontent.com/juliuscanute/qr_code_scanner/master/.resources/ios-app-screen-two.png" width="30%" height="30%">
 </p>
 </td>
 </tr>
@@ -65,6 +67,7 @@ class _QRViewExampleState extends State<QRViewExample> {
             flex: 5,
             child: QRView(
               key: qrKey,
+              cameraFacing: CameraFacing.back
               onQRViewCreated: _onQRViewCreated,
             ),
           ),
@@ -97,8 +100,10 @@ class _QRViewExampleState extends State<QRViewExample> {
 ```
 
 ## iOS Integration
+
 In order to use this plugin, add the following to your Info.plist file:
-```
+
+```xml
 <key>io.flutter.embedded_views_preview</key>
 <true/>
 <key>NSCameraUsageDescription</key>
@@ -106,37 +111,47 @@ In order to use this plugin, add the following to your Info.plist file:
 ```
 
 ## Flip Camera (Back/Front)
+
 The default camera is the back camera.
+
 ```dart
 controller.flipCamera();
 ```
 
 ## Flash (Off/On)
+
 By default, flash is OFF.
+
 ```dart
 controller.toggleFlash();
 ```
 
 ## Resume/Pause
+
 Pause camera stream and scanner.
+
 ```dart
 controller.pause();
 ```
+
 Resume camera stream and scanner.
+
 ```dart
 controller.resume();
 ```
 
-
 # SDK
+
 Requires at least SDK 24 (Android 7.0).
 
 # TODOs
+
 * iOS Native embedding is written to match what is supported in the framework as of the date of publication of this package. It needs to be improved as the framework support improves.
 * In future, options will be provided for default states.
 * Finally, I welcome PR's to make it better :), thanks
 
 # Credits
+
 * Android: https://github.com/zxing/zxing
 * iOS: https://github.com/mikebuss/MTBBarcodeScanner
 * Special Thanks To: LeonDevLifeLog for his contributions towards improving this package.
