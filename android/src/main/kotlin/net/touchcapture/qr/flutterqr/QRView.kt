@@ -119,10 +119,12 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
     }
 
     private fun startScan(args: Map<String, Any>, result: MethodChannel.Result) {
+        barcodeView?.pause()
         val settings = barcodeView?.cameraSettings
         settings?.requestedCameraId = if(args["cameraFacing"] as? Int == 1) CameraInfo
         .CAMERA_FACING_FRONT else CameraInfo.CAMERA_FACING_BACK
         barcodeView?.cameraSettings = settings
+        barcodeView?.resume()
 
         checkAndRequestPermission(result){
             barcodeView?.decodeContinuous(
@@ -136,15 +138,6 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
             )
         }
 
-        barcodeView?.decodeContinuous(
-                object : BarcodeCallback {
-                    override fun barcodeResult(result: BarcodeResult) {
-                        channel.invokeMethod("onRecognizeQR", result.text)
-                    }
-
-                    override fun possibleResultPoints(resultPoints: List<ResultPoint>) {}
-                }
-        )
     }
 
     private fun updateCameraSettings(cameraSettings: Map<String, Any>) {
