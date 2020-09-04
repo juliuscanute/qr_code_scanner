@@ -29,7 +29,7 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
     var barcodeView: BarcodeView? = null
     private val activity = registrar.activity()
     var cameraPermissionContinuation: Runnable? = null
-    var requestingPermission = false
+    private var requestingPermission = false
     private var isTorchOn: Boolean = false
     val channel: MethodChannel
 
@@ -37,7 +37,6 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
         registrar.addRequestPermissionsResultListener(CameraRequestPermissionsListener())
         channel = MethodChannel(registrar.messenger(), "net.touchcapture.qr.flutterqr/qrview_$id")
         channel.setMethodCallHandler(this)
-        checkAndRequestPermission(null)
         registrar.activity().application.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
             override fun onActivityPaused(p0: Activity?) {
                 if (p0 == registrar.activity()) {
@@ -68,12 +67,12 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
         })
     }
 
-    fun flipCamera() {
+    private fun flipCamera() {
         barcodeView?.pause()
-        var settings = barcodeView?.cameraSettings
+        val settings = barcodeView?.cameraSettings
 
         if(settings?.requestedCameraId == CameraInfo.CAMERA_FACING_FRONT)
-            settings?.requestedCameraId = CameraInfo.CAMERA_FACING_BACK
+            settings.requestedCameraId = CameraInfo.CAMERA_FACING_BACK
         else
             settings?.requestedCameraId = CameraInfo.CAMERA_FACING_FRONT
 
@@ -114,14 +113,30 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
 
     private fun initBarCodeView(): BarcodeView? {
         if (barcodeView == null) {
-            barcodeView = createBarCodeView()
+            barcodeView = BarcodeView(registrar.activity())
         }
         return barcodeView
     }
 
-    private fun createBarCodeView(): BarcodeView? {
-        val barcode = BarcodeView(registrar.activity())
-        barcode.decodeContinuous(
+    private fun startScan(args: Map<String, Any>, result: MethodChannel.Result) {
+        val settings = barcodeView?.cameraSettings
+        settings?.requestedCameraId = if(args["cameraFacing"] as? Int == 1) CameraInfo
+        .CAMERA_FACING_FRONT else CameraInfo.CAMERA_FACING_BACK
+        barcodeView?.cameraSettings = settings
+
+        checkAndRequestPermission(result){
+            barcodeView?.decodeContinuous(
+                object : BarcodeCallback {
+                    override fun barcodeResult(result: BarcodeResult) {
+                        channel.invokeMethod("onRecognizeQR", result.text)
+                    }
+
+                    override fun possibleResultPoints(resultPoints: List<ResultPoint>) {}
+                }
+            )
+        }
+
+        barcodeView?.decodeContinuous(
                 object : BarcodeCallback {
                     override fun barcodeResult(result: BarcodeResult) {
                         channel.invokeMethod("onRecognizeQR", result.text)
@@ -130,7 +145,17 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
                     override fun possibleResultPoints(resultPoints: List<ResultPoint>) {}
                 }
         )
-        return barcode
+    }
+
+    private fun updateCameraSettings(cameraSettings: Map<String, Any>) {
+        barcodeView?.pause()
+        val settings = barcodeView?.cameraSettings
+
+        settings?.requestedCameraId = if(cameraSettings["cameraFacing"] as? Int == 1) CameraInfo
+        .CAMERA_FACING_FRONT else CameraInfo.CAMERA_FACING_BACK
+
+        barcodeView?.cameraSettings = settings
+        barcodeView?.resume()
     }
 
     override fun dispose() {
@@ -150,14 +175,21 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
 
     private fun hasCameraPermission(): Boolean {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                activity.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                activity.checkSelfPermission(Manifest.permission.CAMERA) == PERMISSION_GRANTED
     }
 
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        when(call?.method){
-            "checkAndRequestPermission" -> {
-                checkAndRequestPermission(result)
+        when(call.method){
+            "startScan" -> {
+                if(call.arguments == null) return
+
+                @Suppress("UNCHECKED_CAST")
+                startScan(call.arguments as Map<String, Any>, result)
+            }
+            "updateSettings" -> {
+                @Suppress("UNCHECKED_CAST")
+                updateCameraSettings(call.arguments as Map<String, Any>)
             }
             "flipCamera" -> {
                 flipCamera()
@@ -174,7 +206,8 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
         }
     }
 
-    private fun checkAndRequestPermission(result: MethodChannel.Result?) {
+    private fun checkAndRequestPermission(result: MethodChannel.Result?, callback: (() -> Unit)? =
+        null) {
         if (cameraPermissionContinuation != null) {
             result?.error("cameraPermission", "Camera permission request ongoing", null);
         }
@@ -186,6 +219,8 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
                         "cameraPermission", "MediaRecorderCamera permission not granted", null)
                 return@Runnable
             }
+
+            if(callback != null) callback()
         }
 
         requestingPermission = false

@@ -34,6 +34,7 @@ class _QRViewExampleState extends State<QRViewExample> {
             child: QRView(
               key: qrKey,
               onQRViewCreated: _onQRViewCreated,
+              cameraFacing: CameraFacing.back,
               overlay: QrScannerOverlayShape(
                 borderColor: Colors.red,
                 borderRadius: 10,
@@ -72,8 +73,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                               }
                             }
                           },
-                          child:
-                              Text(flashState, style: TextStyle(fontSize: 20)),
+                          child: Text(flashState, style: TextStyle(fontSize: 20)),
                         ),
                       ),
                       Container(
@@ -93,8 +93,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                               }
                             }
                           },
-                          child:
-                              Text(cameraState, style: TextStyle(fontSize: 20)),
+                          child: Text(cameraState, style: TextStyle(fontSize: 20)),
                         ),
                       )
                     ],

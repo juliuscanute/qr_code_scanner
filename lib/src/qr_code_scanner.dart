@@ -6,11 +6,14 @@ import 'package:flutter/services.dart';
 
 typedef QRViewCreatedCallback = void Function(QRViewController);
 
+enum CameraFacing { back, front }
+
 class QRView extends StatefulWidget {
   const QRView({
     @required Key key,
     @required this.onQRViewCreated,
     this.overlay,
+    this.cameraFacing = CameraFacing.back,
   })  : assert(key != null),
         assert(onQRViewCreated != null),
         super(key: key);
@@ -19,11 +22,17 @@ class QRView extends StatefulWidget {
 
   final ShapeBorder overlay;
 
+  final CameraFacing cameraFacing;
+
   @override
   State<StatefulWidget> createState() => _QRViewState();
 }
 
 class _QRViewState extends State<QRView> {
+  final Completer<QRViewController> _controller = Completer<QRViewController>();
+
+  _QrCameraSettings _settings;
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -41,8 +50,21 @@ class _QRViewState extends State<QRView> {
     );
   }
 
+  @override
+  void didUpdateWidget(QRView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _updateConfiguration(_QrCameraSettings.fromWidget(widget));
+  }
+
+  Future<void> _updateConfiguration(_QrCameraSettings settings) async {
+    _settings = settings;
+    final controller = await _controller.future;
+    await controller._updateSettings(settings);
+  }
+
   Widget _getPlatformQrView() {
     Widget _platformQrView;
+
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         _platformQrView = AndroidView(
@@ -54,7 +76,6 @@ class _QRViewState extends State<QRView> {
         _platformQrView = UiKitView(
           viewType: 'net.touchcapture.qr.flutterqr/qrview',
           onPlatformViewCreated: _onPlatformViewCreated,
-          creationParams: _CreationParams.fromWidget(0, 0).toMap(),
           creationParamsCodec: StandardMessageCodec(),
         );
         break;
@@ -66,62 +87,84 @@ class _QRViewState extends State<QRView> {
   }
 
   void _onPlatformViewCreated(int id) {
-    if (widget.onQRViewCreated == null) {
-      return;
+    final controller = QRViewController._(id, _QrCameraSettings.fromWidget(widget));
+    _controller.complete(controller);
+
+    //start the scan by updating preview View size (size is used only on iOS)
+    final RenderBox renderBox = context.findRenderObject();
+    controller._startScan(renderBox.size.width, renderBox.size.height);
+
+    if (widget.onQRViewCreated != null) {
+      widget.onQRViewCreated(controller);
     }
-    widget.onQRViewCreated(QRViewController._(id, widget.key));
   }
 }
 
-class _CreationParams {
-  _CreationParams({this.width, this.height});
+class _QrCameraSettings {
+  _QrCameraSettings({
+    this.cameraFacing,
+  });
 
-  static _CreationParams fromWidget(double width, double height) {
-    return _CreationParams(
-      width: width,
-      height: height,
-    );
+  static _QrCameraSettings fromWidget(QRView widget) {
+    return _QrCameraSettings(cameraFacing: widget.cameraFacing);
   }
 
-  final double width;
-  final double height;
+  final CameraFacing cameraFacing;
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'width': width,
-      'height': height,
+      'cameraFacing': cameraFacing.index,
+    };
+  }
+
+  Map<String, dynamic> updatesMap(_QrCameraSettings newSettings) {
+    if (cameraFacing == newSettings.cameraFacing) {
+      return null;
+    }
+    return <String, dynamic>{
+      'cameraFacing': newSettings.cameraFacing.index,
     };
   }
 }
 
 class QRViewController {
-  QRViewController._(int id, GlobalKey qrKey)
-      : _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id') {
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      final RenderBox renderBox = qrKey.currentContext.findRenderObject();
-      _channel.invokeMethod('setDimensions',
-          {'width': renderBox.size.width, 'height': renderBox.size.height});
-    }
-    _channel.setMethodCallHandler(
-      (call) async {
-        switch (call.method) {
-          case scanMethodCall:
-            if (call.arguments != null) {
-              _scanUpdateController.sink.add(call.arguments.toString());
-            }
-        }
-      },
-    );
+  QRViewController._(int id, this._settings) : _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id') {
+    _channel.setMethodCallHandler(_onMethodCall);
   }
-
-  static const scanMethodCall = 'onRecognizeQR';
 
   final MethodChannel _channel;
 
-  final StreamController<String> _scanUpdateController =
-      StreamController<String>();
+  _QrCameraSettings _settings;
+
+  final StreamController<String> _scanUpdateController = StreamController<String>();
 
   Stream<String> get scannedDataStream => _scanUpdateController.stream;
+
+  Future<void> _onMethodCall(MethodCall call) async {
+    switch (call.method) {
+      case 'onRecognizeQR':
+        if (call.arguments != null) {
+          _scanUpdateController.sink.add(call.arguments.toString());
+        }
+    }
+  }
+
+  Future<void> _startScan(double width, double height) async {
+    return _channel.invokeMethod('startScan', <String, dynamic>{
+      'width': width,
+      'height': height,
+      ..._settings.toMap(),
+    });
+  }
+
+  Future<void> _updateSettings(_QrCameraSettings settings) async {
+    final updateMap = _settings.updatesMap(settings);
+    if (updateMap == null) {
+      return;
+    }
+    _settings = settings;
+    return _channel.invokeMethod('updateSettings', updateMap);
+  }
 
   void flipCamera() {
     _channel.invokeMethod('flipCamera');

@@ -9,63 +9,100 @@ import Foundation
 import MTBBarcodeScanner
 
 public class QRView:NSObject,FlutterPlatformView {
-    @IBOutlet var previewView: UIView!
+    var previewView: UIView!
     var scanner: MTBBarcodeScanner?
     var registrar: FlutterPluginRegistrar
     var channel: FlutterMethodChannel
     
-    public init(withFrame frame: CGRect, withRegistrar registrar: FlutterPluginRegistrar, withId id: Int64){
+    public init(withFrame frame: CGRect, registrar: FlutterPluginRegistrar, viewId: Int64){
+        
         self.registrar = registrar
         previewView = UIView(frame: frame)
-        channel = FlutterMethodChannel(name: "net.touchcapture.qr.flutterqr/qrview_\(id)", binaryMessenger: registrar.messenger())
+        
+        channel = FlutterMethodChannel(name: "net.touchcapture.qr.flutterqr/qrview_\(viewId)", binaryMessenger: registrar.messenger())
+        super.init()
+        
+        channel.setMethodCallHandler(onMethodCall)
     }
     
-    func isCameraAvailable(success: Bool) -> Void {
-        if success {
-            do {
-                try scanner?.startScanning(resultBlock: { codes in
-                    if let codes = codes {
-                        for code in codes {
-                            guard let stringValue = code.stringValue else { continue }
-                            self.channel.invokeMethod("onRecognizeQR", arguments: stringValue)
-                        }
-                    }
-                })
-            } catch {
-                NSLog("Unable to start scanning")
-            }
-        } else {
-            UIAlertView(title: "Scanning Unavailable", message: "This app does not have permission to access the camera", delegate: nil, cancelButtonTitle: nil, otherButtonTitles: "Ok").show()
-        }
+    deinit {
+        scanner?.stopScanning()
     }
     
     public func view() -> UIView {
-        channel.setMethodCallHandler({
-            [weak self] (call: FlutterMethodCall, result: FlutterResult) -> Void in
-            switch(call.method){
-                case "setDimensions":
-                    var arguments = call.arguments as! Dictionary<String, Double>
-                    self?.setDimensions(width: arguments["width"] ?? 0,height: arguments["height"] ?? 0)
-                case "flipCamera":
-                    self?.flipCamera()
-                case "toggleFlash":
-                    self?.toggleFlash()
-                case "pauseCamera":
-                    self?.pauseCamera()
-                case "resumeCamera":
-                    self?.resumeCamera()
-                default:
-                    result(FlutterMethodNotImplemented)
-                    return
-            }
-        })
         return previewView
     }
     
-    func setDimensions(width: Double, height: Double) -> Void {
-       previewView.frame = CGRect(x: 0, y: 0, width: width, height: height)
-       scanner = MTBBarcodeScanner(previewView: previewView)
-       MTBBarcodeScanner.requestCameraPermission(success: isCameraAvailable)
+    func onMethodCall(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        switch(call.method){
+            case "startScan":
+                let arguments = call.arguments as! Dictionary<String, Double>
+                self.startScan(arguments, result)
+            case "updateSettings":
+                guard let settings = call.arguments else {
+                  return
+                }
+                self.updateCameraSettings(settings as! [String : Any], result)
+            case "flipCamera":
+                self.flipCamera()
+            case "toggleFlash":
+                self.toggleFlash()
+            case "pauseCamera":
+                self.pauseCamera()
+            case "resumeCamera":
+                self.resumeCamera()
+            default:
+                result(FlutterMethodNotImplemented)
+            return
+        }
+    }
+    
+    func startScan(_ args: [String: Any],_ result: @escaping FlutterResult) -> Void {
+        let width = args["width"] as! Double
+        let height = args["height"] as! Double
+        let cameraFacing = MTBCamera.init(rawValue: UInt(Int(args["cameraFacing"] as! Double))) ?? MTBCamera.back
+        previewView.frame = CGRect(x: 0.0, y: 0.0, width: width, height: height)
+        scanner = MTBBarcodeScanner(previewView: previewView)
+        
+        MTBBarcodeScanner.requestCameraPermission(success: { permissionGranted in
+            if permissionGranted {
+                do {
+                    try self.scanner?.startScanning(with: cameraFacing, resultBlock: { [weak self] codes in
+                        if let codes = codes {
+                            for code in codes {
+                                guard let stringValue = code.stringValue else { continue }
+                                self?.channel.invokeMethod("onRecognizeQR", arguments: stringValue)
+                            }
+                        }
+                    })
+                } catch {
+                    let error = FlutterError(code: "unknown-error", message: "Unable to start scanning", details: nil)
+                    result(error)
+                }
+            } else {
+                let error = FlutterError(code: "cameraPermission", message: "Permission denied to access the camera", details: nil)
+                result(error)
+            }
+        })
+    }
+    
+    func updateCameraSettings(_ settings: [String: Any],_ result: @escaping FlutterResult){
+        let cameraFacing = MTBCamera.init(rawValue: UInt(settings["cameraFacing"] as! Int)) ?? MTBCamera.back
+        scanner?.stopScanning()
+        
+        do {
+            try self.scanner?.startScanning(with: cameraFacing,resultBlock: { [weak self] codes in
+                if let codes = codes {
+                    for code in codes {
+                        guard let stringValue = code.stringValue else { continue }
+                        self?.channel.invokeMethod("onRecognizeQR", arguments: stringValue)
+                    }
+                }
+            })
+        } catch {
+            let error = FlutterError(code: "unknown-error", message: "Unable to start scanning", details: nil)
+            result(error)
+        }
     }
     
     func flipCamera(){
