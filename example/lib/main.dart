@@ -34,6 +34,11 @@ class _QRViewExampleState extends State<QRViewExample> {
             child: QRView(
               key: qrKey,
               onQRViewCreated: _onQRViewCreated,
+              onPermissionSet: (controller, permission){
+                if(!permission) {
+                  controller.showNativeAlertDialog();
+                }
+              },
               overlay: QrScannerOverlayShape(
                 borderColor: Colors.red,
                 borderRadius: 10,

@@ -105,27 +105,81 @@ In order to use this plugin, add the following to your Info.plist file:
 <string>This app needs camera access to scan QR codes</string>
 ```
 
+## Get a callback if camera permissions are set
+```
+QRView(
+      onPermissionSet: (QRViewController controller, bool permission){
+      },
+    ),
+```
+
+## Call native alert dialog (Android and IOS) if you dont have permissions
+```dart
+controller.showNativeAlertDialog();
+```
+
+## Call native alert dialog automatically if no permission is granted
+```dart
+QRView(
+      showNativeAlertDialog: true, 
+    ),
+```
+
 ## Flip Camera (Back/Front)
 The default camera is the back camera.
 ```dart
-controller.flipCamera();
+await controller.flipCamera();
 ```
 
 ## Flash (Off/On)
 By default, flash is OFF.
 ```dart
-controller.toggleFlash();
+await controller.toggleFlash();
 ```
 
 ## Resume/Pause
 Pause camera stream and scanner.
 ```dart
-controller.pause();
+await controller.pause();
 ```
 Resume camera stream and scanner.
 ```dart
-controller.resume();
+await controller.resume();
 ```
+
+## Controller
+Most controller methods return `ReturnStatus`.
+Its defined as
+```dart
+enum ReturnStatus { Success, Failed }
+```
+If you want to get a bool from the returned object just use the `asBool` Method like this:
+```dart
+if((await controller.resume()).asBool){
+...
+}
+```
+
+You can also get the SystemFeatures from the controller:
+- hasFlash
+- hasBackCamera
+- hasFrontCamera 
+```dart
+controller.systemFeatures.hasBackCamera
+```
+
+To get the active camera (front or back):
+var backCameraIsActive = controller.activeCamera == Camera.BackCamera
+var FrontCameraIsActive = controller.activeCamera == Camera.FrontCamera
+
+## dispose
+Turn off flash automatically if you call dispose
+```dart
+QRView(
+      turnFlashOffOnDispose: true,
+  ),
+```
+
 
 
 # SDK
