@@ -150,7 +150,7 @@ class QRViewController {
             if (call.arguments != null) {
               _scanUpdateController.sink.add(call.arguments.toString());
             }
-          break;
+            break;
           case permissionMethodCall:
             await getSystemFeatures(); // if we have no permission all features will not be avaible
             print(call.arguments.toString());
@@ -164,7 +164,7 @@ class QRViewController {
               }
               onPermissionSet(this, call.arguments as bool);
             }
-          break;
+            break;
         }
       },
     );
@@ -251,7 +251,8 @@ class QRViewController {
 
   Future<SystemFeatures> getSystemFeatures() async {
     try {
-      var features = await _channel.invokeMapMethod<String, dynamic>('getSystemFeatures');
+      var features = await _channel.invokeMapMethod<String, dynamic>(
+          'getSystemFeatures');
       _features = SystemFeatures.fromJson(features);
       _activeCamera = features['activeCamera'];
       return _features;
@@ -262,7 +263,7 @@ class QRViewController {
 
   void dispose() {
     if (_features.hasFlash && _turnFlashOffOnDispose && _flashActive) {
-      _channel.invokeMethod('toggleFlash');
+      toggleFlash();
     }
     _scanUpdateController.close();
   }
