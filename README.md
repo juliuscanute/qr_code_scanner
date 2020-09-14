@@ -125,6 +125,11 @@ QRView(
     ),
 ```
 
+## Set allowed Barcode Types
+```dart
+controller.setAllowedBarcodeTypes([BarcodeTypes.ean8, BarcodeTypes.ean13]);
+```
+
 ## Flip Camera (Back/Front)
 The default camera is the back camera.
 ```dart
@@ -169,8 +174,10 @@ controller.systemFeatures.hasBackCamera
 ```
 
 To get the active camera (front or back):
+```dart
 var backCameraIsActive = controller.activeCamera == Camera.BackCamera
 var FrontCameraIsActive = controller.activeCamera == Camera.FrontCamera
+```
 
 ## dispose
 Turn off flash automatically if you call dispose
