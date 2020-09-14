@@ -5,6 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
+import 'types/barcode.dart';
+import 'types/camera.dart';
+import 'types/features.dart';
+import 'types/status.dart';
+
 typedef QRViewCreatedCallback = void Function(QRViewController);
 typedef PermissionSetCallback = void Function(QRViewController, bool);
 
@@ -16,8 +21,7 @@ class QRView extends StatefulWidget {
     this.turnFlashOffOnDispose = true,
     this.showNativeAlertDialog = false,
     this.overlay,
-  })
-      : assert(key != null),
+  })  : assert(key != null),
         assert(onQRViewCreated != null),
         assert(showNativeAlertDialog != null),
         assert(turnFlashOffOnDispose != null),
@@ -109,60 +113,36 @@ class _CreationParams {
   }
 }
 
-enum Camera {
-  BackCamera,
-  FrontCamera,
-}
-
-enum ReturnStatus { Success, Failed }
-
-extension ReturnStatusExtension on ReturnStatus {
-  bool asBool() {
-    return this == ReturnStatus.Success;
-  }
-}
-
-class SystemFeatures {
-  SystemFeatures(this.hasFlash, this.hasBackCamera, this.hasFrontCamera);
-
-  factory SystemFeatures.fromJson(Map<String, dynamic> features) =>
-      SystemFeatures(
-          features['hasFlash'] ?? false,
-          features['hasBackCamera'] ?? false,
-          features['hasFrontCamera'] ?? false);
-
-  final bool hasFlash;
-  final bool hasFrontCamera;
-  final bool hasBackCamera;
-}
-
 class QRViewController {
-  QRViewController._(int id,
-      GlobalKey qrKey,
-      PermissionSetCallback onPermissionSet,
-      bool showNativeAlertDialogOnError,
-      this._turnFlashOffOnDispose,)
-      : _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id') {
+  QRViewController._(
+    int id,
+    GlobalKey qrKey,
+    PermissionSetCallback onPermissionSet,
+    bool showNativeAlertDialogOnError,
+    this._turnFlashOffOnDispose,
+  ) : _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id') {
     _channel.setMethodCallHandler(
-          (call) async {
+      (call) async {
+        var args = call.arguments;
         switch (call.method) {
           case scanMethodCall:
-            if (call.arguments != null) {
-              _scanUpdateController.sink.add(call.arguments.toString());
+            if (args != null) {
+              _scanUpdateController.sink.add(args.toString());
             }
             break;
           case permissionMethodCall:
             await getSystemFeatures(); // if we have no permission all features will not be avaible
-            print(call.arguments.toString());
-            print(onPermissionSet);
-            if (call.arguments != null && onPermissionSet != null) {
-              if (call.arguments as bool) {
+            if (args != null) {
+              if (args as bool) {
                 _cameraActive = true;
+              } else {
+                if (showNativeAlertDialogOnError) {
+                  showNativeAlertDialog();
+                }
               }
-              if (showNativeAlertDialogOnError) {
-                showNativeAlertDialog();
+              if (onPermissionSet != null) {
+                onPermissionSet(this, args as bool);
               }
-              onPermissionSet(this, call.arguments as bool);
             }
             break;
         }
@@ -182,7 +162,7 @@ class QRViewController {
   final MethodChannel _channel;
 
   final StreamController<String> _scanUpdateController =
-  StreamController<String>();
+      StreamController<String>();
 
   Stream<String> get scannedDataStream => _scanUpdateController.stream;
 
@@ -249,10 +229,20 @@ class QRViewController {
     }
   }
 
+  Future<ReturnStatus> setAllowedBarcodeTypes(List<BarcodeTypes> list) async {
+    try {
+      await _channel.invokeMethod('setAllowedBarcodeFormats',
+          list?.map((e) => e.asInt()).toList() ?? []);
+      return ReturnStatus.Success;
+    } on PlatformException catch (e) {
+      return ReturnStatus.Failed;
+    }
+  }
+
   Future<SystemFeatures> getSystemFeatures() async {
     try {
-      var features = await _channel.invokeMapMethod<String, dynamic>(
-          'getSystemFeatures');
+      var features =
+          await _channel.invokeMapMethod<String, dynamic>('getSystemFeatures');
       _features = SystemFeatures.fromJson(features);
       _activeCamera = features['activeCamera'];
       return _features;

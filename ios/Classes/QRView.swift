@@ -14,6 +14,22 @@ public class QRView:NSObject,FlutterPlatformView {
     var registrar: FlutterPluginRegistrar
     var channel: FlutterMethodChannel
     
+    var allowedBarcodeTypes: Array<AVMetadataObject.ObjectType> = []
+
+   var QRCodeTypes = [
+        0: AVMetadataObject.ObjectType.aztec,
+        1: AVMetadataObject.ObjectType.code128,
+        2: AVMetadataObject.ObjectType.code39,
+        3: AVMetadataObject.ObjectType.code93,
+        4: AVMetadataObject.ObjectType.dataMatrix,
+        5: AVMetadataObject.ObjectType.ean13,
+        6: AVMetadataObject.ObjectType.ean8,
+        7: AVMetadataObject.ObjectType.interleaved2of5,
+        8: AVMetadataObject.ObjectType.pdf417,
+        9: AVMetadataObject.ObjectType.qr,
+        10: AVMetadataObject.ObjectType.upce
+       ]
+    
     public init(withFrame frame: CGRect, withRegistrar registrar: FlutterPluginRegistrar, withId id: Int64){
         self.registrar = registrar
         previewView = UIView(frame: frame)
@@ -30,7 +46,9 @@ public class QRView:NSObject,FlutterPlatformView {
                     if let codes = codes {
                         for code in codes {
                             guard let stringValue = code.stringValue else { continue }
-                            self.channel.invokeMethod("onRecognizeQR", arguments: stringValue)
+                            if self.allowedBarcodeTypes.count == 0 || self.allowedBarcodeTypes.contains(code.type){
+                                self.channel.invokeMethod("onRecognizeQR", arguments: stringValue)
+                            }
                         }
                     }
                 })
@@ -48,35 +66,42 @@ public class QRView:NSObject,FlutterPlatformView {
     }
     
     func getSystemFeatures(_ result: @escaping FlutterResult) -> Void {
-        NSLog("in get system features")
         if let sc: MTBBarcodeScanner = scanner {
             var hasBackCameraVar = false
             var hasFrontCameraVar = false
             let camera = sc.camera
-            var camera_id = 1
         
             if(camera == MTBCamera(rawValue: 0)){
-                camera_id = 0
                 hasBackCameraVar = true
                 if sc.hasOppositeCamera() {
                     hasFrontCameraVar = true
                 }
             }else{
-                hasFrontCameraVar = false
+                hasFrontCameraVar = true
                 if sc.hasOppositeCamera() {
                     hasBackCameraVar = true
                 }
             }
-            NSLog("returning get system features")
             return result([
                 "hasFrontCamera": hasFrontCameraVar,
                 "hasBackCamera": hasBackCameraVar,
                 "hasFlash": sc.hasTorch(),
-                "activeCamera": camera_id
+                "activeCamera": camera.rawValue
             ])
         }
-        NSLog("scanner not avaible")
         return result(FlutterError(code: "404", message: nil, details: nil))
+    }
+    
+    func setBarcodeFormats(_ arguments: Array<Int>, _ result: @escaping FlutterResult){
+        do{
+            allowedBarcodeTypes.removeAll()
+            try arguments.forEach { arg in
+                allowedBarcodeTypes.append(try QRCodeTypes[arg]!)
+            }
+            result(true)
+        }catch{
+            result(FlutterError(code: "404", message: nil, details: nil))
+        }
     }
     
     public func view() -> UIView {
@@ -84,7 +109,7 @@ public class QRView:NSObject,FlutterPlatformView {
             [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
             switch(call.method){
                 case "setDimensions":
-                    var arguments = call.arguments as! Dictionary<String, Double>
+                    let arguments = call.arguments as! Dictionary<String, Double>
                     self?.setDimensions(width: arguments["width"] ?? 0,height: arguments["height"] ?? 0)
                 case "flipCamera":
                     self?.flipCamera(result)
@@ -98,6 +123,8 @@ public class QRView:NSObject,FlutterPlatformView {
                     self?.showNativeAlertDialog(result)
                 case "getSystemFeatures":
                     self?.getSystemFeatures(result)
+                case "setAllowedBarcodeFormats":
+                    self?.setBarcodeFormats(call.arguments as! Array<Int>, result)
                 default:
                     result(FlutterMethodNotImplemented)
                     return

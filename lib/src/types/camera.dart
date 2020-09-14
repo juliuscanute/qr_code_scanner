@@ -1,0 +1,4 @@
+enum Camera {
+  BackCamera,
+  FrontCamera,
+}

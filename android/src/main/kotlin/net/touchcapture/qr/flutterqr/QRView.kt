@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import com.google.zxing.BarcodeFormat
 import com.google.zxing.ResultPoint
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
@@ -21,15 +22,29 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.platform.PlatformView
 
-
 class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
         PlatformView, MethodChannel.MethodCallHandler {
+
 
     companion object {
         const val CAMERA_REQUEST_ID = 513469796
     }
 
+    val QRCodeTypes = mapOf(
+            0 to BarcodeFormat.AZTEC,
+            1 to BarcodeFormat.CODE_128,
+            2 to BarcodeFormat.CODE_39,
+            3 to BarcodeFormat.CODE_93,
+            4 to BarcodeFormat.DATA_MATRIX,
+            5 to BarcodeFormat.EAN_13,
+            6 to BarcodeFormat.EAN_8,
+            7 to BarcodeFormat.ITF,
+            8 to BarcodeFormat.PDF_417,
+            9 to BarcodeFormat.QR_CODE,
+            10 to BarcodeFormat.UPC_E
+    )
     var barcodeView: BarcodeView? = null
+    var allowedBarcodeTypes = mutableListOf<BarcodeFormat>()
     private val activity = registrar.activity()
     private var isTorchOn: Boolean = false
     val channel: MethodChannel
@@ -169,7 +184,8 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
         barcode.decodeContinuous(
                 object : BarcodeCallback {
                     override fun barcodeResult(result: BarcodeResult) {
-                        channel.invokeMethod("onRecognizeQR", result.text)
+                        if (allowedBarcodeTypes.size == 0 || allowedBarcodeTypes.contains(result.barcodeFormat))
+                            channel.invokeMethod("onRecognizeQR", result.text)
                     }
 
                     override fun possibleResultPoints(resultPoints: List<ResultPoint>) {}
@@ -221,6 +237,18 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
         }
     }
 
+    private fun setBarcodeFormats(arguments: List<Int>, result: MethodChannel.Result) {
+        try {
+            allowedBarcodeTypes.clear()
+            arguments.forEach {
+                allowedBarcodeTypes.add(QRCodeTypes[it]!!)
+            }
+            result.success(true)
+        } catch (e: java.lang.Exception) {
+            result.error(null, null, null)
+        }
+    }
+
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "flipCamera" -> {
@@ -240,6 +268,9 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
             }
             "getSystemFeatures" -> {
                 getSystemFeatures(result)
+            }
+            "setAllowedBarcodeFormats" -> {
+                setBarcodeFormats(call.arguments as List<Int>, result)
             }
             else -> {
                 result.error("404", "Method not implemented", null)
