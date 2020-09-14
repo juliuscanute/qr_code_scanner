@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import 'types/barcode.dart';
 import 'types/camera.dart';
@@ -186,18 +185,18 @@ class QRViewController {
   Future<ReturnStatus> flipCamera() async {
     try {
       _activeCamera = await _channel.invokeMethod('flipCamera') as int;
-      return ReturnStatus.Success;
-    } on PlatformException catch (e) {
-      return ReturnStatus.Failed;
+      return ReturnStatus.success;
+    } on PlatformException {
+      return ReturnStatus.failed;
     }
   }
 
   Future<ReturnStatus> toggleFlash() async {
     try {
       _flashActive = await _channel.invokeMethod('toggleFlash') as bool;
-      return ReturnStatus.Success;
-    } on PlatformException catch (e) {
-      return ReturnStatus.Failed;
+      return ReturnStatus.success;
+    } on PlatformException {
+      return ReturnStatus.failed;
     }
   }
 
@@ -205,37 +204,37 @@ class QRViewController {
     try {
       var cameraPaused = await _channel.invokeMethod('pauseCamera') as bool;
       _cameraActive = !cameraPaused;
-      return ReturnStatus.Success;
-    } on PlatformException catch (e) {
-      return ReturnStatus.Failed;
+      return ReturnStatus.success;
+    } on PlatformException {
+      return ReturnStatus.failed;
     }
   }
 
   Future<ReturnStatus> resumeCamera() async {
     try {
       _cameraActive = await _channel.invokeMethod('resumeCamera');
-      return ReturnStatus.Success;
-    } on PlatformException catch (e) {
-      return ReturnStatus.Failed;
+      return ReturnStatus.success;
+    } on PlatformException {
+      return ReturnStatus.failed;
     }
   }
 
   Future<ReturnStatus> showNativeAlertDialog() async {
     try {
       await _channel.invokeMethod('showNativeAlertDialog');
-      return ReturnStatus.Success;
-    } on PlatformException catch (e) {
-      return ReturnStatus.Failed;
+      return ReturnStatus.success;
+    } on PlatformException {
+      return ReturnStatus.failed;
     }
   }
 
   Future<ReturnStatus> setAllowedBarcodeTypes(List<BarcodeTypes> list) async {
     try {
       await _channel.invokeMethod('setAllowedBarcodeFormats',
-          list?.map((e) => e.asInt()).toList() ?? []);
-      return ReturnStatus.Success;
-    } on PlatformException catch (e) {
-      return ReturnStatus.Failed;
+          list?.map((e) => e.asInt())?.toList() ?? []);
+      return ReturnStatus.success;
+    } on PlatformException {
+      return ReturnStatus.failed;
     }
   }
 
@@ -246,7 +245,7 @@ class QRViewController {
       _features = SystemFeatures.fromJson(features);
       _activeCamera = features['activeCamera'];
       return _features;
-    } on PlatformException catch (e) {
+    } on PlatformException {
       return null;
     }
   }

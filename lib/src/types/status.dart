@@ -1,7 +1,7 @@
-enum ReturnStatus { Success, Failed }
+enum ReturnStatus { success, failed }
 
 extension ReturnStatusExtension on ReturnStatus {
   bool asBool() {
-    return this == ReturnStatus.Success;
+    return this == ReturnStatus.success;
   }
 }
