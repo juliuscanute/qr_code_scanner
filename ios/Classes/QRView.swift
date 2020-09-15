@@ -46,7 +46,10 @@ public class QRView:NSObject,FlutterPlatformView {
                     if let codes = codes {
                         for code in codes {
                             guard let stringValue = code.stringValue else { continue }
-                            if self?.allowedBarcodeTypes.count == 0 || self?.allowedBarcodeTypes.contains(code.type){
+                            if self == nil{
+                                continue
+                            }
+                            else if self!.allowedBarcodeTypes.count == 0 || self!.allowedBarcodeTypes.contains(code.type){
                                 self?.channel.invokeMethod("onRecognizeQR", arguments: stringValue)
                             }
                         }
