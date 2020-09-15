@@ -42,12 +42,12 @@ public class QRView:NSObject,FlutterPlatformView {
                 NSLog("firing permission")
                 self.channel.invokeMethod("onPermissionSet", arguments: true)
                 NSLog("permission fired")
-                try scanner?.startScanning(resultBlock: { codes in
+                try scanner?.startScanning(resultBlock: { [weak self] codes in
                     if let codes = codes {
                         for code in codes {
                             guard let stringValue = code.stringValue else { continue }
-                            if self.allowedBarcodeTypes.count == 0 || self.allowedBarcodeTypes.contains(code.type){
-                                self.channel.invokeMethod("onRecognizeQR", arguments: stringValue)
+                            if self?.allowedBarcodeTypes.count == 0 || self?.allowedBarcodeTypes.contains(code.type){
+                                self?.channel.invokeMethod("onRecognizeQR", arguments: stringValue)
                             }
                         }
                     }
