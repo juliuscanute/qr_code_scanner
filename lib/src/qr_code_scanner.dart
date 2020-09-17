@@ -134,7 +134,9 @@ class QRViewController {
             if (args != null) {
               if (args as bool) {
                 _cameraActive = true;
+                _hasPermissions = true;
               } else {
+                _hasPermissions = false;
                 if (showNativeAlertDialogOnError) {
                   showNativeAlertDialog();
                 }
@@ -174,6 +176,10 @@ class QRViewController {
   SystemFeatures _features;
 
   SystemFeatures get systemFeatures => _features;
+
+  bool _hasPermissions;
+
+  bool get hasPermissions => _hasPermissions;
 
   bool get cameraActive => _cameraActive;
 
