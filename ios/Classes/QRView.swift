@@ -25,10 +25,27 @@ public class QRView:NSObject,FlutterPlatformView {
             do {
                 try scanner?.startScanning(resultBlock: { codes in
                     if let codes = codes {
-                        for code in codes {
-                            guard let stringValue = code.stringValue else { continue }
-                            self.channel.invokeMethod("onRecognizeQR", arguments: stringValue)
+                        //for code in codes {
+                        //    guard let stringValue = code.stringValue else { continue }
+                        //    self.channel.invokeMethod("onRecognizeQR", arguments: stringValue)
+                        //}
+                        let validCodes = codes.filter { code -> Bool in
+                            return  !(code.stringValue ?? "").isEmpty
                         }
+                        let codesDictionary: [[String: Any]] = validCodes.map { code -> [String : Any] in
+                            return [
+                                "code": code.stringValue ?? "",
+                                "height": code.bounds.height,
+                                "width": code.bounds.width,
+                                "minX": code.bounds.minX,
+                                "midX": code.bounds.midX,
+                                "maxX": code.bounds.maxX,
+                                "minY": code.bounds.minY,
+                                "midY": code.bounds.midY,
+                                "maxY": code.bounds.maxY,
+                            ]
+                        }
+                        self.channel.invokeMethod("onRecognizeQR", arguments: codesDictionary)
                     }
                 })
             } catch {
@@ -64,7 +81,8 @@ public class QRView:NSObject,FlutterPlatformView {
     
     func setDimensions(width: Double, height: Double) -> Void {
        previewView.frame = CGRect(x: 0, y: 0, width: width, height: height)
-       scanner = MTBBarcodeScanner(previewView: previewView)
+       scanner = MTBBarcodeScanner(metadataObjectTypes: [AVMetadataObject.ObjectType.ean13
+       .rawValue], previewView: previewView)
        MTBBarcodeScanner.requestCameraPermission(success: isCameraAvailable)
     }
     

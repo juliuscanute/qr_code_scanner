@@ -107,7 +107,7 @@ class QRViewController {
         switch (call.method) {
           case scanMethodCall:
             if (call.arguments != null) {
-              _scanUpdateController.sink.add(call.arguments.toString());
+              _scanUpdateController.sink.add(call.arguments);
             }
         }
       },
@@ -118,10 +118,10 @@ class QRViewController {
 
   final MethodChannel _channel;
 
-  final StreamController<String> _scanUpdateController =
-      StreamController<String>();
+  final StreamController<dynamic> _scanUpdateController =
+      StreamController<dynamic>();
 
-  Stream<String> get scannedDataStream => _scanUpdateController.stream;
+  Stream<dynamic> get scannedDataStream => _scanUpdateController.stream;
 
   void flipCamera() {
     _channel.invokeMethod('flipCamera');
