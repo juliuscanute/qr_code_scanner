@@ -29,38 +29,34 @@ class _QRViewExampleState extends State<QRViewExample> {
     return Scaffold(
       body: Column(
         children: <Widget>[
-          Expanded(
-            flex: 4,
-            child: Container(
-              child: Stack(
-                children: [
-                  QRView(
-                    key: qrKey,
-                    onQRViewCreated: _onQRViewCreated,
-                    overlay: QrScannerOverlayShape(
-                      borderColor: Colors.red,
-                      borderRadius: 10,
-                      borderLength: 30,
-                      borderWidth: 10,
-                      cutOutSize: 300,
-                    ),
+          Container(
+            height: 400,
+            child: Stack(
+              children: [
+                QRView(
+                  key: qrKey,
+                  onQRViewCreated: _onQRViewCreated,
+                  // overlay: QrScannerOverlayShape(
+                  //   borderColor: Colors.red,
+                  //   borderRadius: 10,
+                  //   borderLength: 30,
+                  //   borderWidth: 10,
+                  //   cutOutSize: 300,
+                  // ),
+                ),
+                Positioned(
+                  top: barcodeData?.minY ?? 0,
+                  left: barcodeData?.minX ?? 0,
+                  child: Container(
+                    height: barcodeData?.height ?? 0,
+                    width: barcodeData?.width ?? 0,
+                    color: Colors.red,
                   ),
-                  Positioned(
-                    top: barcodeData?.minY ?? 0,
-                    left: barcodeData?.minX ?? 0,
-                    child: Container(
-                      height: barcodeData?.height ?? 0,
-                      width: barcodeData?.width ?? 0,
-                      color: Colors.red,
-                      child: Text('${barcodeData?.code}'),
-                    ),
-                  )
-                ],
-              ),
+                )
+              ],
             ),
           ),
           Expanded(
-            flex: 1,
             child: FittedBox(
               fit: BoxFit.contain,
               child: Column(
@@ -222,15 +218,15 @@ class BarcodeData {
   double maxX;
 
   factory BarcodeData.fromJson(Map<String, dynamic> json) => BarcodeData(
-        height: json["height"].toDouble(),
-        width: json["width"].toDouble(),
-        minX: json["minX"].toDouble(),
+        height: json["height"]?.toDouble() ?? 0,
+        width: json["width"]?.toDouble() ?? 0,
+        minX: json["minX"]?.toDouble() ?? 0,
         code: json["code"],
-        midX: json["midX"].toDouble(),
-        minY: json["minY"].toDouble(),
-        midY: json["midY"].toDouble(),
-        maxY: json["maxY"].toDouble(),
-        maxX: json["maxX"].toDouble(),
+        midX: json["midX"]?.toDouble() ?? 0,
+        minY: json["minY"]?.toDouble() ?? 0,
+        midY: json["midY"]?.toDouble() ?? 0,
+        maxY: json["maxY"]?.toDouble() ?? 0,
+        maxX: json["maxX"]?.toDouble() ?? 0,
       );
 
   Map<String, dynamic> toJson() => {
