@@ -99,4 +99,8 @@ public class QRView:NSObject,FlutterPlatformView {
             }
         }
     }
+
+    deinit {
+        scanner?.stopScanning()
+    }
 }
