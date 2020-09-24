@@ -17,18 +17,15 @@ class QRView extends StatefulWidget {
     @required Key key,
     @required this.onQRViewCreated,
     this.onPermissionSet,
-    this.turnFlashOffOnDispose = true,
     this.showNativeAlertDialog = false,
     this.overlay,
   })  : assert(key != null),
         assert(onQRViewCreated != null),
         assert(showNativeAlertDialog != null),
-        assert(turnFlashOffOnDispose != null),
         super(key: key);
 
   final QRViewCreatedCallback onQRViewCreated;
   final PermissionSetCallback onPermissionSet;
-  final bool turnFlashOffOnDispose;
   final bool showNativeAlertDialog;
   final ShapeBorder overlay;
 
@@ -86,8 +83,7 @@ class _QRViewState extends State<QRView> {
         id,
         widget.key,
         widget.onPermissionSet,
-        widget.showNativeAlertDialog,
-        widget.turnFlashOffOnDispose));
+        widget.showNativeAlertDialog));
   }
 }
 
@@ -118,7 +114,6 @@ class QRViewController {
     GlobalKey qrKey,
     PermissionSetCallback onPermissionSet,
     bool showNativeAlertDialogOnError,
-    this._turnFlashOffOnDispose,
   ) : _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id') {
     _channel.setMethodCallHandler(
       (call) async {
@@ -156,7 +151,6 @@ class QRViewController {
     }
   }
 
-  final bool _turnFlashOffOnDispose;
   static const scanMethodCall = 'onRecognizeQR';
   static const permissionMethodCall = 'onPermissionSet';
 
@@ -257,9 +251,6 @@ class QRViewController {
   }
 
   void dispose() {
-    if (_features.hasFlash && _turnFlashOffOnDispose && _flashActive) {
-      toggleFlash();
-    }
     _scanUpdateController.close();
   }
 }
