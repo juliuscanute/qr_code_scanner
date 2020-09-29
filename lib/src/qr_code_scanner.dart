@@ -130,7 +130,7 @@ class QRViewController {
               } else {
                 _hasPermissions = false;
                 if (showNativeAlertDialogOnError) {
-                  showNativeAlertDialog();
+                  await showNativeAlertDialog();
                 }
               }
               if (onPermissionSet != null) {
