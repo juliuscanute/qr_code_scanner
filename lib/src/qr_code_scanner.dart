@@ -80,10 +80,7 @@ class _QRViewState extends State<QRView> {
       return;
     }
     widget.onQRViewCreated(QRViewController._(
-        id,
-        widget.key,
-        widget.onPermissionSet,
-        widget.showNativeAlertDialog));
+        id, widget.key, widget.onPermissionSet, widget.showNativeAlertDialog));
   }
 }
 
