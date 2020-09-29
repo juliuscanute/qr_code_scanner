@@ -39,9 +39,8 @@ public class QRView:NSObject,FlutterPlatformView {
     func isCameraAvailable(success: Bool) -> Void {
         if success {
             do {
-                NSLog("firing permission")
                 self.channel.invokeMethod("onPermissionSet", arguments: true)
-                NSLog("permission fired")
+
                 try scanner?.startScanning(resultBlock: { [weak self] codes in
                     if let codes = codes {
                         for code in codes {
