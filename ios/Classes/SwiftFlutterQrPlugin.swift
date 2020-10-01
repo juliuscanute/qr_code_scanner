@@ -2,7 +2,7 @@ import Flutter
 import UIKit
 import MTBBarcodeScanner
 
-public class SwiftFlutterQrPlugin: NSObject, FlutterPlugin, FlutterStreamHandler{
+public class SwiftFlutterQrPlugin: NSObject, FlutterPlugin{
   var channel: FlutterMethodChannel
   var factory: QRViewFactory
 
@@ -10,7 +10,8 @@ public class SwiftFlutterQrPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
     self.factory = QRViewFactory(withRegistrar: registrar)
     registrar.register(factory, withId: "net.touchcapture.qr.flutterqr/qrview")
     channel = FlutterMethodChannel(name: "net.touchcapture.qr.flutterqr/qrview", binaryMessenger: registrar.messenger())
-    channel.setMethodCallHandler(self)
+    super.init()
+    channel.setMethodCallHandler(self.onMethodCalled)
   }
     
   public static func register(with registrar: FlutterPluginRegistrar) {
@@ -26,9 +27,9 @@ public class SwiftFlutterQrPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
     }
     
   public func onMethodCalled(_ call: FlutterMethodCall, result: @escaping FlutterResult){
-        switch call.method {
+      switch call.method {
         case "requestPermissions":
-            MTBBarcodeScanner.requestCameraPermission(success: (success:Bool)->isCameraAvailable(success, result))
+            MTBBarcodeScanner.requestCameraPermission(success: {(success:Bool) in self.isCameraAvailable(success, result)})
         default:
             result(FlutterMethodNotImplemented)
         }

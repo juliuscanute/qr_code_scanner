@@ -17,7 +17,8 @@ class QRView extends StatefulWidget {
 
   static Future<bool> requestCameraPermission() async {
     try {
-      return await _channel.invokeMethod('requestPermissions');
+      var permissions =  await _channel.invokeMethod('requestPermissions');
+      return permissions;
     } on PlatformException {
       return false;
     }
