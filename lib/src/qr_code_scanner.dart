@@ -12,6 +12,16 @@ import 'types/status.dart';
 typedef QRViewCreatedCallback = void Function(QRViewController);
 typedef PermissionSetCallback = void Function(QRViewController, bool);
 
+final _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview');
+
+Future<bool> requestCameraPermission() async {
+  try {
+    return await _channel.invokeMethod('requestPermissions');
+  } on PlatformException {
+    return false;
+  }
+}
+
 class QRView extends StatefulWidget {
   const QRView({
     @required Key key,
