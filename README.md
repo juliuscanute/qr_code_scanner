@@ -180,12 +180,7 @@ var FrontCameraIsActive = controller.activeCamera == Camera.FrontCamera
 ```
 
 ## dispose
-Turn off flash automatically if you call dispose
-```dart
-QRView(
-      turnFlashOffOnDispose: true,
-  ),
-```
+If the view gets disposed, the flash and camera automatically shutdown.
 
 
 
