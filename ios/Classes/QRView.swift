@@ -54,6 +54,9 @@ public class QRView:NSObject,FlutterPlatformView {
                     self?.pauseCamera()
                 case "resumeCamera":
                     self?.resumeCamera()
+                case "stopScanning":
+                // 添加关闭相机方法
+                    self?.scanner?.stopScanning()
                 default:
                     result(FlutterMethodNotImplemented)
                     return

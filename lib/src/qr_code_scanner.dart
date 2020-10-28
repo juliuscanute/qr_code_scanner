@@ -140,6 +140,8 @@ class QRViewController {
   }
 
   void dispose() {
+    // 退出页面后，关闭相机，不然会在iOS14中，bar上一直显示绿点，相机在运行
+    _channel.invokeMethod('stopScanning');
     _scanUpdateController.close();
   }
 }
