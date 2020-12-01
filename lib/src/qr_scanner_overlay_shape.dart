@@ -11,8 +11,8 @@ class QrScannerOverlayShape extends ShapeBorder {
     this.borderLength = 40,
     this.cutOutSize = 250,
   }) : assert(
-            cutOutSize != null ??
-                cutOutSize != null ??
+            cutOutSize != null &&
+                cutOutSize != null &&
                 borderLength <= cutOutSize / 2 + borderWidth * 2,
             "Border can't be larger than ${cutOutSize / 2 + borderWidth * 2}");
 
@@ -27,14 +27,14 @@ class QrScannerOverlayShape extends ShapeBorder {
   EdgeInsetsGeometry get dimensions => const EdgeInsets.all(10);
 
   @override
-  Path getInnerPath(Rect rect, {TextDirection textDirection}) {
+  Path getInnerPath(Rect rect, {TextDirection? textDirection}) {
     return Path()
       ..fillType = PathFillType.evenOdd
       ..addPath(getOuterPath(rect), Offset.zero);
   }
 
   @override
-  Path getOuterPath(Rect rect, {TextDirection textDirection}) {
+  Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
     Path _getLeftTopPath(Rect rect) {
       return Path()
         ..moveTo(rect.left, rect.bottom)
@@ -58,7 +58,7 @@ class QrScannerOverlayShape extends ShapeBorder {
   }
 
   @override
-  void paint(Canvas canvas, Rect rect, {TextDirection textDirection}) {
+  void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {
     final width = rect.width;
     final borderWidthSize = width / 2;
     final height = rect.height;

@@ -8,8 +8,8 @@ typedef QRViewCreatedCallback = void Function(QRViewController);
 
 class QRView extends StatefulWidget {
   const QRView({
-    @required Key key,
-    @required this.onQRViewCreated,
+    required Key key,
+    required this.onQRViewCreated,
     this.overlay,
   })  : assert(key != null),
         assert(onQRViewCreated != null),
@@ -17,7 +17,7 @@ class QRView extends StatefulWidget {
 
   final QRViewCreatedCallback onQRViewCreated;
 
-  final ShapeBorder overlay;
+  final ShapeBorder? overlay;
 
   @override
   State<StatefulWidget> createState() => _QRViewState();
@@ -32,7 +32,7 @@ class _QRViewState extends State<QRView> {
         if (widget.overlay != null)
           Container(
             decoration: ShapeDecoration(
-              shape: widget.overlay,
+              shape: widget.overlay!,
             ),
           )
         else
@@ -69,12 +69,12 @@ class _QRViewState extends State<QRView> {
     if (widget.onQRViewCreated == null) {
       return;
     }
-    widget.onQRViewCreated(QRViewController._(id, widget.key));
+    widget.onQRViewCreated(QRViewController._(id, widget.key as GlobalKey));
   }
 }
 
 class _CreationParams {
-  _CreationParams({this.width, this.height});
+  _CreationParams({required this.width, required this.height});
 
   static _CreationParams fromWidget(double width, double height) {
     return _CreationParams(
@@ -98,9 +98,11 @@ class QRViewController {
   QRViewController._(int id, GlobalKey qrKey)
       : _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id') {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      final RenderBox renderBox = qrKey.currentContext.findRenderObject();
-      _channel.invokeMethod('setDimensions',
-          {'width': renderBox.size.width, 'height': renderBox.size.height});
+      final RenderBox? renderBox =
+          qrKey.currentContext?.findRenderObject() as RenderBox;
+      if (renderBox != null)
+        _channel.invokeMethod('setDimensions',
+            {'width': renderBox.size.width, 'height': renderBox.size.height});
     }
     _channel.setMethodCallHandler(
       (call) async {

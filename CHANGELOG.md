@@ -1,3 +1,6 @@
+## 0.0.13-nullsafety
+* Add null-safety support
+
 ## 0.0.13
 * Fix misalignment when QRView doesn't start from the top left (#45)
 * Fix crash on iOS when scanning returns nil (#69, #72)

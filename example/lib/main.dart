@@ -10,7 +10,7 @@ const backCamera = 'BACK CAMERA';
 
 class QRViewExample extends StatefulWidget {
   const QRViewExample({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -21,7 +21,7 @@ class _QRViewExampleState extends State<QRViewExample> {
   var qrText = '';
   var flashState = flashOn;
   var cameraState = frontCamera;
-  QRViewController controller;
+  QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
   @override
@@ -60,7 +60,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                         child: RaisedButton(
                           onPressed: () {
                             if (controller != null) {
-                              controller.toggleFlash();
+                              controller!.toggleFlash();
                               if (_isFlashOn(flashState)) {
                                 setState(() {
                                   flashState = flashOff;
@@ -81,7 +81,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                         child: RaisedButton(
                           onPressed: () {
                             if (controller != null) {
-                              controller.flipCamera();
+                              controller!.flipCamera();
                               if (_isBackCamera(cameraState)) {
                                 setState(() {
                                   cameraState = frontCamera;
@@ -151,7 +151,7 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   @override
   void dispose() {
-    controller.dispose();
+    controller?.dispose();
     super.dispose();
   }
 }
