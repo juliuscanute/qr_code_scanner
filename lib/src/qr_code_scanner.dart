@@ -11,9 +11,7 @@ class QRView extends StatefulWidget {
     required Key key,
     required this.onQRViewCreated,
     this.overlay,
-  })  : assert(key != null),
-        assert(onQRViewCreated != null),
-        super(key: key);
+  }) : super(key: key);
 
   final QRViewCreatedCallback onQRViewCreated;
 
@@ -66,9 +64,6 @@ class _QRViewState extends State<QRView> {
   }
 
   void _onPlatformViewCreated(int id) {
-    if (widget.onQRViewCreated == null) {
-      return;
-    }
     widget.onQRViewCreated(QRViewController._(id, widget.key as GlobalKey));
   }
 }
@@ -100,9 +95,10 @@ class QRViewController {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       final RenderBox? renderBox =
           qrKey.currentContext?.findRenderObject() as RenderBox;
-      if (renderBox != null)
+      if (renderBox != null) {
         _channel.invokeMethod('setDimensions',
             {'width': renderBox.size.width, 'height': renderBox.size.height});
+      }
     }
     _channel.setMethodCallHandler(
       (call) async {
