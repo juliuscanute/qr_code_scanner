@@ -1,5 +1,8 @@
-## 0.0.13-nullsafety
+## 0.0.14-nullsafety
 * Add null-safety support
+
+## 0.0.14
+* Fix disposing camera on iOS 14 (#113)
 
 ## 0.0.13
 * Fix misalignment when QRView doesn't start from the top left (#45)
