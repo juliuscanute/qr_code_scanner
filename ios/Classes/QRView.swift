@@ -44,7 +44,7 @@ public class QRView:NSObject,FlutterPlatformView {
             [weak self] (call: FlutterMethodCall, result: FlutterResult) -> Void in
             switch(call.method){
                 case "setDimensions":
-                    var arguments = call.arguments as! Dictionary<String, Double>
+                    let arguments = call.arguments as! Dictionary<String, Double>
                     self?.setDimensions(width: arguments["width"] ?? 0,height: arguments["height"] ?? 0)
                 case "flipCamera":
                     self?.flipCamera()
