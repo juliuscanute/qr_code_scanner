@@ -38,7 +38,8 @@ android {
 
     defaultConfig {
         applicationId "net.touchcapture.qr.flutterqrexample"
-        minSdkVersion 19
+        // minSdkVersion is determined by Native View.
+        minSdkVersion 20
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
