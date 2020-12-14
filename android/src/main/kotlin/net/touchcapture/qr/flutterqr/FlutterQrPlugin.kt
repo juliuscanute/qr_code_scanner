@@ -1,60 +1,54 @@
 package net.touchcapture.qr.flutterqr
 
 import android.Manifest
-import android.app.Activity
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry
+import io.flutter.plugin.platform.PlatformViewRegistry
 
 
 class FlutterQrPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     var cameraPermissionContinuation: Runnable? = null
     var requestingPermission = false
-//    private var activity: Activity? = null
 
-//    /** Plugin registration embedding v1 */
-//    companion object {
-//        @JvmStatic
-//        fun registerWith(registrar: Registrar) {
-//            FlutterQrPlugin().onAttachedToEngine(registrar)
-//        }
-//    }
+    /** Plugin registration embedding v1 */
+    companion object {
+        @JvmStatic
+        fun registerWith(registrar: PluginRegistry.Registrar) {
+            FlutterQrPlugin().onAttachedToV1(registrar)
+        }
+    }
+
+    private fun onAttachedToV1(registrar: PluginRegistry.Registrar) {
+        Shared.activity = registrar.activity()
+        registrar.addRequestPermissionsResultListener(CameraRequestPermissionsListener())
+        checkAndRequestPermission(null)
+        onAttachedToEngines(registrar.platformViewRegistry(), registrar.messenger())
+    }
 
     /** Plugin registration embedding v2 */
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        onAttachedToEngines(flutterPluginBinding)
+        onAttachedToEngines(flutterPluginBinding.platformViewRegistry, flutterPluginBinding.binaryMessenger)
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
     }
 
-    // TODO: Fix v1 embedding for Flutter < 1.12 support
     /** Plugin start for both embedding v1 & v2 */
-    private fun onAttachedToEngines(binding: FlutterPlugin.FlutterPluginBinding) {
-        binding.platformViewRegistry
+    private fun onAttachedToEngines(platformViewRegistry: PlatformViewRegistry, messenger: BinaryMessenger) {
+        platformViewRegistry
                 .registerViewFactory(
-                        "net.touchcapture.qr.flutterqr/qrview", QRViewFactory(binding.binaryMessenger))
+                        "net.touchcapture.qr.flutterqr/qrview", QRViewFactory(messenger))
     }
-
-//    private fun onAttachedToEngine(registrar: Registrar) {
-//        activity = registrar.activity()
-//        registrar.addRequestPermissionsResultListener(CameraRequestPermissionsListener())
-//        checkAndRequestPermission(null)
-//        registrar
-//                .platformViewRegistry()
-//                .registerViewFactory(
-//                        "net.touchcapture.qr.flutterqr/qrview", QRViewFactory(registrar))
-//    }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
         when (call.method) {
@@ -63,24 +57,20 @@ class FlutterQrPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     override fun onAttachedToActivity(activityPluginBinding: ActivityPluginBinding) {
-        Shared.activityPluginBinding = activityPluginBinding
         Shared.activity = activityPluginBinding.activity
         activityPluginBinding.addRequestPermissionsResultListener(CameraRequestPermissionsListener())
         checkAndRequestPermission(null)
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
-        Shared.activityPluginBinding = null
         Shared.activity = null
     }
 
     override fun onReattachedToActivityForConfigChanges(activityPluginBinding: ActivityPluginBinding) {
-        Shared.activityPluginBinding = activityPluginBinding
         Shared.activity = activityPluginBinding.activity
     }
 
     override fun onDetachedFromActivity() {
-        Shared.activityPluginBinding = null
         Shared.activity = null
     }
 
@@ -101,7 +91,7 @@ class FlutterQrPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     private fun checkAndRequestPermission(result: Result?) {
         if (cameraPermissionContinuation != null) {
-            result?.error("cameraPermission", "Camera permission request ongoing", null);
+            result?.error("cameraPermission", "Camera permission request ongoing", null)
         }
 
         cameraPermissionContinuation = Runnable {
