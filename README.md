@@ -120,11 +120,11 @@ controller.toggleFlash();
 ## Resume/Pause
 Pause camera stream and scanner.
 ```dart
-controller.pause();
+controller.pauseCamera();
 ```
 Resume camera stream and scanner.
 ```dart
-controller.resume();
+controller.resumeCamera();
 ```
 
 
