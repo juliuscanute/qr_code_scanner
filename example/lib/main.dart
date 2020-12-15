@@ -129,7 +129,7 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   Widget _buildQrView(BuildContext context) {
     // To ensure the Scanner view is properly sizes after rotation
-    // we need to listen for Flutter SizeChanged notifiation and update controller
+    // we need to listen for Flutter SizeChanged notification and update controller
     return NotificationListener<SizeChangedLayoutNotification>(
         onNotification: (notification) {
           Future.microtask(() => controller?.updateDimensions(qrKey));
