@@ -63,9 +63,16 @@ public class QRView:NSObject,FlutterPlatformView {
     }
     
     func setDimensions(width: Double, height: Double) -> Void {
-       previewView.frame = CGRect(x: 0, y: 0, width: width, height: height)
-       scanner = MTBBarcodeScanner(previewView: previewView)
-       MTBBarcodeScanner.requestCameraPermission(success: isCameraAvailable)
+        previewView.frame = CGRect(x: 0, y: 0, width: width, height: height)
+
+        if let sc: MTBBarcodeScanner = scanner {
+            if let previewLayer = sc.previewLayer {
+                previewLayer.frame = previewView.bounds;
+            }
+        } else {
+            scanner = MTBBarcodeScanner(previewView: previewView)
+            MTBBarcodeScanner.requestCameraPermission(success: isCameraAvailable)
+        }
     }
     
     func flipCamera(){
