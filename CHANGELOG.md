@@ -1,3 +1,11 @@
+## 0.1.0
+* Changed Android minSDKversion from 24 to 21 (#170)
+* Fix preview size after iPad rotation (#125)
+* Implemented Android Embedding V2 (#132)
+* Added cutout bottom offset (#115)
+* Fix Android ActivityLifecycleCallbacks (#166)
+* Fix some other small bugs
+
 ## 0.0.14
 * Fix disposing camera on iOS 14 (#113)
 
