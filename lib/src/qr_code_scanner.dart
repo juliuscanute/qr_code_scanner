@@ -11,6 +11,7 @@ class QRView extends StatefulWidget {
     @required Key key,
     @required this.onQRViewCreated,
     this.overlay,
+    this.overlayMargin = EdgeInsets.zero,
   })  : assert(key != null),
         assert(onQRViewCreated != null),
         super(key: key);
@@ -18,6 +19,7 @@ class QRView extends StatefulWidget {
   final QRViewCreatedCallback onQRViewCreated;
 
   final ShapeBorder overlay;
+  final EdgeInsetsGeometry overlayMargin;
 
   @override
   State<StatefulWidget> createState() => _QRViewState();
@@ -31,6 +33,7 @@ class _QRViewState extends State<QRView> {
         _getPlatformQrView(),
         if (widget.overlay != null)
           Container(
+            padding: widget.overlayMargin,
             decoration: ShapeDecoration(
               shape: widget.overlay,
             ),
@@ -97,11 +100,7 @@ class _CreationParams {
 class QRViewController {
   QRViewController._(int id, GlobalKey qrKey)
       : _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id') {
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      final RenderBox renderBox = qrKey.currentContext.findRenderObject();
-      _channel.invokeMethod('setDimensions',
-          {'width': renderBox.size.width, 'height': renderBox.size.height});
-    }
+    updateDimensions(qrKey);
     _channel.setMethodCallHandler(
       (call) async {
         switch (call.method) {
@@ -141,5 +140,13 @@ class QRViewController {
 
   void dispose() {
     _scanUpdateController.close();
+  }
+
+  void updateDimensions(GlobalKey key) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      final RenderBox renderBox = key.currentContext.findRenderObject();
+      _channel.invokeMethod('setDimensions',
+          {'width': renderBox.size.width, 'height': renderBox.size.height});
+    }
   }
 }
