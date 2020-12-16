@@ -63,9 +63,20 @@ class _QRViewExampleState extends State<QRViewExample> {
         children: <Widget>[
           Expanded(
             flex: 5,
-            child: QRView(
-              key: qrKey,
-              onQRViewCreated: _onQRViewCreated,
+             // To ensure the Scanner view is properly sizes after rotation
+             // we need to listen for Flutter SizeChanged notification and update controller
+            child: NotificationListener<SizeChangedLayoutNotification>(
+              onNotification: (notification) {
+                Future.microtask(() => controller?.updateDimensions(qrKey));
+                return false;
+              },
+              child: SizeChangedLayoutNotifier(
+                key: const Key('qr-size-notifier'),
+                child: QRView(
+                  key: qrKey,
+                  onQRViewCreated: _onQRViewCreated,
+                ),
+              ),
             ),
           ),
           Expanded(
@@ -120,16 +131,16 @@ controller.toggleFlash();
 ## Resume/Pause
 Pause camera stream and scanner.
 ```dart
-controller.pause();
+controller.pauseCamera();
 ```
 Resume camera stream and scanner.
 ```dart
-controller.resume();
+controller.resumeCamera();
 ```
 
 
 # SDK
-Requires at least SDK 24 (Android 7.0).
+Requires at least SDK 21 (Android 5.0).
 
 # TODOs
 * iOS Native embedding is written to match what is supported in the framework as of the date of publication of this package. It needs to be improved as the framework support improves.

@@ -1,3 +1,14 @@
+## 0.1.0
+* Changed Android minSDKversion from 24 to 21 (#170)
+* Fix preview size after iPad rotation (#125)
+* Implemented Android Embedding V2 (#132)
+* Added cutout bottom offset (#115)
+* Fix Android ActivityLifecycleCallbacks (#166)
+* Fix some other small bugs
+
+## 0.0.14
+* Fix disposing camera on iOS 14 (#113)
+
 ## 0.0.13
 * Fix misalignment when QRView doesn't start from the top left (#45)
 * Fix crash on iOS when scanning returns nil (#69, #72)
