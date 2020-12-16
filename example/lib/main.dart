@@ -25,6 +25,12 @@ class _QRViewExampleState extends State<QRViewExample> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
   @override
+  void reassemble() {
+    super.reassemble();
+    controller.pauseCamera();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
