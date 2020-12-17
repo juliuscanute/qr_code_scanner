@@ -106,8 +106,6 @@ class QRView extends StatefulWidget {
 }
 
 class _QRViewState extends State<QRView> {
-
-
   @override
   Widget build(BuildContext context) {
     return Stack(

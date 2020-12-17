@@ -45,7 +45,8 @@ class _QRViewExampleState extends State<QRViewExample> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   if (result != null)
-                    Text('Barcode Type: ${describeEnum(result.format)}   Data: ${result.code}')
+                    Text(
+                        'Barcode Type: ${describeEnum(result.format)}   Data: ${result.code}')
                   else
                     Text('Scan a code'),
                   Row(
