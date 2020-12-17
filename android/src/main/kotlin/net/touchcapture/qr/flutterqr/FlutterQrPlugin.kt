@@ -1,6 +1,7 @@
 package net.touchcapture.qr.flutterqr
 
 import android.Manifest
+import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.annotation.NonNull
@@ -29,22 +30,24 @@ class FlutterQrPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private fun onAttachedToV1(registrar: PluginRegistry.Registrar) {
-        Shared.activity = registrar.activity()
         registrar.addRequestPermissionsResultListener(CameraRequestPermissionsListener())
         checkAndRequestPermission(null)
-        onAttachedToEngines(registrar.platformViewRegistry(), registrar.messenger())
+        onAttachedToEngines(registrar.platformViewRegistry(), registrar.messenger(), registrar.activity())
     }
 
     /** Plugin registration embedding v2 */
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        onAttachedToEngines(flutterPluginBinding.platformViewRegistry, flutterPluginBinding.binaryMessenger)
+        onAttachedToEngines(flutterPluginBinding.platformViewRegistry, flutterPluginBinding.binaryMessenger, Shared.activity)
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
     }
 
     /** Plugin start for both embedding v1 & v2 */
-    private fun onAttachedToEngines(platformViewRegistry: PlatformViewRegistry, messenger: BinaryMessenger) {
+    private fun onAttachedToEngines(platformViewRegistry: PlatformViewRegistry, messenger: BinaryMessenger, activity: Activity?) {
+        if (activity != null) {
+            Shared.activity = activity
+        }
         platformViewRegistry
                 .registerViewFactory(
                         "net.touchcapture.qr.flutterqr/qrview", QRViewFactory(messenger))
