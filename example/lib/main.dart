@@ -33,13 +33,6 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   @override
   Widget build(BuildContext context) {
-    String resultText;
-    if (result == null) {
-      resultText = 'No previous result';
-    } else {
-      resultText =
-          'This is the result of scan (${describeEnum(result.format)}): ${result.code}';
-    }
     return Scaffold(
       body: Column(
         children: <Widget>[
@@ -51,7 +44,10 @@ class _QRViewExampleState extends State<QRViewExample> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  Text(resultText),
+                  if (result != null)
+                    Text('Barcode Type: ${describeEnum(result.format)}   Data: ${result.code}')
+                  else
+                    Text('Scan a code'),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,

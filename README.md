@@ -53,8 +53,16 @@ When a QR code is recognized, the text identified will be set in 'qrText'.
 ```dart
 class _QRViewExampleState extends State<QRViewExample> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  var qrText = "";
+  Barcode result;
   QRViewController controller;
+
+  /// Overriding reassemble and pausing the camera
+  /// ensures us that hot reload won't give a black screen
+  @override
+  void reassemble() {
+    super.reassemble();
+    controller.pauseCamera();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +90,9 @@ class _QRViewExampleState extends State<QRViewExample> {
           Expanded(
             flex: 1,
             child: Center(
-              child: Text('Scan result: $qrText'),
+              child: (result != null) ?
+                        Text('Barcode Type: ${describeEnum(result.format)}   Data: ${result.code}')
+                      : Text('Scan a code'),
             ),
           )
         ],
