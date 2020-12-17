@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
@@ -18,7 +19,7 @@ class QRViewExample extends StatefulWidget {
 }
 
 class _QRViewExampleState extends State<QRViewExample> {
-  var qrText = '';
+  Barcode result;
   var flashState = flashOn;
   var cameraState = frontCamera;
   QRViewController controller;
@@ -32,6 +33,13 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   @override
   Widget build(BuildContext context) {
+    String resultText;
+    if (result == null) {
+      resultText = 'No previous result';
+    } else {
+      resultText =
+          'This is the result of scan (${describeEnum(result.format)}): ${result.code}';
+    }
     return Scaffold(
       body: Column(
         children: <Widget>[
@@ -43,7 +51,7 @@ class _QRViewExampleState extends State<QRViewExample> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  Text('This is the result of scan: $qrText'),
+                  Text(resultText),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -160,7 +168,7 @@ class _QRViewExampleState extends State<QRViewExample> {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
       setState(() {
-        qrText = scanData;
+        result = scanData;
       });
     });
   }
