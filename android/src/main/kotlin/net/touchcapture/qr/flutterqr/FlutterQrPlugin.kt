@@ -1,6 +1,7 @@
 package net.touchcapture.qr.flutterqr
 
 import android.app.Activity
+import android.content.pm.PackageManager
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -57,5 +58,15 @@ class FlutterQrPlugin : FlutterPlugin, ActivityAware {
 
     override fun onDetachedFromActivity() {
         Shared.activity = null
+    }
+    
+    inner class CameraRequestPermissionsListener : PluginRegistry.RequestPermissionsResultListener {
+        override fun onRequestPermissionsResult(id: Int, permissions: Array<String>, grantResults: IntArray): Boolean {
+            if (id == Shared.CAMERA_REQUEST_ID && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Shared.cameraPermissionContinuation?.run()
+                return true
+            }
+            return false
+        }
     }
 }
