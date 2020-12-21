@@ -47,12 +47,16 @@ class _QRViewExampleState extends State<QRViewExample> {
   QRViewController controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
-  /// Overriding reassemble and pausing the camera
-  /// ensures us that hot reload won't give a black screen
+  // In order to get hot reload to work we need to pause the camera if the platform
+  // is android, or resume the camera if the platform is iOS.
   @override
   void reassemble() {
     super.reassemble();
-    controller.pauseCamera();
+    if (Platform.isAndroid) {
+      controller.pauseCamera();
+    } else if (Platform.isIOS) {
+      controller.resumeCamera();
+    }
   }
 
   @override
@@ -69,7 +73,8 @@ class _QRViewExampleState extends State<QRViewExample> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   if (result != null)
-                    Text('Barcode Type: ${describeEnum(result.format)}   Data: ${result.code}')
+                    Text(
+                        'Barcode Type: ${describeEnum(result.format)}   Data: ${result.code}')
                   else
                     Text('Scan a code'),
                   Row(
@@ -162,11 +167,17 @@ class _QRViewExampleState extends State<QRViewExample> {
   }
 
   Widget _buildQrView(BuildContext context) {
+    // For this example we check how width or tall the device is and change the scanArea and overlay accordingly.
+    var scanArea = (MediaQuery.of(context).size.width < 400 ||
+            MediaQuery.of(context).size.height < 400)
+        ? 150.0
+        : 300.0;
     // To ensure the Scanner view is properly sizes after rotation
     // we need to listen for Flutter SizeChanged notification and update controller
     return NotificationListener<SizeChangedLayoutNotification>(
         onNotification: (notification) {
-          Future.microtask(() => controller?.updateDimensions(qrKey));
+          Future.microtask(
+              () => controller?.updateDimensions(qrKey, scanArea: scanArea));
           return false;
         },
         child: SizeChangedLayoutNotifier(
@@ -179,7 +190,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                 borderRadius: 10,
                 borderLength: 30,
                 borderWidth: 10,
-                cutOutSize: 300,
+                cutOutSize: scanArea,
               ),
             )));
   }
@@ -199,6 +210,7 @@ class _QRViewExampleState extends State<QRViewExample> {
     super.dispose();
   }
 }
+
 
 
 ```
