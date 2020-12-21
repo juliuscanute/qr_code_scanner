@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 typedef QRViewCreatedCallback = void Function(QRViewController);
 
@@ -110,7 +111,7 @@ class _QRViewState extends State<QRView> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        _getPlatformQrView(),
+        _getPlatformQrView(widget.key),
         if (widget.overlay != null)
           Container(
             padding: widget.overlayMargin,
@@ -124,7 +125,7 @@ class _QRViewState extends State<QRView> {
     );
   }
 
-  Widget _getPlatformQrView() {
+  Widget _getPlatformQrView(GlobalKey key) {
     Widget _platformQrView;
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -137,7 +138,9 @@ class _QRViewState extends State<QRView> {
         _platformQrView = UiKitView(
           viewType: 'net.touchcapture.qr.flutterqr/qrview',
           onPlatformViewCreated: _onPlatformViewCreated,
-          creationParams: _CreationParams.fromWidget(0, 0).toMap(),
+          creationParams:
+              _CreationParams.fromWidget(MediaQuery.of(context).size.width, 400)
+                  .toMap(),
           creationParamsCodec: StandardMessageCodec(),
         );
         break;
@@ -152,7 +155,9 @@ class _QRViewState extends State<QRView> {
     if (widget.onQRViewCreated == null) {
       return;
     }
-    widget.onQRViewCreated(QRViewController._(id, widget.key));
+
+    widget.onQRViewCreated(QRViewController._(
+        id, widget.key, (widget.overlay as QrScannerOverlayShape).cutOutSize));
   }
 }
 
@@ -178,9 +183,9 @@ class _CreationParams {
 }
 
 class QRViewController {
-  QRViewController._(int id, GlobalKey qrKey)
+  QRViewController._(int id, GlobalKey qrKey, double scanArea)
       : _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id') {
-    updateDimensions(qrKey);
+    updateDimensions(qrKey, scanArea: scanArea);
     _channel.setMethodCallHandler(
       (call) async {
         switch (call.method) {
@@ -231,11 +236,14 @@ class QRViewController {
     _scanUpdateController.close();
   }
 
-  void updateDimensions(GlobalKey key) {
+  void updateDimensions(GlobalKey key, {double scanArea}) {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       final RenderBox renderBox = key.currentContext.findRenderObject();
-      _channel.invokeMethod('setDimensions',
-          {'width': renderBox.size.width, 'height': renderBox.size.height});
+      _channel.invokeMethod('setDimensions', {
+        'width': renderBox.size.width,
+        'height': renderBox.size.height,
+        'scanArea': scanArea ?? 0
+      });
     }
   }
 }

@@ -53,7 +53,6 @@ public class QRView:NSObject,FlutterPlatformView {
                                 default:
                                     return
                             }
-
                             guard let stringValue = code.stringValue else { continue }
                             let result = ["code": stringValue, "type": typeString]
                             self?.channel.invokeMethod("onRecognizeQR", arguments: result)
@@ -74,7 +73,7 @@ public class QRView:NSObject,FlutterPlatformView {
             switch(call.method){
                 case "setDimensions":
                     let arguments = call.arguments as! Dictionary<String, Double>
-                    self?.setDimensions(width: arguments["width"] ?? 0,height: arguments["height"] ?? 0)
+                    self?.setDimensions(width: arguments["width"] ?? 0, height: arguments["height"] ?? 0, scanArea: arguments["scanArea"] ?? 0)
                 case "flipCamera":
                     self?.flipCamera()
                 case "toggleFlash":
@@ -91,15 +90,24 @@ public class QRView:NSObject,FlutterPlatformView {
         return previewView
     }
     
-    func setDimensions(width: Double, height: Double) -> Void {
+    func setDimensions(width: Double, height: Double, scanArea: Double) -> Void {
         previewView.frame = CGRect(x: 0, y: 0, width: width, height: height)
-
+        let midX = self.view().bounds.midX
+        let midY = self.view().bounds.midY
         if let sc: MTBBarcodeScanner = scanner {
             if let previewLayer = sc.previewLayer {
                 previewLayer.frame = previewView.bounds;
             }
         } else {
             scanner = MTBBarcodeScanner(previewView: previewView)
+            
+            if (scanArea != 0) {
+                scanner?.didStartScanningBlock = {
+                    self.scanner?.scanRect = CGRect(x: Double(midX) - (scanArea / 2), y: Double(midY) - (scanArea / 2), width: scanArea, height: scanArea)
+                }
+            }
+
+
             MTBBarcodeScanner.requestCameraPermission(success: isCameraAvailable)
         }
     }
