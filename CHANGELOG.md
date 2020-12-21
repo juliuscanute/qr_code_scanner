@@ -1,3 +1,13 @@
+## 0.2.0
+#### Breaking change
+* The plugin now returns Barcode object instead of QR String. This object includes the type of code, the code itself and on Android devices the raw bytes. (#63)
+#### New Features
+* Added possibility to provide scanArea on iOS. (#165)
+#### Bug fixes
+* Fixed preview going black after hot reload. (#76)
+* Fixed nullpointer when plugin binding order isn't correct. (#181)
+* Fixed permission being asked on startup (#185)
+
 ## 0.1.0
 * Changed Android minSDKversion from 24 to 21 (#170)
 * Fix preview size after iPad rotation (#125)
