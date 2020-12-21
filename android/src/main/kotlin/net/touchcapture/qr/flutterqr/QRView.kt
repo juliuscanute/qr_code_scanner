@@ -16,7 +16,6 @@ import com.journeyapps.barcodescanner.BarcodeView
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.platform.PlatformView
 class QRView(messenger: BinaryMessenger, id: Int, private val context: Context) :
         PlatformView, MethodChannel.MethodCallHandler {
@@ -82,12 +81,12 @@ class QRView(messenger: BinaryMessenger, id: Int, private val context: Context) 
         }
     }
 
-    fun flipCamera() {
+    private fun flipCamera() {
         barcodeView?.pause()
-        var settings = barcodeView?.cameraSettings
+        val settings = barcodeView?.cameraSettings
 
         if(settings?.requestedCameraId == CameraInfo.CAMERA_FACING_FRONT)
-            settings?.requestedCameraId = CameraInfo.CAMERA_FACING_BACK
+            settings.requestedCameraId = CameraInfo.CAMERA_FACING_BACK
         else
             settings?.requestedCameraId = CameraInfo.CAMERA_FACING_FRONT
 
@@ -133,7 +132,7 @@ class QRView(messenger: BinaryMessenger, id: Int, private val context: Context) 
         return barcodeView
     }
 
-    private fun createBarCodeView(): BarcodeView? {
+    private fun createBarCodeView(): BarcodeView {
         val barcode = BarcodeView(Shared.activity)
         barcode.decodeContinuous(
                 object : BarcodeCallback {
