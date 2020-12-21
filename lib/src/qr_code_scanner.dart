@@ -138,7 +138,9 @@ class _QRViewState extends State<QRView> {
         _platformQrView = UiKitView(
           viewType: 'net.touchcapture.qr.flutterqr/qrview',
           onPlatformViewCreated: _onPlatformViewCreated,
-          creationParams: _CreationParams.fromWidget(MediaQuery.of(context).size.width, 400).toMap(),
+          creationParams:
+              _CreationParams.fromWidget(MediaQuery.of(context).size.width, 400)
+                  .toMap(),
           creationParamsCodec: StandardMessageCodec(),
         );
         break;
@@ -154,7 +156,8 @@ class _QRViewState extends State<QRView> {
       return;
     }
 
-    widget.onQRViewCreated(QRViewController._(id, widget.key, (widget.overlay as QrScannerOverlayShape).cutOutSize));
+    widget.onQRViewCreated(QRViewController._(
+        id, widget.key, (widget.overlay as QrScannerOverlayShape).cutOutSize));
   }
 }
 
@@ -236,10 +239,11 @@ class QRViewController {
   void updateDimensions(GlobalKey key, {double scanArea}) {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       final RenderBox renderBox = key.currentContext.findRenderObject();
-      _channel.invokeMethod('setDimensions',
-          {'width': renderBox.size.width,
-            'height': renderBox.size.height,
-          'scanArea': scanArea?? 0});
+      _channel.invokeMethod('setDimensions', {
+        'width': renderBox.size.width,
+        'height': renderBox.size.height,
+        'scanArea': scanArea ?? 0
+      });
     }
   }
 }
