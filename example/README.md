@@ -41,11 +41,19 @@ class QRViewExample extends StatefulWidget {
 }
 
 class _QRViewExampleState extends State<QRViewExample> {
-  var qrText = '';
+  Barcode result;
   var flashState = flashOn;
   var cameraState = frontCamera;
   QRViewController controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+
+  /// Overriding reassemble and pausing the camera
+  /// ensures us that hot reload won't give a black screen
+  @override
+  void reassemble() {
+    super.reassemble();
+    controller.pauseCamera();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +68,10 @@ class _QRViewExampleState extends State<QRViewExample> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  Text('This is the result of scan: $qrText'),
+                  if (result != null)
+                    Text('Barcode Type: ${describeEnum(result.format)}   Data: ${result.code}')
+                  else
+                    Text('Scan a code'),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -177,7 +188,7 @@ class _QRViewExampleState extends State<QRViewExample> {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
       setState(() {
-        qrText = scanData;
+        result = scanData;
       });
     });
   }
@@ -188,6 +199,7 @@ class _QRViewExampleState extends State<QRViewExample> {
     super.dispose();
   }
 }
+
 
 ```
 
