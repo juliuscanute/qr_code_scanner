@@ -138,7 +138,10 @@ class QRView(messenger: BinaryMessenger, id: Int, private val context: Context) 
         barcode.decodeContinuous(
                 object : BarcodeCallback {
                     override fun barcodeResult(result: BarcodeResult) {
-                        val code = mapOf("code" to result.text, "type" to result.barcodeFormat.name)
+                        val code = mapOf(
+                                "code" to result.text,
+                                "type" to result.barcodeFormat.name,
+                                "rawBytes" to result.rawBytes)
                         channel.invokeMethod("onRecognizeQR", code)
                     }
 
@@ -179,15 +182,5 @@ class QRView(messenger: BinaryMessenger, id: Int, private val context: Context) 
             }
         }
     }
-
 }
 
-class CameraRequestPermissionsListener : PluginRegistry.RequestPermissionsResultListener {
-    override fun onRequestPermissionsResult(id: Int, permissions: Array<String>, grantResults: IntArray): Boolean {
-        if (id == Shared.CAMERA_REQUEST_ID && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Shared.cameraPermissionContinuation?.run()
-            return true
-        }
-        return false
-    }
-}

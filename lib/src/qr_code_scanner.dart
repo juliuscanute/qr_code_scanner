@@ -81,10 +81,12 @@ const _formatNames = <String, BarcodeFormat>{
 };
 
 class Barcode {
-  Barcode(this.code, this.format);
+  Barcode(this.code, this.format, this.rawBytes);
 
   final String code;
   final BarcodeFormat format;
+  /// Raw bytes are only supported by Android.
+  final List<int> rawBytes;
 }
 
 class QRView extends StatefulWidget {
@@ -194,9 +196,11 @@ class QRViewController {
               final args = call.arguments as Map;
               final code = args['code'] as String;
               final rawType = args['type'] as String;
+              // Raw bytes are only supported by Android.
+              final rawBytes = args['rawBytes'] as List<int>;
               final format = _formatNames[rawType];
               if (format != null) {
-                final barcode = Barcode(code, format);
+                final barcode = Barcode(code, format, rawBytes);
                 _scanUpdateController.sink.add(barcode);
               } else {
                 throw Exception('Unexpected barcode type $rawType');
