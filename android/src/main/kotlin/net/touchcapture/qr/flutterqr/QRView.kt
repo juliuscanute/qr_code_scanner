@@ -1,5 +1,6 @@
 package net.touchcapture.qr.flutterqr
 
+import android.Manifest
 import android.app.Activity
 import android.app.Application
 import android.content.Context
@@ -8,26 +9,25 @@ import android.os.Bundle
 import android.view.View
 import com.google.zxing.ResultPoint
 import android.hardware.Camera.CameraInfo
+import android.os.Build
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.BarcodeView
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.platform.PlatformView
 class QRView(messenger: BinaryMessenger, id: Int, private val context: Context) :
         PlatformView, MethodChannel.MethodCallHandler {
 
-    companion object {
-        const val CAMERA_REQUEST_ID = 513469796
-    }
-
-    var barcodeView: BarcodeView? = null
-
     private var isTorchOn: Boolean = false
-    val channel: MethodChannel
+    private var barcodeView: BarcodeView? = null
+    private var requestingPermission = false
+    private val channel: MethodChannel
 
     init {
+        checkAndRequestPermission(null)
         channel = MethodChannel(messenger, "net.touchcapture.qr.flutterqr/qrview_$id")
         channel.setMethodCallHandler(this)
         Shared.activity?.application?.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
@@ -58,6 +58,28 @@ class QRView(messenger: BinaryMessenger, id: Int, private val context: Context) 
             override fun onActivityCreated(p0: Activity, p1: Bundle?) {
             }
         })
+    }
+
+    override fun dispose() {
+        barcodeView?.pause()
+        barcodeView = null
+    }
+
+    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        when(call.method){
+            "flipCamera" -> {
+                flipCamera()
+            }
+            "toggleFlash" -> {
+                toggleFlash()
+            }
+            "pauseCamera" -> {
+                pauseCamera()
+            }
+            "resumeCamera" -> {
+                resumeCamera()
+            }
+        }
     }
 
     fun flipCamera() {
@@ -126,28 +148,46 @@ class QRView(messenger: BinaryMessenger, id: Int, private val context: Context) 
         return barcode
     }
 
-    override fun dispose() {
-        barcodeView?.pause()
-        barcodeView = null
+    private fun hasCameraPermission(): Boolean {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+                Shared.activity?.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
     }
 
-    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        when(call.method){
-            "flipCamera" -> {
-                flipCamera()
+    private fun checkAndRequestPermission(result: MethodChannel.Result?) {
+        if (Shared.cameraPermissionContinuation != null) {
+            result?.error("cameraPermission", "Camera permission request ongoing", null)
+        }
+
+        Shared.cameraPermissionContinuation = Runnable {
+            Shared.cameraPermissionContinuation = null
+            if (!hasCameraPermission()) {
+                result?.error(
+                        "cameraPermission", "MediaRecorderCamera permission not granted", null)
+                return@Runnable
             }
-            "toggleFlash" -> {
-                toggleFlash()
-            }
-            "pauseCamera" -> {
-                pauseCamera()
-            }
-            "resumeCamera" -> {
-                resumeCamera()
+        }
+
+        requestingPermission = false
+        if (hasCameraPermission()) {
+            Shared.cameraPermissionContinuation?.run()
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestingPermission = true
+                Shared.activity?.requestPermissions(
+                        arrayOf(Manifest.permission.CAMERA),
+                        Shared.CAMERA_REQUEST_ID)
             }
         }
     }
 
+}
 
-
+class CameraRequestPermissionsListener : PluginRegistry.RequestPermissionsResultListener {
+    override fun onRequestPermissionsResult(id: Int, permissions: Array<String>, grantResults: IntArray): Boolean {
+        if (id == Shared.CAMERA_REQUEST_ID && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Shared.cameraPermissionContinuation?.run()
+            return true
+        }
+        return false
+    }
 }

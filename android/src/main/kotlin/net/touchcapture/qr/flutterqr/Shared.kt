@@ -1,9 +1,9 @@
 package net.touchcapture.qr.flutterqr
 
 import android.app.Activity
-import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
-
 
 object Shared {
+    const val CAMERA_REQUEST_ID = 513469796
     var activity: Activity? = null
+    var cameraPermissionContinuation: Runnable? = null
 }
