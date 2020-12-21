@@ -85,6 +85,7 @@ class Barcode {
 
   final String code;
   final BarcodeFormat format;
+
   /// Raw bytes are only supported by Android.
   final List<int> rawBytes;
 }
