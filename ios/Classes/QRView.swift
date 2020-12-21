@@ -13,18 +13,15 @@ public class QRView:NSObject,FlutterPlatformView {
     var scanner: MTBBarcodeScanner?
     var registrar: FlutterPluginRegistrar
     var channel: FlutterMethodChannel
-    var frame: CGRect
     
     public init(withFrame frame: CGRect, withRegistrar registrar: FlutterPluginRegistrar, withId id: Int64){
         self.registrar = registrar
-        self.frame = frame
         previewView = UIView(frame: frame)
         channel = FlutterMethodChannel(name: "net.touchcapture.qr.flutterqr/qrview_\(id)", binaryMessenger: registrar.messenger())
     }
     
     func isCameraAvailable(success: Bool) -> Void {
         if success {
-            
             do {
                 try scanner?.startScanning(resultBlock: { [weak self] codes in
                     if let codes = codes {
@@ -56,7 +53,6 @@ public class QRView:NSObject,FlutterPlatformView {
                                 default:
                                     return
                             }
-
                             guard let stringValue = code.stringValue else { continue }
                             let result = ["code": stringValue, "type": typeString]
                             self?.channel.invokeMethod("onRecognizeQR", arguments: result)
