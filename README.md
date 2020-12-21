@@ -3,6 +3,14 @@
 
 A QR code scanner that works on both iOS and Android by natively embedding the platform view within Flutter. The integration with Flutter is seamless, much better than jumping into a native Activity or a ViewController to perform the scan.
 
+# *Warning*
+If you are using Flutter Beta or Dev channel (1.25 or 1.26) you can get the following error:
+
+`java.lang.AbstractMethodError: abstract method "void io.flutter.plugin.platform.PlatformView.onFlutterViewAttached(android.view.View)"`
+
+This is a bug in Flutter which is being tracked here: https://github.com/flutter/flutter/issues/72185
+
+There is a workaround by adding `android.enableDexingArtifactTransform=false` to your `gradle.properties` file.
 
 ## Screenshots
 <table>
