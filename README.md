@@ -56,12 +56,16 @@ class _QRViewExampleState extends State<QRViewExample> {
   Barcode result;
   QRViewController controller;
 
-  /// Overriding reassemble and pausing the camera
-  /// ensures us that hot reload won't give a black screen
+  // In order to get hot reload to work we need to pause the camera if the platform
+  // is android, or resume the camera if the platform is iOS.
   @override
   void reassemble() {
     super.reassemble();
-    controller.pauseCamera();
+    if (Platform.isAndroid) {
+      controller.pauseCamera();
+    } else if (Platform.isIOS) {
+      controller.resumeCamera();
+    }
   }
 
   @override
