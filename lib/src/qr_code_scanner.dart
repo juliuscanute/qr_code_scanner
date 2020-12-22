@@ -87,22 +87,21 @@ class Barcode {
   final BarcodeFormat format;
 
   /// Raw bytes are only supported by Android.
-  final List<int> rawBytes;
+  final List<int>? rawBytes;
 }
 
 class QRView extends StatefulWidget {
   const QRView({
-    @required Key key,
-    @required this.onQRViewCreated,
+    required Key key,
+    required this.onQRViewCreated,
     this.overlay,
     this.overlayMargin = EdgeInsets.zero,
-  })  : assert(key != null),
-        assert(onQRViewCreated != null),
+  })  : assert(onQRViewCreated != null),
         super(key: key);
 
   final QRViewCreatedCallback onQRViewCreated;
 
-  final ShapeBorder overlay;
+  final ShapeBorder? overlay;
   final EdgeInsetsGeometry overlayMargin;
 
   @override
@@ -114,12 +113,12 @@ class _QRViewState extends State<QRView> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        _getPlatformQrView(widget.key),
+        _getPlatformQrView(widget.key as GlobalKey<State<StatefulWidget>>),
         if (widget.overlay != null)
           Container(
             padding: widget.overlayMargin,
             decoration: ShapeDecoration(
-              shape: widget.overlay,
+              shape: widget.overlay!,
             ),
           )
         else
@@ -155,17 +154,13 @@ class _QRViewState extends State<QRView> {
   }
 
   void _onPlatformViewCreated(int id) {
-    if (widget.onQRViewCreated == null) {
-      return;
-    }
-
     // We pass the cutout size so that the scanner respects the scan area.
     var cutOutSize = 0.0;
     if (widget.overlay != null) {
       cutOutSize = (widget.overlay as QrScannerOverlayShape).cutOutSize;
     }
 
-    widget.onQRViewCreated(QRViewController._(id, widget.key, cutOutSize));
+    widget.onQRViewCreated(QRViewController._(id, widget.key as GlobalKey<State<StatefulWidget>>, cutOutSize));
   }
 }
 
@@ -179,8 +174,8 @@ class _CreationParams {
     );
   }
 
-  final double width;
-  final double height;
+  final double? width;
+  final double? height;
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -201,10 +196,10 @@ class QRViewController {
             if (call.arguments != null) {
               final args = call.arguments as Map;
               final code = args['code'] as String;
-              final rawType = args['type'] as String;
+              final rawType = args['type'] as String?;
               // Raw bytes are only supported by Android.
-              final rawBytes = args['rawBytes'] as List<int>;
-              final format = _formatNames[rawType];
+              final rawBytes = args['rawBytes'] as List<int>?;
+              final format = _formatNames[rawType!];
               if (format != null) {
                 final barcode = Barcode(code, format, rawBytes);
                 _scanUpdateController.sink.add(barcode);
@@ -246,9 +241,9 @@ class QRViewController {
     _scanUpdateController.close();
   }
 
-  void updateDimensions(GlobalKey key, {double scanArea}) {
+  void updateDimensions(GlobalKey key, {double? scanArea}) {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      final RenderBox renderBox = key.currentContext.findRenderObject();
+      final renderBox = key.currentContext!.findRenderObject() as RenderBox;
       _channel.invokeMethod('setDimensions', {
         'width': renderBox.size.width,
         'height': renderBox.size.height,
