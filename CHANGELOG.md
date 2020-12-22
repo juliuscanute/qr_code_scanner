@@ -1,3 +1,6 @@
+## 0.2.1
+* Fixed critical bug where scanner wouldn't open when no scan overlay was configured.
+
 ## 0.2.0
 #### Breaking change
 * The plugin now returns Barcode object instead of QR String. This object includes the type of code, the code itself and on Android devices the raw bytes. (#63)

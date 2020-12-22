@@ -159,8 +159,13 @@ class _QRViewState extends State<QRView> {
       return;
     }
 
-    widget.onQRViewCreated(QRViewController._(
-        id, widget.key, (widget.overlay as QrScannerOverlayShape).cutOutSize));
+    // We pass the cutout size so that the scanner respects the scan area.
+    var cutOutSize = 0.0;
+    if (widget.overlay != null) {
+      cutOutSize = (widget.overlay as QrScannerOverlayShape).cutOutSize;
+    }
+
+    widget.onQRViewCreated(QRViewController._(id, widget.key, cutOutSize));
   }
 }
 
