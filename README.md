@@ -4,7 +4,7 @@
 A QR code scanner that works on both iOS and Android by natively embedding the platform view within Flutter. The integration with Flutter is seamless, much better than jumping into a native Activity or a ViewController to perform the scan.
 
 # Breaking changes
-In version 0.2.0 the plugin returns a Barcode object instead of QR a String. This object includes the type of code, the code itself and on Android devices the raw bytes. (#63)
+In version 0.2.1 the plugin returns a Barcode object instead of QR a String. This object includes the type of code, the code itself and on Android devices the raw bytes. (#63)
 
 # *Warning*
 If you are using Flutter Beta or Dev channel (1.25 or 1.26) you can get the following error:
