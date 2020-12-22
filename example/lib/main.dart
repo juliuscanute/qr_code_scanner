@@ -13,7 +13,7 @@ const backCamera = 'BACK CAMERA';
 
 class QRViewExample extends StatefulWidget {
   const QRViewExample({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -21,10 +21,10 @@ class QRViewExample extends StatefulWidget {
 }
 
 class _QRViewExampleState extends State<QRViewExample> {
-  Barcode result;
+  Barcode? result;
   var flashState = flashOn;
   var cameraState = frontCamera;
-  QRViewController controller;
+  QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
   // In order to get hot reload to work we need to pause the camera if the platform
@@ -33,9 +33,9 @@ class _QRViewExampleState extends State<QRViewExample> {
   void reassemble() {
     super.reassemble();
     if (Platform.isAndroid) {
-      controller.pauseCamera();
+      controller!.pauseCamera();
     } else if (Platform.isIOS) {
-      controller.resumeCamera();
+      controller!.resumeCamera();
     }
   }
 
@@ -54,7 +54,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                 children: <Widget>[
                   if (result != null)
                     Text(
-                        'Barcode Type: ${describeEnum(result.format)}   Data: ${result.code}')
+                        'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
                   else
                     Text('Scan a code'),
                   Row(
@@ -66,7 +66,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                         child: RaisedButton(
                           onPressed: () {
                             if (controller != null) {
-                              controller.toggleFlash();
+                              controller!.toggleFlash();
                               if (_isFlashOn(flashState)) {
                                 setState(() {
                                   flashState = flashOff;
@@ -87,7 +87,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                         child: RaisedButton(
                           onPressed: () {
                             if (controller != null) {
-                              controller.flipCamera();
+                              controller!.flipCamera();
                               if (_isBackCamera(cameraState)) {
                                 setState(() {
                                   cameraState = frontCamera;
@@ -186,7 +186,7 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   @override
   void dispose() {
-    controller.dispose();
+    controller!.dispose();
     super.dispose();
   }
 }
