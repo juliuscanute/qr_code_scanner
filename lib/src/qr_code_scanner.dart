@@ -7,6 +7,14 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 typedef QRViewCreatedCallback = void Function(QRViewController);
 
+enum CameraFacing {
+  /// Shows back facing camera.
+  back,
+
+  /// Shows front facing camera.
+  front
+}
+
 enum BarcodeFormat {
   /// Aztec 2D barcode format.
   aztec,
@@ -80,6 +88,11 @@ const _formatNames = <String, BarcodeFormat>{
   'UPC_EAN_EXTENSION': BarcodeFormat.upcEanExtension,
 };
 
+/// The [Barcode] object holds information about the barcode or qr code.
+///
+/// [code] is the content of the barcode.
+/// [format] displays which type the code is.
+/// Only for Android, [rawBytes] gives a list of bytes of the result.
 class Barcode {
   Barcode(this.code, this.format, this.rawBytes);
 
@@ -90,60 +103,84 @@ class Barcode {
   final List<int> rawBytes;
 }
 
+/// The [QRView] is the view where the camera and the barcode scanner gets displayed.
 class QRView extends StatefulWidget {
   const QRView({
     @required Key key,
     @required this.onQRViewCreated,
     this.overlay,
     this.overlayMargin = EdgeInsets.zero,
+    this.cameraFacing = CameraFacing.back,
   })  : assert(key != null),
         assert(onQRViewCreated != null),
         super(key: key);
 
   final QRViewCreatedCallback onQRViewCreated;
-
   final ShapeBorder overlay;
   final EdgeInsetsGeometry overlayMargin;
+  final CameraFacing cameraFacing;
 
   @override
   State<StatefulWidget> createState() => _QRViewState();
 }
 
 class _QRViewState extends State<QRView> {
+
+  var _channel;
+
   @override
   Widget build(BuildContext context) {
+    return NotificationListener(
+      onNotification: onNotification,
+      child: SizeChangedLayoutNotifier(
+        child: (widget.overlay != null) ?
+        _getPlatformQrViewWithOverlay() :
+        _getPlatformQrView(),
+      ),
+    );
+  }
+
+  bool onNotification(notification) {
+    Future.microtask(() => {
+      QRViewController.updateDimensions(
+          widget.key,
+          _channel,
+    scanArea: widget.overlay != null ?
+    (widget.overlay as QrScannerOverlayShape).cutOutSize : 0.0)
+    });
+    return false;
+  }
+
+  Widget _getPlatformQrViewWithOverlay() {
     return Stack(
       children: [
-        _getPlatformQrView(widget.key),
-        if (widget.overlay != null)
-          Container(
-            padding: widget.overlayMargin,
-            decoration: ShapeDecoration(
-              shape: widget.overlay,
-            ),
-          )
-        else
-          Container(),
+        _getPlatformQrView(),
+        Container(
+          padding: widget.overlayMargin,
+          decoration: ShapeDecoration(
+            shape: widget.overlay,
+          ),
+        )
       ],
     );
   }
 
-  Widget _getPlatformQrView(GlobalKey key) {
+  Widget _getPlatformQrView() {
     Widget _platformQrView;
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         _platformQrView = AndroidView(
           viewType: 'net.touchcapture.qr.flutterqr/qrview',
           onPlatformViewCreated: _onPlatformViewCreated,
+          creationParams: _QrCameraSettings(cameraFacing: widget.cameraFacing).toMap(),
+          creationParamsCodec: StandardMessageCodec(),
         );
         break;
       case TargetPlatform.iOS:
         _platformQrView = UiKitView(
           viewType: 'net.touchcapture.qr.flutterqr/qrview',
           onPlatformViewCreated: _onPlatformViewCreated,
-          creationParams:
-              _CreationParams.fromWidget(MediaQuery.of(context).size.width, 400)
-                  .toMap(),
+          creationParams: _QrCameraSettings(cameraFacing: widget.cameraFacing).toMap(),
           creationParamsCodec: StandardMessageCodec(),
         );
         break;
@@ -155,101 +192,109 @@ class _QRViewState extends State<QRView> {
   }
 
   void _onPlatformViewCreated(int id) {
-    if (widget.onQRViewCreated == null) {
-      return;
-    }
-
     // We pass the cutout size so that the scanner respects the scan area.
     var cutOutSize = 0.0;
     if (widget.overlay != null) {
       cutOutSize = (widget.overlay as QrScannerOverlayShape).cutOutSize;
     }
 
-    widget.onQRViewCreated(QRViewController._(id, widget.key, cutOutSize));
+    _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id');
+
+    // Start scan after creation of the view
+    final controller = QRViewController._(_channel, widget.key, cutOutSize)
+    .._startScan(widget.key, cutOutSize);
+
+    // Initialize the controller for controlling the QRView
+    if (widget.onQRViewCreated != null) {
+      widget.onQRViewCreated(controller);
+    }
   }
 }
 
-class _CreationParams {
-  _CreationParams({this.width, this.height});
+class _QrCameraSettings {
+  _QrCameraSettings({
+     this.cameraFacing,
+  });
 
-  static _CreationParams fromWidget(double width, double height) {
-    return _CreationParams(
-      width: width,
-      height: height,
-    );
-  }
-
-  final double width;
-  final double height;
+  final CameraFacing cameraFacing;
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'width': width,
-      'height': height,
+      'cameraFacing': cameraFacing.index,
     };
   }
+
 }
 
 class QRViewController {
-  QRViewController._(int id, GlobalKey qrKey, double scanArea)
-      : _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id') {
-    updateDimensions(qrKey, scanArea: scanArea);
-    _channel.setMethodCallHandler(
-      (call) async {
-        switch (call.method) {
-          case scanMethodCall:
-            if (call.arguments != null) {
-              final args = call.arguments as Map;
-              final code = args['code'] as String;
-              final rawType = args['type'] as String;
-              // Raw bytes are only supported by Android.
-              final rawBytes = args['rawBytes'] as List<int>;
-              final format = _formatNames[rawType];
-              if (format != null) {
-                final barcode = Barcode(code, format, rawBytes);
-                _scanUpdateController.sink.add(barcode);
-              } else {
-                throw Exception('Unexpected barcode type $rawType');
-              }
-            }
-        }
-      },
-    );
+  QRViewController._(MethodChannel channel, GlobalKey qrKey, double scanArea)
+      : _channel = channel {
+    _channel.setMethodCallHandler(_onMethodCall);
   }
 
-  static const scanMethodCall = 'onRecognizeQR';
-
   final MethodChannel _channel;
-
   final StreamController<Barcode> _scanUpdateController =
       StreamController<Barcode>();
 
   Stream<Barcode> get scannedDataStream => _scanUpdateController.stream;
 
+  Future<void> _onMethodCall(MethodCall call) async {
+    switch (call.method) {
+      case 'onRecognizeQR':
+        if (call.arguments != null) {
+          final args = call.arguments as Map;
+          final code = args['code'] as String;
+          final rawType = args['type'] as String;
+          // Raw bytes are only supported by Android.
+          final rawBytes = args['rawBytes'] as List<int>;
+          final format = _formatNames[rawType];
+          if (format != null) {
+            final barcode = Barcode(code, format, rawBytes);
+            _scanUpdateController.sink.add(barcode);
+          } else {
+            throw Exception('Unexpected barcode type $rawType');
+          }
+        }
+    }
+  }
+
+  /// Starts the barcode scanner
+  Future<void> _startScan(GlobalKey key, double cutOutSize, ) async {
+    // We need to update the dimension before the scan is started.
+    QRViewController.updateDimensions(key, _channel, scanArea: cutOutSize);
+    return _channel.invokeMethod('startScan');
+  }
+
+  /// Flips the camera between available modes
   void flipCamera() {
     _channel.invokeMethod('flipCamera');
   }
 
+  /// Toggles the flashlight between available modes
   void toggleFlash() {
     _channel.invokeMethod('toggleFlash');
   }
 
+  /// Pauses barcode scanning
   void pauseCamera() {
     _channel.invokeMethod('pauseCamera');
   }
 
+  /// Resumes barcode scanning
   void resumeCamera() {
     _channel.invokeMethod('resumeCamera');
   }
 
+  /// Disposes the barcode stream.
   void dispose() {
     _scanUpdateController.close();
   }
 
-  void updateDimensions(GlobalKey key, {double scanArea}) {
+  /// Updates the view dimensions for iOS.
+  static void updateDimensions(GlobalKey key, MethodChannel channel, {double scanArea}) {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       final RenderBox renderBox = key.currentContext.findRenderObject();
-      _channel.invokeMethod('setDimensions', {
+      channel.invokeMethod('setDimensions', {
         'width': renderBox.size.width,
         'height': renderBox.size.height,
         'scanArea': scanArea ?? 0

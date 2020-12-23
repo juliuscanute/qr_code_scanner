@@ -17,7 +17,7 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
-class QRView(messenger: BinaryMessenger, id: Int, private val context: Context) :
+class QRView(messenger: BinaryMessenger, id: Int, private val context: Context, private val params: HashMap<String, Any>) :
         PlatformView, MethodChannel.MethodCallHandler {
 
     private var isTorchOn: Boolean = false
@@ -66,6 +66,12 @@ class QRView(messenger: BinaryMessenger, id: Int, private val context: Context) 
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when(call.method){
+            "startScan" -> {
+                startScan()
+            }
+            "stopScan" -> {
+                stopScan()
+            }
             "flipCamera" -> {
                 flipCamera()
             }
@@ -127,14 +133,16 @@ class QRView(messenger: BinaryMessenger, id: Int, private val context: Context) 
 
     private fun initBarCodeView(): BarcodeView? {
         if (barcodeView == null) {
-            barcodeView = createBarCodeView()
+            barcodeView = BarcodeView(Shared.activity)
+            if (params["cameraFacing"] as Int == 1) {
+                barcodeView?.cameraSettings?.requestedCameraId = CameraInfo.CAMERA_FACING_FRONT
+            }
         }
         return barcodeView
     }
 
-    private fun createBarCodeView(): BarcodeView {
-        val barcode = BarcodeView(Shared.activity)
-        barcode.decodeContinuous(
+    private fun startScan() {
+        barcodeView?.decodeContinuous(
                 object : BarcodeCallback {
                     override fun barcodeResult(result: BarcodeResult) {
                         val code = mapOf(
@@ -147,7 +155,10 @@ class QRView(messenger: BinaryMessenger, id: Int, private val context: Context) 
                     override fun possibleResultPoints(resultPoints: List<ResultPoint>) {}
                 }
         )
-        return barcode
+    }
+
+    private fun stopScan() {
+        barcodeView?.stopDecoding()
     }
 
     private fun hasCameraPermission(): Boolean {
