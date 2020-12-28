@@ -125,7 +125,6 @@ class QRView extends StatefulWidget {
 }
 
 class _QRViewState extends State<QRView> {
-
   var _channel;
 
   @override
@@ -133,21 +132,20 @@ class _QRViewState extends State<QRView> {
     return NotificationListener(
       onNotification: onNotification,
       child: SizeChangedLayoutNotifier(
-        child: (widget.overlay != null) ?
-        _getPlatformQrViewWithOverlay() :
-        _getPlatformQrView(),
+        child: (widget.overlay != null)
+            ? _getPlatformQrViewWithOverlay()
+            : _getPlatformQrView(),
       ),
     );
   }
 
   bool onNotification(notification) {
     Future.microtask(() => {
-      QRViewController.updateDimensions(
-          widget.key,
-          _channel,
-    scanArea: widget.overlay != null ?
-    (widget.overlay as QrScannerOverlayShape).cutOutSize : 0.0)
-    });
+          QRViewController.updateDimensions(widget.key, _channel,
+              scanArea: widget.overlay != null
+                  ? (widget.overlay as QrScannerOverlayShape).cutOutSize
+                  : 0.0)
+        });
     return false;
   }
 
@@ -172,7 +170,8 @@ class _QRViewState extends State<QRView> {
         _platformQrView = AndroidView(
           viewType: 'net.touchcapture.qr.flutterqr/qrview',
           onPlatformViewCreated: _onPlatformViewCreated,
-          creationParams: _QrCameraSettings(cameraFacing: widget.cameraFacing).toMap(),
+          creationParams:
+              _QrCameraSettings(cameraFacing: widget.cameraFacing).toMap(),
           creationParamsCodec: StandardMessageCodec(),
         );
         break;
@@ -180,7 +179,8 @@ class _QRViewState extends State<QRView> {
         _platformQrView = UiKitView(
           viewType: 'net.touchcapture.qr.flutterqr/qrview',
           onPlatformViewCreated: _onPlatformViewCreated,
-          creationParams: _QrCameraSettings(cameraFacing: widget.cameraFacing).toMap(),
+          creationParams:
+              _QrCameraSettings(cameraFacing: widget.cameraFacing).toMap(),
           creationParamsCodec: StandardMessageCodec(),
         );
         break;
@@ -202,7 +202,7 @@ class _QRViewState extends State<QRView> {
 
     // Start scan after creation of the view
     final controller = QRViewController._(_channel, widget.key, cutOutSize)
-    .._startScan(widget.key, cutOutSize);
+      .._startScan(widget.key, cutOutSize);
 
     // Initialize the controller for controlling the QRView
     if (widget.onQRViewCreated != null) {
@@ -213,7 +213,7 @@ class _QRViewState extends State<QRView> {
 
 class _QrCameraSettings {
   _QrCameraSettings({
-     this.cameraFacing,
+    this.cameraFacing,
   });
 
   final CameraFacing cameraFacing;
@@ -223,7 +223,6 @@ class _QrCameraSettings {
       'cameraFacing': cameraFacing.index,
     };
   }
-
 }
 
 class QRViewController {
@@ -259,7 +258,10 @@ class QRViewController {
   }
 
   /// Starts the barcode scanner
-  Future<void> _startScan(GlobalKey key, double cutOutSize, ) async {
+  Future<void> _startScan(
+    GlobalKey key,
+    double cutOutSize,
+  ) async {
     // We need to update the dimension before the scan is started.
     QRViewController.updateDimensions(key, _channel, scanArea: cutOutSize);
     return _channel.invokeMethod('startScan');
@@ -291,7 +293,8 @@ class QRViewController {
   }
 
   /// Updates the view dimensions for iOS.
-  static void updateDimensions(GlobalKey key, MethodChannel channel, {double scanArea}) {
+  static void updateDimensions(GlobalKey key, MethodChannel channel,
+      {double scanArea}) {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       final RenderBox renderBox = key.currentContext.findRenderObject();
       channel.invokeMethod('setDimensions', {
