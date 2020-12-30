@@ -56,13 +56,10 @@ extension BarcodeTypesExtension on BarcodeFormat {
     return index;
   }
 
-  BarcodeFormat fromString(String format) {
-
-  }
+  BarcodeFormat fromString(String format) {}
 
   String get formatName {
     switch (this) {
-
       case BarcodeFormat.aztec:
         return 'AZTEC';
         break;
@@ -117,5 +114,4 @@ extension BarcodeTypesExtension on BarcodeFormat {
     }
     return 'NOT_VALID';
   }
-
 }
