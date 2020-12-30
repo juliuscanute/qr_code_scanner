@@ -15,6 +15,22 @@ public class QRView:NSObject,FlutterPlatformView {
     var channel: FlutterMethodChannel
     var cameraFacing: MTBCamera
     
+    var allowedBarcodeTypes: Array<AVMetadataObject.ObjectType> = []
+    
+    var QRCodeTypes = [
+          0: AVMetadataObject.ObjectType.aztec,
+          1: AVMetadataObject.ObjectType.code128,
+          2: AVMetadataObject.ObjectType.code39,
+          3: AVMetadataObject.ObjectType.code93,
+          4: AVMetadataObject.ObjectType.dataMatrix,
+          5: AVMetadataObject.ObjectType.ean13,
+          6: AVMetadataObject.ObjectType.ean8,
+          7: AVMetadataObject.ObjectType.interleaved2of5,
+          8: AVMetadataObject.ObjectType.pdf417,
+          9: AVMetadataObject.ObjectType.qr,
+          10: AVMetadataObject.ObjectType.upce
+         ]
+    
     public init(withFrame frame: CGRect, withRegistrar registrar: FlutterPluginRegistrar, withId id: Int64, params: Dictionary<String, Any>){
         self.registrar = registrar
         previewView = UIView(frame: frame)
@@ -36,13 +52,23 @@ public class QRView:NSObject,FlutterPlatformView {
                 case "startScan":
                     self?.startScan(result)
                 case "flipCamera":
-                    self?.flipCamera()
+                    self?.flipCamera(result)
                 case "toggleFlash":
-                    self?.toggleFlash()
+                    self?.toggleFlash(result)
                 case "pauseCamera":
-                    self?.pauseCamera()
+                    self?.pauseCamera(result)
                 case "resumeCamera":
-                    self?.resumeCamera()
+                    self?.resumeCamera(result)
+                case "getCameraInfo":
+                    self?.getCameraInfo(result)
+                case "getFlashInfo":
+                    self?.getFlashInfo(result)
+                case "showNativeAlertDialog":
+                    self?.showNativeAlertDialog(result)
+                case "getSystemFeatures":
+                    self?.getSystemFeatures(result)
+                case "setAllowedBarcodeFormats":
+                    self?.setBarcodeFormats(call.arguments as! Array<Int>, result)
                 default:
                     result(FlutterMethodNotImplemented)
                     return
@@ -108,7 +134,10 @@ public class QRView:NSObject,FlutterPlatformView {
                                 }
                                 guard let stringValue = code.stringValue else { continue }
                                 let result = ["code": stringValue, "type": typeString]
-                                self?.channel.invokeMethod("onRecognizeQR", arguments: result)
+                                if self!.allowedBarcodeTypes.count == 0 || self!.allowedBarcodeTypes.contains(code.type) {
+                                    self?.channel.invokeMethod("onRecognizeQR", arguments: result)
+                                }
+                                
                             }
                         }
                     })
@@ -131,35 +160,106 @@ public class QRView:NSObject,FlutterPlatformView {
         }
     }
     
-    func flipCamera(){
+    func getCameraInfo(_ result: @escaping FlutterResult) -> Void {
+        if let sc: MTBBarcodeScanner = scanner {
+            result(sc.camera.rawValue)
+        } else {
+            let error = FlutterError(code: "cameraInformationError", message: "Could not get camera information", details: nil)
+            result(error)
+        }
+    }
+    
+    func flipCamera(_ result: @escaping FlutterResult){
         if let sc: MTBBarcodeScanner = scanner {
             if sc.hasOppositeCamera() {
                 sc.flipCamera()
             }
+            return result(sc.camera.rawValue)
+        }
+        return result(FlutterError(code: "404", message: "No barcode scanner found", details: nil))
+    }
+    
+    func getFlashInfo(_ result: @escaping FlutterResult) -> Void {
+        if let sc: MTBBarcodeScanner = scanner {
+            result(sc.torchMode.rawValue != 0)
+        } else {
+            let error = FlutterError(code: "cameraInformationError", message: "Could not get flash information", details: nil)
+            result(error)
         }
     }
     
-    func toggleFlash(){
+    func toggleFlash(_ result: @escaping FlutterResult){
         if let sc: MTBBarcodeScanner = scanner {
             if sc.hasTorch() {
                 sc.toggleTorch()
+                return result(sc.torchMode == MTBTorchMode(rawValue: 1))
             }
+            return result(FlutterError(code: "404", message: "This device doesn\'t support flash", details: nil))
         }
+        return result(FlutterError(code: "404", message: "No barcode scanner found", details: nil))
     }
     
-    func pauseCamera() {
+    func pauseCamera(_ result: @escaping FlutterResult) {
         if let sc: MTBBarcodeScanner = scanner {
             if sc.isScanning() {
                 sc.freezeCapture()
             }
+            return result(true)
         }
+        return result(FlutterError(code: "404", message: "No barcode scanner found", details: nil))
     }
     
-    func resumeCamera() {
+    func resumeCamera(_ result: @escaping FlutterResult) {
         if let sc: MTBBarcodeScanner = scanner {
             if !sc.isScanning() {
                 sc.unfreezeCapture()
             }
+            return result(true)
+        }
+        return result(FlutterError(code: "404", message: "No barcode scanner found", details: nil))
+    }
+    
+    func showNativeAlertDialog(_ result: @escaping FlutterResult) -> Void {
+        UIAlertView(title: "Scanning Unavailable", message: "This app does not have permission to access the camera", delegate: nil, cancelButtonTitle: nil, otherButtonTitles: "Ok").show()
+        return result(true)
+    }
+
+    func getSystemFeatures(_ result: @escaping FlutterResult) -> Void {
+        if let sc: MTBBarcodeScanner = scanner {
+            var hasBackCameraVar = false
+            var hasFrontCameraVar = false
+            let camera = sc.camera
+
+            if(camera == MTBCamera(rawValue: 0)){
+                hasBackCameraVar = true
+                if sc.hasOppositeCamera() {
+                    hasFrontCameraVar = true
+                }
+            }else{
+                hasFrontCameraVar = true
+                if sc.hasOppositeCamera() {
+                    hasBackCameraVar = true
+                }
+            }
+            return result([
+                "hasFrontCamera": hasFrontCameraVar,
+                "hasBackCamera": hasBackCameraVar,
+                "hasFlash": sc.hasTorch(),
+                "activeCamera": camera.rawValue
+            ])
+        }
+        return result(FlutterError(code: "404", message: nil, details: nil))
+    }
+
+    func setBarcodeFormats(_ arguments: Array<Int>, _ result: @escaping FlutterResult){
+        do{
+            allowedBarcodeTypes.removeAll()
+            try arguments.forEach { arg in
+                allowedBarcodeTypes.append(try QRCodeTypes[arg]!)
+            }
+            result(true)
+        }catch{
+            result(FlutterError(code: "404", message: nil, details: nil))
         }
     }
-}
+ }
