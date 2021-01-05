@@ -56,7 +56,63 @@ extension BarcodeTypesExtension on BarcodeFormat {
     return index;
   }
 
-  BarcodeFormat fromString(String format) {}
+  static BarcodeFormat fromString(String format) {
+    switch (format) {
+      case 'AZTEC':
+        return BarcodeFormat.aztec;
+        break;
+      case 'CODABAR':
+        return BarcodeFormat.codabar;
+        break;
+      case 'CODE_39':
+        return BarcodeFormat.code39;
+        break;
+      case 'CODE_93':
+        return BarcodeFormat.code93;
+        break;
+      case 'CODE_128':
+        return BarcodeFormat.code128;
+        break;
+      case 'DATA_MATRIX':
+        return BarcodeFormat.dataMatrix;
+        break;
+      case 'EAN_8':
+        return BarcodeFormat.ean8;
+        break;
+      case 'EAN_13':
+        return BarcodeFormat.ean13;
+        break;
+      case 'ITF':
+        return BarcodeFormat.itf;
+        break;
+      case 'MAXICODE':
+        return BarcodeFormat.maxicode;
+        break;
+      case 'PDF_417':
+        return BarcodeFormat.pdf417;
+        break;
+      case 'QR_CODE':
+        return BarcodeFormat.qrcode;
+        break;
+      case 'RSS14':
+        return BarcodeFormat.rss14;
+        break;
+      case 'RSS_EXPANDED':
+        return BarcodeFormat.rssExpanded;
+        break;
+      case 'UPC_A':
+        return BarcodeFormat.upcA;
+        break;
+      case 'UPC_E':
+        return BarcodeFormat.upcE;
+        break;
+      case 'UPC_EAN_EXTENSION':
+        return BarcodeFormat.upcEanExtension;
+        break;
+      default:
+        return null;
+    }
+  }
 
   String get formatName {
     switch (this) {
@@ -111,7 +167,8 @@ extension BarcodeTypesExtension on BarcodeFormat {
       case BarcodeFormat.upcEanExtension:
         return 'UPC_EAN_EXTENSION';
         break;
+      default:
+        return 'NOT_VALID';
     }
-    return 'NOT_VALID';
   }
 }

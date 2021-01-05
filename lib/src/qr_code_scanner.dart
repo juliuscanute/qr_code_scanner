@@ -14,7 +14,8 @@ import 'types/features.dart';
 typedef QRViewCreatedCallback = void Function(QRViewController);
 typedef PermissionSetCallback = void Function(QRViewController, bool);
 
-/// The [QRView] is the view where the camera and the barcode scanner gets displayed.
+/// The [QRView] is the view where the camera
+/// and the barcode scanner gets displayed.
 class QRView extends StatefulWidget {
   const QRView({
     @required Key key,
@@ -28,11 +29,26 @@ class QRView extends StatefulWidget {
         assert(onQRViewCreated != null),
         super(key: key);
 
+  /// [onQRViewCreated] gets called when the view is created
   final QRViewCreatedCallback onQRViewCreated;
+
+  /// Use [overlay] to provide an overlay for the view.
+  /// This can be used to create a certain scan area.
   final ShapeBorder overlay;
+
+  /// Use [overlayMargin] to provide a margin to [overlay]
   final EdgeInsetsGeometry overlayMargin;
+
+  /// Set which camera to use on startup.
+  ///
+  /// [cameraFacing] can either be CameraFacing.front or CameraFacing.back.
+  /// Defaults to CameraFacing.back
   final CameraFacing cameraFacing;
+
+  /// Calls the provided [onPermissionSet] callback when the permission is set.
   final PermissionSetCallback onPermissionSet;
+
+  /// Gives the possibility to show a dialog.
   final bool showNativeAlertDialog;
 
   @override
@@ -141,26 +157,6 @@ class _QrCameraSettings {
   }
 }
 
-const _formatNames = <String, BarcodeFormat>{
-  'AZTEC': BarcodeFormat.aztec,
-  'CODABAR': BarcodeFormat.codabar,
-  'CODE_39': BarcodeFormat.code39,
-  'CODE_93': BarcodeFormat.code93,
-  'CODE_128': BarcodeFormat.code128,
-  'DATA_MATRIX': BarcodeFormat.dataMatrix,
-  'EAN_8': BarcodeFormat.ean8,
-  'EAN_13': BarcodeFormat.ean13,
-  'ITF': BarcodeFormat.itf,
-  'MAXICODE': BarcodeFormat.maxicode,
-  'PDF_417': BarcodeFormat.pdf417,
-  'QR_CODE': BarcodeFormat.qrcode,
-  'RSS_14': BarcodeFormat.rss14,
-  'RSS_EXPANDED': BarcodeFormat.rssExpanded,
-  'UPC_A': BarcodeFormat.upcA,
-  'UPC_E': BarcodeFormat.upcE,
-  'UPC_EAN_EXTENSION': BarcodeFormat.upcEanExtension,
-};
-
 class QRViewController {
   QRViewController._(
     MethodChannel channel,
@@ -178,7 +174,7 @@ class QRViewController {
             final rawType = args['type'] as String;
             // Raw bytes are only supported by Android.
             final rawBytes = args['rawBytes'] as List<int>;
-            final format = _formatNames[rawType];
+            final format = BarcodeTypesExtension.fromString(rawType);
             if (format != null) {
               final barcode = Barcode(code, format, rawBytes);
               _scanUpdateController.sink.add(barcode);
