@@ -59,7 +59,7 @@ iOS
 
 ## Get Scanned QR Code
 
-When a QR code is recognized, the text identified will be set in 'qrText'.
+When a QR code is recognized, the text identified will be set in 'result' of type `Barcode`, which contains the output text as property 'code' of type `String` and scanned code type as property 'format' which is an enum `BarcodeFormat`, defined in the library.
 
 ```dart
 class _QRViewExampleState extends State<QRViewExample> {
