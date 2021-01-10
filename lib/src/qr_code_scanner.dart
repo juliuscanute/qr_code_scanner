@@ -132,8 +132,8 @@ class _QRViewState extends State<QRView> {
     _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id');
 
     // Start scan after creation of the view
-    final controller = QRViewController._(_channel, widget.key, cutOutSize,
-        widget.onPermissionSet)
+    final controller = QRViewController._(
+        _channel, widget.key, cutOutSize, widget.onPermissionSet)
       .._startScan(widget.key, cutOutSize, widget.formatsAllowed);
 
     // Initialize the controller for controlling the QRView
@@ -158,12 +158,9 @@ class _QrCameraSettings {
 }
 
 class QRViewController {
-  QRViewController._(
-    MethodChannel channel,
-    GlobalKey qrKey,
-    double scanArea,
-    PermissionSetCallback onPermissionSet
-  ) : _channel = channel {
+  QRViewController._(MethodChannel channel, GlobalKey qrKey, double scanArea,
+      PermissionSetCallback onPermissionSet)
+      : _channel = channel {
     _channel.setMethodCallHandler((call) async {
       switch (call.method) {
         case 'onRecognizeQR':
@@ -212,14 +209,12 @@ class QRViewController {
   bool get hasPermissions => _hasPermissions;
 
   /// Starts the barcode scanner
-  Future<void> _startScan(
-    GlobalKey key,
-    double cutOutSize,
+  Future<void> _startScan(GlobalKey key, double cutOutSize,
       List<BarcodeFormat> barcodeFormats) async {
     // We need to update the dimension before the scan is started.
     QRViewController.updateDimensions(key, _channel, scanArea: cutOutSize);
-    return _channel.invokeMethod('startScan',
-        barcodeFormats?.map((e) => e.asInt())?.toList() ?? []);
+    return _channel.invokeMethod(
+        'startScan', barcodeFormats?.map((e) => e.asInt())?.toList() ?? []);
   }
 
   /// Gets information about which camera is active.
