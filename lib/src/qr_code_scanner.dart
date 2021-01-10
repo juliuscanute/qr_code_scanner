@@ -24,7 +24,7 @@ class QRView extends StatefulWidget {
     this.overlayMargin = EdgeInsets.zero,
     this.cameraFacing = CameraFacing.back,
     this.onPermissionSet,
-    this.showNativeAlertDialog = false,
+    this.formatsAllowed,
   })  : assert(key != null),
         assert(onQRViewCreated != null),
         super(key: key);
@@ -48,8 +48,8 @@ class QRView extends StatefulWidget {
   /// Calls the provided [onPermissionSet] callback when the permission is set.
   final PermissionSetCallback onPermissionSet;
 
-  /// Gives the possibility to show a dialog.
-  final bool showNativeAlertDialog;
+  /// Use [formatsAllowed] to specify which formats needs to be scanned.
+  final List<BarcodeFormat> formatsAllowed;
 
   @override
   State<StatefulWidget> createState() => _QRViewState();
@@ -133,8 +133,8 @@ class _QRViewState extends State<QRView> {
 
     // Start scan after creation of the view
     final controller = QRViewController._(_channel, widget.key, cutOutSize,
-        widget.onPermissionSet, widget.showNativeAlertDialog)
-      .._startScan(widget.key, cutOutSize);
+        widget.onPermissionSet)
+      .._startScan(widget.key, cutOutSize, widget.formatsAllowed);
 
     // Initialize the controller for controlling the QRView
     if (widget.onQRViewCreated != null) {
@@ -162,8 +162,7 @@ class QRViewController {
     MethodChannel channel,
     GlobalKey qrKey,
     double scanArea,
-    PermissionSetCallback onPermissionSet,
-    bool showNativeAlertDialogOnError,
+    PermissionSetCallback onPermissionSet
   ) : _channel = channel {
     _channel.setMethodCallHandler((call) async {
       switch (call.method) {
@@ -190,9 +189,6 @@ class QRViewController {
               _hasPermissions = true;
             } else {
               _hasPermissions = false;
-              if (showNativeAlertDialogOnError) {
-                await showNativeAlertDialog();
-              }
             }
             if (onPermissionSet != null) {
               onPermissionSet(this, call.arguments as bool);
@@ -219,12 +215,14 @@ class QRViewController {
   Future<void> _startScan(
     GlobalKey key,
     double cutOutSize,
-  ) async {
+      List<BarcodeFormat> barcodeFormats) async {
     // We need to update the dimension before the scan is started.
     QRViewController.updateDimensions(key, _channel, scanArea: cutOutSize);
-    return _channel.invokeMethod('startScan');
+    return _channel.invokeMethod('startScan',
+        barcodeFormats?.map((e) => e.asInt())?.toList() ?? []);
   }
 
+  /// Gets information about which camera is active.
   Future<CameraFacing> getCameraInfo() async {
     try {
       return CameraFacing
@@ -280,23 +278,7 @@ class QRViewController {
     }
   }
 
-  Future<void> showNativeAlertDialog() async {
-    try {
-      await _channel.invokeMethod('showNativeAlertDialog');
-    } on PlatformException catch (e) {
-      throw CameraException(e.code, e.message);
-    }
-  }
-
-  Future<void> setAllowedBarcodeTypes(List<BarcodeFormat> list) async {
-    try {
-      await _channel.invokeMethod('setAllowedBarcodeFormats',
-          list?.map((e) => e.asInt())?.toList() ?? []);
-    } on PlatformException catch (e) {
-      throw CameraException(e.code, e.message);
-    }
-  }
-
+  /// Returns which features are available on device.
   Future<SystemFeatures> getSystemFeatures() async {
     try {
       var features =

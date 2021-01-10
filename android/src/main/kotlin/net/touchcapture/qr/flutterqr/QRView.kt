@@ -3,7 +3,6 @@ package net.touchcapture.qr.flutterqr
 import android.Manifest
 import android.app.Activity
 import android.app.Application
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
@@ -18,27 +17,12 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
-class QRView(messenger: BinaryMessenger, id: Int, private val context: Context, private val params: HashMap<String, Any>) :
+class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<String, Any>) :
         PlatformView, MethodChannel.MethodCallHandler {
 
     private var isTorchOn: Boolean = false
     private var barcodeView: BarcodeView? = null
     private val channel: MethodChannel
-    var allowedBarcodeTypes = mutableListOf<BarcodeFormat>()
-
-    private val qrCodeTypes = mapOf(
-            0 to BarcodeFormat.AZTEC,
-            1 to BarcodeFormat.CODE_128,
-            2 to BarcodeFormat.CODE_39,
-            3 to BarcodeFormat.CODE_93,
-            4 to BarcodeFormat.DATA_MATRIX,
-            5 to BarcodeFormat.EAN_13,
-            6 to BarcodeFormat.EAN_8,
-            7 to BarcodeFormat.ITF,
-            8 to BarcodeFormat.PDF_417,
-            9 to BarcodeFormat.QR_CODE,
-            10 to BarcodeFormat.UPC_E
-    )
 
     init {
         checkAndRequestPermission(null)
@@ -81,7 +65,7 @@ class QRView(messenger: BinaryMessenger, id: Int, private val context: Context, 
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when(call.method) {
-            "startScan" -> startScan()
+            "startScan" -> startScan(call.arguments as? List<Int>, result)
             "stopScan" -> stopScan()
             "flipCamera" -> flipCamera(result)
             "toggleFlash" -> toggleFlash(result)
@@ -90,9 +74,7 @@ class QRView(messenger: BinaryMessenger, id: Int, private val context: Context, 
             "requestPermissions" -> checkAndRequestPermission(result)
             "getCameraInfo" -> getCameraInfo(result)
             "getFlashInfo" -> getFlashInfo(result)
-//            "showNativeAlertDialog" -> showNativeAlertDialog(result)
             "getSystemFeatures" -> getSystemFeatures(result)
-            "setAllowedBarcodeFormats" -> setBarcodeFormats(call.arguments as List<Int>, result)
             else -> result.notImplemented()
         }
     }
@@ -209,7 +191,16 @@ class QRView(messenger: BinaryMessenger, id: Int, private val context: Context, 
         return barcodeView
     }
 
-    private fun startScan() {
+    private fun startScan(arguments: List<Int>?, result: MethodChannel.Result) {
+        val allowedBarcodeTypes = mutableListOf<BarcodeFormat>()
+        try {
+            arguments?.forEach {
+                allowedBarcodeTypes.add(BarcodeFormat.values()[it])
+            }
+        } catch (e: java.lang.Exception) {
+            result.error(null, null, null)
+        }
+
         barcodeView?.decodeContinuous(
                 object : BarcodeCallback {
                     override fun barcodeResult(result: BarcodeResult) {
@@ -241,29 +232,6 @@ class QRView(messenger: BinaryMessenger, id: Int, private val context: Context, 
             result.error(null, null, null)
         }
     }
-
-    private fun setBarcodeFormats(arguments: List<Int>, result: MethodChannel.Result) {
-        try {
-            allowedBarcodeTypes.clear()
-            arguments.forEach {
-                allowedBarcodeTypes.add(qrCodeTypes[it]!!)
-            }
-            result.success(true)
-        } catch (e: java.lang.Exception) {
-            result.error(null, null, null)
-        }
-    }
-
-//    private fun showNativeAlertDialog(result: MethodChannel.Result) {
-//        AlertDialog.Builder(context)
-//                .setTitle("Scanning Unavailable")
-//                .setMessage("This app does not have permission to access the camera")
-//                .setPositiveButton(R.string.ok, null)
-//                .setCancelable(false)
-//                .setIcon(R.drawable.ic_dialog_alert)
-//                .show()
-//        result.success(true)
-//    }
 
     private fun hasCameraPermission(): Boolean {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
