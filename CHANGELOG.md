@@ -1,3 +1,18 @@
+## 0.3.0
+#### Breaking change
+Its not necessary anymore to wrap the QRView in a SizeChangedLayoutNotifier because this is handled inside the plugin.
+#### New Features
+* Added possibility to set allowed barcodes. (#135)
+* Added possibility to check what features are supported by device. (hasFlash, hasBackCamera, hasFrontCamera) (#135)
+* Added possibility to check if flash is on. (#135)
+* Added possibility to check which camera is active. (#135)
+* All functions are now async so you can await them. (#135)
+
+See the updated example on how to implement these features.
+#### Bug fixes
+* Fixed permission handling in Android.
+* Native functions now returns results so exceptions can be thrown when an error occurs.
+
 ## 0.2.1
 * Fixed critical bug where scanner wouldn't open when no scan overlay was configured.
 
@@ -29,7 +44,7 @@
 
 ## 0.0.12
 * Add optional parameter to use a camera overlay.
-* Simplfiy controller, expose scanDataStream.
+* Simplify controller, expose scanDataStream.
 * Fix for Android flash toggle.
 * Add ability to pause/resume the camera.
 * Thanks! to Luis Thein for all the above contributions.
