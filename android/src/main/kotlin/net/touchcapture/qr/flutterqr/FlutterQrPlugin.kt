@@ -63,7 +63,6 @@ class FlutterQrPlugin : FlutterPlugin, ActivityAware {
     inner class CameraRequestPermissionsListener : PluginRegistry.RequestPermissionsResultListener {
         override fun onRequestPermissionsResult(id: Int, permissions: Array<String>, grantResults: IntArray): Boolean {
             if (id == Shared.CAMERA_REQUEST_ID && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Shared.cameraPermissionContinuation?.run()
                 return true
             }
             return false
