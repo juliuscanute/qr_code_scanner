@@ -104,36 +104,35 @@ public class QRView:NSObject,FlutterPlatformView {
                     try self.scanner?.startScanning(with: self.cameraFacing, resultBlock: { [weak self] codes in
                         if let codes = codes {
                             for code in codes {
-//                                var typeString: String;
-//                                switch(code.type) {
-//                                    case AVMetadataObject.ObjectType.aztec:
-//                                       typeString = "AZTEC"
-//                                    case AVMetadataObject.ObjectType.code39:
-//                                        typeString = "CODE_39"
-//                                    case AVMetadataObject.ObjectType.code93:
-//                                        typeString = "CODE_93"
-//                                    case AVMetadataObject.ObjectType.code128:
-//                                        typeString = "CODE_128"
-//                                    case AVMetadataObject.ObjectType.dataMatrix:
-//                                        typeString = "DATA_MATRIX"
-//                                    case AVMetadataObject.ObjectType.ean8:
-//                                        typeString = "EAN_8"
-//                                    case AVMetadataObject.ObjectType.ean13:
-//                                        typeString = "EAN_13"
-//                                    case AVMetadataObject.ObjectType.itf14:
-//                                        typeString = "ITF"
-//                                    case AVMetadataObject.ObjectType.pdf417:
-//                                        typeString = "PDF_417"
-//                                    case AVMetadataObject.ObjectType.qr:
-//                                        typeString = "QR_CODE"
-//                                    case AVMetadataObject.ObjectType.upce:
-//                                        typeString = "UPC_E"
-//                                    default:
-//                                        return
-//                                }
+                                var typeString: String;
+                                switch(code.type) {
+                                    case AVMetadataObject.ObjectType.aztec:
+                                       typeString = "AZTEC"
+                                    case AVMetadataObject.ObjectType.code39:
+                                        typeString = "CODE_39"
+                                    case AVMetadataObject.ObjectType.code93:
+                                        typeString = "CODE_93"
+                                    case AVMetadataObject.ObjectType.code128:
+                                        typeString = "CODE_128"
+                                    case AVMetadataObject.ObjectType.dataMatrix:
+                                        typeString = "DATA_MATRIX"
+                                    case AVMetadataObject.ObjectType.ean8:
+                                        typeString = "EAN_8"
+                                    case AVMetadataObject.ObjectType.ean13:
+                                        typeString = "EAN_13"
+                                    case AVMetadataObject.ObjectType.itf14:
+                                        typeString = "ITF"
+                                    case AVMetadataObject.ObjectType.pdf417:
+                                        typeString = "PDF_417"
+                                    case AVMetadataObject.ObjectType.qr:
+                                        typeString = "QR_CODE"
+                                    case AVMetadataObject.ObjectType.upce:
+                                        typeString = "UPC_E"
+                                    default:
+                                        return
+                                }
                                 guard let stringValue = code.stringValue else { continue }
-                                let typeString = code.type.rawValue
-                                let result = ["code": stringValue, "type": typeString]
+                               let result = ["code": stringValue, "type": typeString]
                                 if allowedBarcodeTypes.count == 0 || allowedBarcodeTypes.contains(code.type) {
                                     self?.channel.invokeMethod("onRecognizeQR", arguments: result)
                                 }
