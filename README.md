@@ -3,9 +3,6 @@
 
 A QR code scanner that works on both iOS and Android by natively embedding the platform view within Flutter. The integration with Flutter is seamless, much better than jumping into a native Activity or a ViewController to perform the scan.
 
-# Breaking changes
-In version 0.2.1 the plugin returns a Barcode object instead of QR a String. This object includes the type of code, the code itself and on Android devices the raw bytes. (#63)
-
 # *Warning*
 If you are using Flutter Beta or Dev channel (1.25 or 1.26) you can get the following error:
 
@@ -86,28 +83,18 @@ class _QRViewExampleState extends State<QRViewExample> {
         children: <Widget>[
           Expanded(
             flex: 5,
-             // To ensure the Scanner view is properly sizes after rotation
-             // we need to listen for Flutter SizeChanged notification and update controller
-            child: NotificationListener<SizeChangedLayoutNotification>(
-              onNotification: (notification) {
-                Future.microtask(() => controller?.updateDimensions(qrKey));
-                return false;
-              },
-              child: SizeChangedLayoutNotifier(
-                key: const Key('qr-size-notifier'),
-                child: QRView(
-                  key: qrKey,
-                  onQRViewCreated: _onQRViewCreated,
-                ),
-              ),
+            child: QRView(
+              key: qrKey,
+              onQRViewCreated: _onQRViewCreated,
             ),
           ),
           Expanded(
             flex: 1,
             child: Center(
-              child: (result != null) ?
-                        Text('Barcode Type: ${describeEnum(result.format)}   Data: ${result.code}')
-                      : Text('Scan a code'),
+              child: (result != null)
+                  ? Text(
+                      'Barcode Type: ${describeEnum(result.format)}   Data: ${result.code}')
+                  : Text('Scan a code'),
             ),
           )
         ],
@@ -130,6 +117,7 @@ class _QRViewExampleState extends State<QRViewExample> {
     super.dispose();
   }
 }
+
 ```
 
 ## iOS Integration
