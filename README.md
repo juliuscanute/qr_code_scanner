@@ -132,23 +132,23 @@ In order to use this plugin, add the following to your Info.plist file:
 ## Flip Camera (Back/Front)
 The default camera is the back camera.
 ```dart
-controller.flipCamera();
+await controller.flipCamera();
 ```
 
 ## Flash (Off/On)
 By default, flash is OFF.
 ```dart
-controller.toggleFlash();
+await controller.toggleFlash();
 ```
 
 ## Resume/Pause
 Pause camera stream and scanner.
 ```dart
-controller.pauseCamera();
+await controller.pauseCamera();
 ```
 Resume camera stream and scanner.
 ```dart
-controller.resumeCamera();
+await controller.resumeCamera();
 ```
 
 
