@@ -72,14 +72,23 @@ public class QRView:NSObject,FlutterPlatformView {
     }
     
     func setDimensions(width: Double, height: Double, scanArea: Double) -> Void {
+        // First set the size of the preview area.
         previewView.frame = CGRect(x: 0, y: 0, width: width, height: height)
+        
+        // Then set the size of the scan area.
         let midX = self.view().bounds.midX
         let midY = self.view().bounds.midY
+        
+        // Check if the scanner is already created.
         if let sc: MTBBarcodeScanner = scanner {
             if let previewLayer = sc.previewLayer {
                 previewLayer.frame = previewView.bounds;
             }
+            if (scanArea != 0) {
+                sc.scanRect = CGRect(x: Double(midX) - (scanArea / 2), y: Double(midY) - (scanArea / 2), width: scanArea, height: scanArea)
+            }
         } else {
+            // Create a scanner view if it doesn't exist yet.
             scanner = MTBBarcodeScanner(previewView: previewView)
             
             if (scanArea != 0) {
@@ -91,7 +100,10 @@ public class QRView:NSObject,FlutterPlatformView {
     }
     
     func startScan(_ arguments: Array<Int>, _ result: @escaping FlutterResult) -> Void {
-        scanner = MTBBarcodeScanner(previewView: previewView)
+        if (scanner == nil) {
+            scanner = MTBBarcodeScanner(previewView: previewView)
+        }
+        
         
         var allowedBarcodeTypes: Array<AVMetadataObject.ObjectType> = []
         arguments.forEach { arg in
