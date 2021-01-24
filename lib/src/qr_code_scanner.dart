@@ -73,9 +73,8 @@ class _QRViewState extends State<QRView> {
   bool onNotification(notification) {
     Future.microtask(() => {
           QRViewController.updateDimensions(widget.key, _channel,
-              scanArea: widget.overlay != null
-                  ? widget.overlay.cutOutSize
-                  : 0.0)
+              scanArea:
+                  widget.overlay != null ? widget.overlay.cutOutSize : 0.0)
         });
     return false;
   }
