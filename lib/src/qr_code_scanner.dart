@@ -34,7 +34,7 @@ class QRView extends StatefulWidget {
 
   /// Use [overlay] to provide an overlay for the view.
   /// This can be used to create a certain scan area.
-  final ShapeBorder overlay;
+  final QrScannerOverlayShape overlay;
 
   /// Use [overlayMargin] to provide a margin to [overlay]
   final EdgeInsetsGeometry overlayMargin;
@@ -73,9 +73,8 @@ class _QRViewState extends State<QRView> {
   bool onNotification(notification) {
     Future.microtask(() => {
           QRViewController.updateDimensions(widget.key, _channel,
-              scanArea: widget.overlay != null
-                  ? (widget.overlay as QrScannerOverlayShape).cutOutSize
-                  : 0.0)
+              scanArea:
+                  widget.overlay != null ? widget.overlay.cutOutSize : 0.0)
         });
     return false;
   }
@@ -126,7 +125,7 @@ class _QRViewState extends State<QRView> {
     // We pass the cutout size so that the scanner respects the scan area.
     var cutOutSize = 0.0;
     if (widget.overlay != null) {
-      cutOutSize = (widget.overlay as QrScannerOverlayShape).cutOutSize;
+      cutOutSize = widget.overlay.cutOutSize;
     }
 
     _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id');
