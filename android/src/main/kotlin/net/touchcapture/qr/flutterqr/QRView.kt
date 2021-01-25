@@ -89,7 +89,10 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
     private fun flipCamera(result: MethodChannel.Result) {
         if (barcodeView == null) {
             return barCodeViewNotSet(result)
+        } else if (!hasCameraPermission()) {
+            return cameraPermissionNotSet(result)
         }
+
         barcodeView!!.pause()
         val settings = barcodeView!!.cameraSettings
 
@@ -113,6 +116,8 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
     private fun toggleFlash(result: MethodChannel.Result) {
         if (barcodeView == null) {
             return barCodeViewNotSet(result)
+        } else if (!hasCameraPermission()) {
+            return cameraPermissionNotSet(result)
         }
 
         if (hasFlash()) {
@@ -128,7 +133,10 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
     private fun pauseCamera(result: MethodChannel.Result) {
         if (barcodeView == null) {
             return barCodeViewNotSet(result)
+        } else if (!hasCameraPermission()) {
+            return cameraPermissionNotSet(result)
         }
+
         if (barcodeView!!.isPreviewActive) {
             barcodeView!!.pause()
         }
@@ -138,7 +146,10 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
     private fun resumeCamera(result: MethodChannel.Result) {
         if (barcodeView == null) {
             return barCodeViewNotSet(result)
+        } else if (!hasCameraPermission()) {
+            return cameraPermissionNotSet(result)
         }
+
         if (!barcodeView!!.isPreviewActive) {
             barcodeView!!.resume()
         }
@@ -164,6 +175,10 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
 
     private fun barCodeViewNotSet(result: MethodChannel.Result) {
         result.error("404", "No barcode view found", null)
+    }
+
+    private fun cameraPermissionNotSet(result: MethodChannel.Result) {
+         result.error("cameraPermission", " Permission denied to access the camera", null)
     }
 
     override fun getView(): View {
@@ -192,6 +207,10 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
     }
 
     private fun startScan(arguments: List<Int>?, result: MethodChannel.Result) {
+        if (!hasCameraPermission()) {
+            return cameraPermissionNotSet(result)
+        }
+
         val allowedBarcodeTypes = mutableListOf<BarcodeFormat>()
         try {
             arguments?.forEach {

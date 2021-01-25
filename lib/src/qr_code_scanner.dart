@@ -211,9 +211,14 @@ class QRViewController {
   Future<void> _startScan(GlobalKey key, double cutOutSize,
       List<BarcodeFormat> barcodeFormats) async {
     // We need to update the dimension before the scan is started.
-    QRViewController.updateDimensions(key, _channel, scanArea: cutOutSize);
-    return _channel.invokeMethod(
-        'startScan', barcodeFormats?.map((e) => e.asInt())?.toList() ?? []);
+    try {
+      await QRViewController.updateDimensions(key, _channel,
+          scanArea: cutOutSize);
+      return await _channel.invokeMethod(
+          'startScan', barcodeFormats?.map((e) => e.asInt())?.toList() ?? []);
+    } on PlatformException catch (e) {
+      throw CameraException(e.code, e.message);
+    }
   }
 
   /// Gets information about which camera is active.
@@ -289,15 +294,19 @@ class QRViewController {
   }
 
   /// Updates the view dimensions for iOS.
-  static void updateDimensions(GlobalKey key, MethodChannel channel,
-      {double scanArea}) {
+  static Future<void> updateDimensions(GlobalKey key, MethodChannel channel,
+      {double scanArea}) async {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       final RenderBox renderBox = key.currentContext.findRenderObject();
-      channel.invokeMethod('setDimensions', {
-        'width': renderBox.size.width,
-        'height': renderBox.size.height,
-        'scanArea': scanArea ?? 0
-      });
+      try {
+        await channel.invokeMethod('setDimensions', {
+          'width': renderBox.size.width,
+          'height': renderBox.size.height,
+          'scanArea': scanArea ?? 0
+        });
+      } on PlatformException catch (e) {
+        throw CameraException(e.code, e.message);
+      }
     }
   }
 }

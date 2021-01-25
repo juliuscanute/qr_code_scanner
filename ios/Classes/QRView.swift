@@ -46,7 +46,7 @@ public class QRView:NSObject,FlutterPlatformView {
             switch(call.method){
                 case "setDimensions":
                     let arguments = call.arguments as! Dictionary<String, Double>
-                    self?.setDimensions(width: arguments["width"] ?? 0, height: arguments["height"] ?? 0, scanArea: arguments["scanArea"] ?? 0)
+                    self?.setDimensions(result, width: arguments["width"] ?? 0, height: arguments["height"] ?? 0, scanArea: arguments["scanArea"] ?? 0)
                 case "startScan":
                     self?.startScan(call.arguments as! Array<Int>, result)
                 case "flipCamera":
@@ -71,32 +71,39 @@ public class QRView:NSObject,FlutterPlatformView {
         return previewView
     }
     
-    func setDimensions(width: Double, height: Double, scanArea: Double) -> Void {
-        // First set the size of the preview area.
-        previewView.frame = CGRect(x: 0, y: 0, width: width, height: height)
-        
-        // Then set the size of the scan area.
-        let midX = self.view().bounds.midX
-        let midY = self.view().bounds.midY
-        
-        // Check if the scanner is already created.
-        if let sc: MTBBarcodeScanner = scanner {
-            if let previewLayer = sc.previewLayer {
-                previewLayer.frame = previewView.bounds;
-            }
-            if (scanArea != 0) {
-                sc.scanRect = CGRect(x: Double(midX) - (scanArea / 2), y: Double(midY) - (scanArea / 2), width: scanArea, height: scanArea)
-            }
-        } else {
-            // Create a scanner view if it doesn't exist yet.
-            scanner = MTBBarcodeScanner(previewView: previewView)
-            
-            if (scanArea != 0) {
-                scanner?.didStartScanningBlock = {
-                    self.scanner?.scanRect = CGRect(x: Double(midX) - (scanArea / 2), y: Double(midY) - (scanArea / 2), width: scanArea, height: scanArea)
+    func setDimensions(_ result: @escaping FlutterResult, width: Double, height: Double, scanArea: Double) -> Void {
+        MTBBarcodeScanner.requestCameraPermission(success: { permissionGranted in
+            if permissionGranted {
+                // First set the size of the preview area.
+                self.previewView.frame = CGRect(x: 0, y: 0, width: width, height: height)
+                
+                // Then set the size of the scan area.
+                let midX = self.view().bounds.midX
+                let midY = self.view().bounds.midY
+                
+                // Check if the scanner is already created.
+                if let sc: MTBBarcodeScanner = self.scanner {
+                    if let previewLayer = sc.previewLayer {
+                        previewLayer.frame = self.previewView.bounds;
+                    }
+                    if (scanArea != 0) {
+                        sc.scanRect = CGRect(x: Double(midX) - (scanArea / 2), y: Double(midY) - (scanArea / 2), width: scanArea, height: scanArea)
+                    }
+                } else {
+                    // Create a scanner view if it doesn't exist yet.
+                    self.scanner = MTBBarcodeScanner(previewView: self.previewView)
+                    
+                    if (scanArea != 0) {
+                        self.scanner?.didStartScanningBlock = {
+                            self.scanner?.scanRect = CGRect(x: Double(midX) - (scanArea / 2), y: Double(midY) - (scanArea / 2), width: scanArea, height: scanArea)
+                        }
+                    }
                 }
+                return result(width)
+            } else {
+                return result(FlutterError(code: "cameraPermission", message: "Permission denied to access the camera", details: nil))
             }
-        }
+        })
     }
     
     func startScan(_ arguments: Array<Int>, _ result: @escaping FlutterResult) -> Void {
@@ -154,21 +161,27 @@ public class QRView:NSObject,FlutterPlatformView {
                     })
                 } catch {
                     let error = FlutterError(code: "unknown-error", message: "Unable to start scanning", details: nil)
-                    result(error)
+                    return result(error)
                 }
             } else {
-                let error = FlutterError(code: "cameraPermission", message: "Permission denied to access the camera", details: nil)
-                result(error)
+                return result(FlutterError(code: "cameraPermission", message: "Permission denied to access the camera", details: nil))
             }
         })
+    
     }
     
-    func stopScan(){
-        if let sc: MTBBarcodeScanner = scanner {
-            if sc.isScanning() {
-                sc.stopScanning()
+    func stopScan(_ result: @escaping FlutterResult){
+        MTBBarcodeScanner.requestCameraPermission(success: { permissionGranted in
+            if permissionGranted {
+                if let sc: MTBBarcodeScanner = self.scanner {
+                    if sc.isScanning() {
+                        sc.stopScanning()
+                    }
+                }
+            } else {
+                return result(FlutterError(code: "cameraPermission", message: "Permission denied to access the camera", details: nil))
             }
-        }
+        })
     }
     
     func getCameraInfo(_ result: @escaping FlutterResult) -> Void {
@@ -181,13 +194,19 @@ public class QRView:NSObject,FlutterPlatformView {
     }
     
     func flipCamera(_ result: @escaping FlutterResult){
-        if let sc: MTBBarcodeScanner = scanner {
-            if sc.hasOppositeCamera() {
-                sc.flipCamera()
+        MTBBarcodeScanner.requestCameraPermission(success: { permissionGranted in
+            if permissionGranted {
+                if let sc: MTBBarcodeScanner = self.scanner {
+                    if sc.hasOppositeCamera() {
+                        sc.flipCamera()
+                    }
+                    return result(sc.camera.rawValue)
+                }
+                return result(FlutterError(code: "404", message: "No barcode scanner found", details: nil))
+            } else {
+                return result(FlutterError(code: "cameraPermission", message: "Permission denied to access the camera", details: nil))
             }
-            return result(sc.camera.rawValue)
-        }
-        return result(FlutterError(code: "404", message: "No barcode scanner found", details: nil))
+        })
     }
     
     func getFlashInfo(_ result: @escaping FlutterResult) -> Void {
@@ -200,34 +219,52 @@ public class QRView:NSObject,FlutterPlatformView {
     }
     
     func toggleFlash(_ result: @escaping FlutterResult){
-        if let sc: MTBBarcodeScanner = scanner {
-            if sc.hasTorch() {
-                sc.toggleTorch()
-                return result(sc.torchMode == MTBTorchMode(rawValue: 1))
+        MTBBarcodeScanner.requestCameraPermission(success: { permissionGranted in
+            if permissionGranted {
+                if let sc: MTBBarcodeScanner = self.scanner {
+                    if sc.hasTorch() {
+                        sc.toggleTorch()
+                        return result(sc.torchMode == MTBTorchMode(rawValue: 1))
+                    }
+                    return result(FlutterError(code: "404", message: "This device doesn\'t support flash", details: nil))
+                }
+                return result(FlutterError(code: "404", message: "No barcode scanner found", details: nil))
+            } else {
+                return result(FlutterError(code: "cameraPermission", message: "Permission denied to access the camera", details: nil))
             }
-            return result(FlutterError(code: "404", message: "This device doesn\'t support flash", details: nil))
-        }
-        return result(FlutterError(code: "404", message: "No barcode scanner found", details: nil))
+        })
     }
     
     func pauseCamera(_ result: @escaping FlutterResult) {
-        if let sc: MTBBarcodeScanner = scanner {
-            if sc.isScanning() {
-                sc.freezeCapture()
+        MTBBarcodeScanner.requestCameraPermission(success: { permissionGranted in
+            if permissionGranted {
+                if let sc: MTBBarcodeScanner = self.scanner {
+                    if sc.isScanning() {
+                        sc.freezeCapture()
+                    }
+                    return result(true)
+                }
+                return result(FlutterError(code: "404", message: "No barcode scanner found", details: nil))
+            } else {
+                return result(FlutterError(code: "cameraPermission", message: "Permission denied to access the camera", details: nil))
             }
-            return result(true)
-        }
-        return result(FlutterError(code: "404", message: "No barcode scanner found", details: nil))
+        })
     }
     
     func resumeCamera(_ result: @escaping FlutterResult) {
-        if let sc: MTBBarcodeScanner = scanner {
-            if !sc.isScanning() {
-                sc.unfreezeCapture()
+        MTBBarcodeScanner.requestCameraPermission(success: { permissionGranted in
+            if permissionGranted {
+                if let sc: MTBBarcodeScanner = self.scanner {
+                    if !sc.isScanning() {
+                        sc.unfreezeCapture()
+                    }
+                    return result(true)
+                }
+                return result(FlutterError(code: "404", message: "No barcode scanner found", details: nil))
+            } else {
+                return result(FlutterError(code: "cameraPermission", message: "Permission denied to access the camera", details: nil))
             }
-            return result(true)
-        }
-        return result(FlutterError(code: "404", message: "No barcode scanner found", details: nil))
+        })
     }
 
     func getSystemFeatures(_ result: @escaping FlutterResult) -> Void {
