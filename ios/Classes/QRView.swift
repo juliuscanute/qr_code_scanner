@@ -74,6 +74,7 @@ public class QRView:NSObject,FlutterPlatformView {
     func setDimensions(_ result: @escaping FlutterResult, width: Double, height: Double, scanArea: Double) -> Void {
         MTBBarcodeScanner.requestCameraPermission(success: { permissionGranted in
             if permissionGranted {
+//                self?.channel.invokeMethod("onPermissionSet", arguments: true)
                 // First set the size of the preview area.
                 self.previewView.frame = CGRect(x: 0, y: 0, width: width, height: height)
                 
@@ -111,14 +112,14 @@ public class QRView:NSObject,FlutterPlatformView {
             scanner = MTBBarcodeScanner(previewView: previewView)
         }
         
-        
         var allowedBarcodeTypes: Array<AVMetadataObject.ObjectType> = []
         arguments.forEach { arg in
             allowedBarcodeTypes.append( QRCodeTypes[arg]!)
         }
-
+        
         MTBBarcodeScanner.requestCameraPermission(success: { permissionGranted in
             if permissionGranted {
+                self.channel.invokeMethod("onPermissionSet", arguments: true)
                 do {
                     try self.scanner?.startScanning(with: self.cameraFacing, resultBlock: { [weak self] codes in
                         if let codes = codes {
@@ -185,12 +186,18 @@ public class QRView:NSObject,FlutterPlatformView {
     }
     
     func getCameraInfo(_ result: @escaping FlutterResult) -> Void {
-        if let sc: MTBBarcodeScanner = scanner {
-            result(sc.camera.rawValue)
-        } else {
-            let error = FlutterError(code: "cameraInformationError", message: "Could not get camera information", details: nil)
-            result(error)
-        }
+        MTBBarcodeScanner.requestCameraPermission(success: { permissionGranted in
+            if permissionGranted {
+                if let sc: MTBBarcodeScanner = self.scanner {
+                    result(sc.camera.rawValue)
+                } else {
+                    let error = FlutterError(code: "cameraInformationError", message: "Could not get camera information", details: nil)
+                    result(error)
+                }
+            } else {
+                return result(FlutterError(code: "cameraPermission", message: "Permission denied to access the camera", details: nil))
+            }
+        })
     }
     
     func flipCamera(_ result: @escaping FlutterResult){
@@ -210,12 +217,18 @@ public class QRView:NSObject,FlutterPlatformView {
     }
     
     func getFlashInfo(_ result: @escaping FlutterResult) -> Void {
-        if let sc: MTBBarcodeScanner = scanner {
-            result(sc.torchMode.rawValue != 0)
-        } else {
-            let error = FlutterError(code: "cameraInformationError", message: "Could not get flash information", details: nil)
-            result(error)
-        }
+        MTBBarcodeScanner.requestCameraPermission(success: { permissionGranted in
+            if permissionGranted {
+                if let sc: MTBBarcodeScanner = self.scanner {
+                    result(sc.torchMode.rawValue != 0)
+                } else {
+                    let error = FlutterError(code: "cameraInformationError", message: "Could not get flash information", details: nil)
+                    result(error)
+                }
+            } else {
+                return result(FlutterError(code: "cameraPermission", message: "Permission denied to access the camera", details: nil))
+            }
+        })
     }
     
     func toggleFlash(_ result: @escaping FlutterResult){
