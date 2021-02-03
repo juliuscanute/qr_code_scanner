@@ -46,7 +46,11 @@ public class QRView:NSObject,FlutterPlatformView {
             switch(call.method){
                 case "setDimensions":
                     let arguments = call.arguments as! Dictionary<String, Double>
-                    self?.setDimensions(result, width: arguments["width"] ?? 0, height: arguments["height"] ?? 0, scanArea: arguments["scanArea"] ?? 0)
+                    self?.setDimensions(result,
+                                        width: arguments["width"] ?? 0,
+                                        height: arguments["height"] ?? 0,
+                                        scanArea: arguments["scanArea"] ?? 0,
+                                        scanAreaOffset: arguments["scanAreaOffset"] ?? 0)
                 case "startScan":
                     self?.startScan(call.arguments as! Array<Int>, result)
                 case "flipCamera":
@@ -71,7 +75,7 @@ public class QRView:NSObject,FlutterPlatformView {
         return previewView
     }
     
-    func setDimensions(_ result: @escaping FlutterResult, width: Double, height: Double, scanArea: Double) -> Void {
+    func setDimensions(_ result: @escaping FlutterResult, width: Double, height: Double, scanArea: Double, scanAreaOffset: Double) -> Void {
         MTBBarcodeScanner.requestCameraPermission(success: { permissionGranted in
             if permissionGranted {
 //                self?.channel.invokeMethod("onPermissionSet", arguments: true)
@@ -89,6 +93,11 @@ public class QRView:NSObject,FlutterPlatformView {
                     }
                     if (scanArea != 0) {
                         sc.scanRect = CGRect(x: Double(midX) - (scanArea / 2), y: Double(midY) - (scanArea / 2), width: scanArea, height: scanArea)
+                        
+                        // Set offset if provided.
+                        if (scanAreaOffset != 0) {
+                            sc.scanRect = sc.scanRect.offsetBy(dx: 0, dy: CGFloat(scanAreaOffset))
+                        }
                     }
                 } else {
                     // Create a scanner view if it doesn't exist yet.
@@ -97,6 +106,11 @@ public class QRView:NSObject,FlutterPlatformView {
                     if (scanArea != 0) {
                         self.scanner?.didStartScanningBlock = {
                             self.scanner?.scanRect = CGRect(x: Double(midX) - (scanArea / 2), y: Double(midY) - (scanArea / 2), width: scanArea, height: scanArea)
+                            
+                            // Set offset if provided.
+                            if (scanAreaOffset != 0) {
+                                self.scanner?.scanRect = (self.scanner?.scanRect.offsetBy(dx: 0, dy: CGFloat(scanAreaOffset)))!
+                            }
                         }
                     }
                 }
