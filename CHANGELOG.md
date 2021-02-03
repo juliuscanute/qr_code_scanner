@@ -1,3 +1,10 @@
+## 0.3.1
+#### Bug fixes
+* Fixed permission callback on iOS & Android.
+* Fixed camera facing not working on Android.
+* Fixed scanArea not being honored on Android.
+* Updated ShapeBorder to QrScannerOverlayShape.
+
 ## 0.3.0
 #### Breaking change
 Its not necessary anymore to wrap the QRView in a SizeChangedLayoutNotifier because this is handled inside the plugin.
