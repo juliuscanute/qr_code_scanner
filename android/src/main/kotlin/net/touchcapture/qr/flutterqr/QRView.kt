@@ -182,18 +182,7 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
     }
 
     override fun getView(): View {
-        return initBarCodeView()?.apply {
-            if (!hasBackCamera()) {
-                if (!hasFrontCamera()) {
-                    // No camera available!
-                } else {
-                    this.cameraSettings.requestedCameraId = CameraInfo.CAMERA_FACING_FRONT
-                }
-            } else {
-                this.cameraSettings.requestedCameraId = CameraInfo.CAMERA_FACING_BACK
-            }
-            resume()
-        }!!
+        return initBarCodeView().apply {}!!
     }
 
     private fun initBarCodeView(): BarcodeView? {
@@ -202,6 +191,7 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
             if (params["cameraFacing"] as Int == 1) {
                 barcodeView?.cameraSettings?.requestedCameraId = CameraInfo.CAMERA_FACING_FRONT
             }
+            barcodeView!!.resume()
         }
         return barcodeView
     }
