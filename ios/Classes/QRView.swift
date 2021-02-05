@@ -59,6 +59,8 @@ public class QRView:NSObject,FlutterPlatformView {
                     self?.toggleFlash(result)
                 case "pauseCamera":
                     self?.pauseCamera(result)
+                case "stopCamera":
+                    self?.stopCamera(result)
                 case "resumeCamera":
                     self?.resumeCamera(result)
                 case "getCameraInfo":
@@ -185,7 +187,7 @@ public class QRView:NSObject,FlutterPlatformView {
     
     }
     
-    func stopScan(_ result: @escaping FlutterResult){
+    func stopCamera(_ result: @escaping FlutterResult){
         MTBBarcodeScanner.requestCameraPermission(success: { permissionGranted in
             if permissionGranted {
                 if let sc: MTBBarcodeScanner = self.scanner {

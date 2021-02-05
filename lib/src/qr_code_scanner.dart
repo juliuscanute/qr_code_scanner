@@ -251,10 +251,19 @@ class QRViewController {
     }
   }
 
-  /// Pauses barcode scanning
+  /// Pauses the camera and barcode scanning
   Future<void> pauseCamera() async {
     try {
       await _channel.invokeMethod('pauseCamera');
+    } on PlatformException catch (e) {
+      throw CameraException(e.code, e.message);
+    }
+  }
+
+  /// Stops barcode scanning and the camera
+  Future<void> stopCamera() async {
+    try {
+      await _channel.invokeMethod('stopCamera');
     } on PlatformException catch (e) {
       throw CameraException(e.code, e.message);
     }
@@ -280,8 +289,9 @@ class QRViewController {
     }
   }
 
-  /// Disposes the barcode stream.
+  /// Stops the camera and disposes the barcode stream.
   void dispose() {
+    stopCamera();
     _scanUpdateController.close();
   }
 

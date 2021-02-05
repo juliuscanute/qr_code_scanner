@@ -70,6 +70,8 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
             "flipCamera" -> flipCamera(result)
             "toggleFlash" -> toggleFlash(result)
             "pauseCamera" -> pauseCamera(result)
+            // Stopping camera is the same as pausing camera
+            "stopCamera" -> pauseCamera(result)
             "resumeCamera" -> resumeCamera(result)
             "requestPermissions" -> checkAndRequestPermission(result)
             "getCameraInfo" -> getCameraInfo(result)
