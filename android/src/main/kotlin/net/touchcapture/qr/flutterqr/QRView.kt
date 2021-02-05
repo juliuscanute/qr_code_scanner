@@ -21,6 +21,7 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
         PlatformView, MethodChannel.MethodCallHandler {
 
     private var isTorchOn: Boolean = false
+    private var isPaused: Boolean = false
     private var barcodeView: BarcodeView? = null
     private val channel: MethodChannel
 
@@ -30,13 +31,13 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
         channel.setMethodCallHandler(this)
         Shared.activity?.application?.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
             override fun onActivityPaused(p0: Activity) {
-                if (p0 == Shared.activity) {
+                if (p0 == Shared.activity && !isPaused) {
                     barcodeView?.pause()
                 }
             }
 
             override fun onActivityResumed(p0: Activity) {
-                if (p0 == Shared.activity) {
+                if (p0 == Shared.activity && !isPaused) {
                     barcodeView?.resume()
                 }
             }
@@ -140,6 +141,7 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
         }
 
         if (barcodeView!!.isPreviewActive) {
+            isPaused = true
             barcodeView!!.pause()
         }
         result.success(true)
@@ -153,6 +155,7 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
         }
 
         if (!barcodeView!!.isPreviewActive) {
+            isPaused = false
             barcodeView!!.resume()
         }
         result.success(true)
