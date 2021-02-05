@@ -56,7 +56,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                     children: <Widget>[
                       Container(
                         margin: EdgeInsets.all(8),
-                        child: RaisedButton(
+                        child: ElevatedButton(
                             onPressed: () async {
                               await controller?.toggleFlash();
                               setState(() {});
@@ -70,7 +70,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                       ),
                       Container(
                         margin: EdgeInsets.all(8),
-                        child: RaisedButton(
+                        child: ElevatedButton(
                             onPressed: () async {
                               await controller?.flipCamera();
                               setState(() {});
@@ -95,7 +95,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                     children: <Widget>[
                       Container(
                         margin: EdgeInsets.all(8),
-                        child: RaisedButton(
+                        child: ElevatedButton(
                           onPressed: () async {
                             await controller?.pauseCamera();
                           },
@@ -104,7 +104,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                       ),
                       Container(
                         margin: EdgeInsets.all(8),
-                        child: RaisedButton(
+                        child: ElevatedButton(
                           onPressed: () async {
                             await controller?.resumeCamera();
                           },
