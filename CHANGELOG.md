@@ -1,3 +1,8 @@
+## 0.3.2
+#### Bug fixes
+* Fixed null-pointer when no overlay provided on iOS. (#245)
+* Fixed camera not stopping (green dot on iOS 14) when navigating to other page. (#240)
+
 ## 0.3.1
 #### Bug fixes
 * Fixed permission callback on iOS & Android.
