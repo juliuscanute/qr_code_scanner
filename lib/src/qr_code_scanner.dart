@@ -294,8 +294,8 @@ class QRViewController {
         await channel.invokeMethod('setDimensions', {
           'width': renderBox.size.width,
           'height': renderBox.size.height,
-          'scanArea': overlay.cutOutSize ?? 0,
-          'scanAreaOffset': overlay.cutOutBottomOffset ?? 0
+          'scanArea': overlay?.cutOutSize ?? 0,
+          'scanAreaOffset': overlay?.cutOutBottomOffset ?? 0
         });
       } on PlatformException catch (e) {
         throw CameraException(e.code, e.message);
