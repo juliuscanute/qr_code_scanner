@@ -204,12 +204,7 @@ public class QRView:NSObject,FlutterPlatformView {
     func getCameraInfo(_ result: @escaping FlutterResult) -> Void {
         MTBBarcodeScanner.requestCameraPermission(success: { permissionGranted in
             if permissionGranted {
-                if let sc: MTBBarcodeScanner = self.scanner {
-                    result(sc.camera.rawValue)
-                } else {
-                    let error = FlutterError(code: "cameraInformationError", message: "Could not get camera information", details: nil)
-                    result(error)
-                }
+                result(self.cameraFacing.rawValue)
             } else {
                 return result(FlutterError(code: "cameraPermission", message: "Permission denied to access the camera", details: nil))
             }
@@ -222,6 +217,7 @@ public class QRView:NSObject,FlutterPlatformView {
                 if let sc: MTBBarcodeScanner = self.scanner {
                     if sc.hasOppositeCamera() {
                         sc.flipCamera()
+                        self.cameraFacing = sc.camera
                     }
                     return result(sc.camera.rawValue)
                 }
