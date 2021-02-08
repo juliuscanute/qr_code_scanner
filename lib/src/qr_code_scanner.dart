@@ -62,12 +62,10 @@ class _QRViewState extends State<QRView> {
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addObserver(
-        LifecycleEventHandler(resumeCallBack: () async =>
-            QRViewController.updateDimensions(widget.key, _channel,
-            overlay: widget.overlay)
-    ));
+    WidgetsBinding.instance.addObserver(LifecycleEventHandler(
+        resumeCallBack: () async => QRViewController.updateDimensions(
+            widget.key, _channel,
+            overlay: widget.overlay)));
   }
 
   @override
