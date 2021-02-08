@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'lifecycle_event_handler.dart';
 import 'qr_scanner_overlay_shape.dart';
 import 'types/barcode.dart';
 import 'types/barcode_format.dart';
@@ -57,6 +58,17 @@ class QRView extends StatefulWidget {
 
 class _QRViewState extends State<QRView> {
   var _channel;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addObserver(
+        LifecycleEventHandler(resumeCallBack: () async =>
+            QRViewController.updateDimensions(widget.key, _channel,
+            overlay: widget.overlay)
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
