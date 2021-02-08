@@ -63,9 +63,13 @@ class _QRViewState extends State<QRView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(LifecycleEventHandler(
-        resumeCallBack: () async => QRViewController.updateDimensions(
-            widget.key, _channel,
-            overlay: widget.overlay)));
+        resumeCallBack: () async => {
+          if (_channel != null) {
+            QRViewController.updateDimensions(
+                widget.key, _channel,
+                overlay: widget.overlay)
+          }
+        }));
   }
 
   @override
@@ -82,9 +86,10 @@ class _QRViewState extends State<QRView> {
 
   bool onNotification(notification) {
     Future.microtask(() => {
-          QRViewController.updateDimensions(widget.key, _channel,
-              overlay: widget.overlay)
-        });
+        QRViewController.updateDimensions(widget.key, _channel,
+        overlay: widget.overlay)
+      });
+
     return false;
   }
 
@@ -204,6 +209,7 @@ class QRViewController {
 
   Stream<Barcode> get scannedDataStream => _scanUpdateController.stream;
 
+  static bool _firstRun = true;
   SystemFeatures _features;
   bool _hasPermissions;
 
@@ -309,8 +315,12 @@ class QRViewController {
   static Future<void> updateDimensions(GlobalKey key, MethodChannel channel,
       {QrScannerOverlayShape overlay}) async {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
+      if (_firstRun) {
+        _firstRun = false;
+        await Future.delayed(Duration(milliseconds: 300));
+      }
       final RenderBox renderBox = key.currentContext.findRenderObject();
-      try {
+       try {
         await channel.invokeMethod('setDimensions', {
           'width': renderBox.size.width,
           'height': renderBox.size.height,

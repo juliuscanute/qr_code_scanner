@@ -32,6 +32,7 @@ public class QRView:NSObject,FlutterPlatformView {
     public init(withFrame frame: CGRect, withRegistrar registrar: FlutterPluginRegistrar, withId id: Int64, params: Dictionary<String, Any>){
         self.registrar = registrar
         previewView = UIView(frame: frame)
+        scanner = MTBBarcodeScanner(previewView: previewView)
         cameraFacing = MTBCamera.init(rawValue: UInt(Int(params["cameraFacing"] as! Double))) ?? MTBCamera.back
         channel = FlutterMethodChannel(name: "net.touchcapture.qr.flutterqr/qrview_\(id)", binaryMessenger: registrar.messenger())
     }
@@ -97,17 +98,12 @@ public class QRView:NSObject,FlutterPlatformView {
         // Then set the size of the scan area.
         let midX = self.view().bounds.midX
         let midY = self.view().bounds.midY
-        
-        // Check if the scanner already exists, else create one.
-        if (self.scanner == nil) {
-            self.scanner = MTBBarcodeScanner(previewView: self.previewView)
-        }
-        
+
         // Set the size of the preview.
         if let previewLayer = self.scanner?.previewLayer {
-            previewLayer.frame = self.previewView.bounds;
+            previewLayer.frame = self.previewView.bounds
         }
-        
+
         // Set scanArea if provided.
         if (scanArea != 0) {
             self.scanner?.didStartScanningBlock = {
