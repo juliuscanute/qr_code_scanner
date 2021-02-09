@@ -32,7 +32,6 @@ public class QRView:NSObject,FlutterPlatformView {
     public init(withFrame frame: CGRect, withRegistrar registrar: FlutterPluginRegistrar, withId id: Int64, params: Dictionary<String, Any>){
         self.registrar = registrar
         previewView = UIView(frame: frame)
-        scanner = MTBBarcodeScanner(previewView: previewView)
         cameraFacing = MTBCamera.init(rawValue: UInt(Int(params["cameraFacing"] as! Double))) ?? MTBCamera.back
         channel = FlutterMethodChannel(name: "net.touchcapture.qr.flutterqr/qrview_\(id)", binaryMessenger: registrar.messenger())
     }
@@ -78,40 +77,34 @@ public class QRView:NSObject,FlutterPlatformView {
         return previewView
     }
     
-    func requestPermissions(_ result: @escaping FlutterResult) {
-        MTBBarcodeScanner.requestCameraPermission(success: { permissionGranted in
-            if permissionGranted {
-                self.channel.invokeMethod("onPermissionSet", arguments: true)
-            } else {
-                return result(FlutterError(code: "cameraPermission", message: "Permission denied to access the camera", details: nil))
-            }
-        })
-    }
-    
     func setDimensions(_ result: @escaping FlutterResult, width: Double, height: Double, scanArea: Double, scanAreaOffset: Double) {
-        // First ask for permission
-        requestPermissions(result)
-        
         // Then set the size of the preview area.
-        self.previewView.frame = CGRect(x: 0, y: 0, width: width, height: height)
+        previewView.frame = CGRect(x: 0, y: 0, width: width, height: height)
         
         // Then set the size of the scan area.
         let midX = self.view().bounds.midX
         let midY = self.view().bounds.midY
-
-        // Set the size of the preview.
-        if let previewLayer = self.scanner?.previewLayer {
-            previewLayer.frame = self.previewView.bounds
+        
+        if let sc: MTBBarcodeScanner = scanner {
+            // Set the size of the preview if preview is already created.
+            if let previewLayer = sc.previewLayer {
+                previewLayer.frame = self.previewView.bounds
+            }
+        } else {
+            // Create new preview.
+            scanner = MTBBarcodeScanner(previewView: previewView)
         }
 
         // Set scanArea if provided.
         if (scanArea != 0) {
-            self.scanner?.didStartScanningBlock = {
+            scanner?.didStartScanningBlock = {
                 self.scanner?.scanRect = CGRect(x: Double(midX) - (scanArea / 2), y: Double(midY) - (scanArea / 2), width: scanArea, height: scanArea)
 
                 // Set offset if provided.
                 if (scanAreaOffset != 0) {
-                    self.scanner?.scanRect = (self.scanner?.scanRect.offsetBy(dx: 0, dy: CGFloat(scanAreaOffset)))!
+                    let reversedOffset = -scanAreaOffset
+                    self.scanner?.scanRect = (self.scanner?.scanRect.offsetBy(dx: 0, dy: CGFloat(reversedOffset)))!
+
                 }
             }
         }
@@ -125,52 +118,58 @@ public class QRView:NSObject,FlutterPlatformView {
         arguments.forEach { arg in
             allowedBarcodeTypes.append( QRCodeTypes[arg]!)
         }
-        
-        do {
-            try self.scanner?.startScanning(with: self.cameraFacing, resultBlock: { [weak self] codes in
-                if let codes = codes {
-                    for code in codes {
-                        var typeString: String;
-                        switch(code.type) {
-                            case AVMetadataObject.ObjectType.aztec:
-                               typeString = "AZTEC"
-                            case AVMetadataObject.ObjectType.code39:
-                                typeString = "CODE_39"
-                            case AVMetadataObject.ObjectType.code93:
-                                typeString = "CODE_93"
-                            case AVMetadataObject.ObjectType.code128:
-                                typeString = "CODE_128"
-                            case AVMetadataObject.ObjectType.dataMatrix:
-                                typeString = "DATA_MATRIX"
-                            case AVMetadataObject.ObjectType.ean8:
-                                typeString = "EAN_8"
-                            case AVMetadataObject.ObjectType.ean13:
-                                typeString = "EAN_13"
-                            case AVMetadataObject.ObjectType.itf14:
-                                typeString = "ITF"
-                            case AVMetadataObject.ObjectType.pdf417:
-                                typeString = "PDF_417"
-                            case AVMetadataObject.ObjectType.qr:
-                                typeString = "QR_CODE"
-                            case AVMetadataObject.ObjectType.upce:
-                                typeString = "UPC_E"
-                            default:
-                                return
+        MTBBarcodeScanner.requestCameraPermission(success: { permissionGranted in
+            if permissionGranted {
+                do {
+                    try self.scanner?.startScanning(with: self.cameraFacing, resultBlock: { [weak self] codes in
+                        if let codes = codes {
+                            for code in codes {
+                                var typeString: String;
+                                switch(code.type) {
+                                    case AVMetadataObject.ObjectType.aztec:
+                                       typeString = "AZTEC"
+                                    case AVMetadataObject.ObjectType.code39:
+                                        typeString = "CODE_39"
+                                    case AVMetadataObject.ObjectType.code93:
+                                        typeString = "CODE_93"
+                                    case AVMetadataObject.ObjectType.code128:
+                                        typeString = "CODE_128"
+                                    case AVMetadataObject.ObjectType.dataMatrix:
+                                        typeString = "DATA_MATRIX"
+                                    case AVMetadataObject.ObjectType.ean8:
+                                        typeString = "EAN_8"
+                                    case AVMetadataObject.ObjectType.ean13:
+                                        typeString = "EAN_13"
+                                    case AVMetadataObject.ObjectType.itf14:
+                                        typeString = "ITF"
+                                    case AVMetadataObject.ObjectType.pdf417:
+                                        typeString = "PDF_417"
+                                    case AVMetadataObject.ObjectType.qr:
+                                        typeString = "QR_CODE"
+                                    case AVMetadataObject.ObjectType.upce:
+                                        typeString = "UPC_E"
+                                    default:
+                                        return
+                                }
+                                guard let stringValue = code.stringValue else { continue }
+                               let result = ["code": stringValue, "type": typeString]
+                                if allowedBarcodeTypes.count == 0 || allowedBarcodeTypes.contains(code.type) {
+                                    self?.channel.invokeMethod("onRecognizeQR", arguments: result)
+                                }
+                                
+                            }
                         }
-                        guard let stringValue = code.stringValue else { continue }
-                       let result = ["code": stringValue, "type": typeString]
-                        if allowedBarcodeTypes.count == 0 || allowedBarcodeTypes.contains(code.type) {
-                            self?.channel.invokeMethod("onRecognizeQR", arguments: result)
-                        }
-                        
-                    }
+
+                    })
+                } catch {
+                    let error = FlutterError(code: "unknown-error", message: "Unable to start scanning", details: nil)
+                    return result(error)
                 }
-            })
-        } catch {
-            let error = FlutterError(code: "unknown-error", message: "Unable to start scanning", details: nil)
-            return result(error)
-        }
-    
+            } else {
+                let error = FlutterError(code: "cameraPermission", message: "Permission denied to access the camera", details: nil)
+                result(error)
+            }
+        })
     }
     
     func stopCamera(_ result: @escaping FlutterResult) {

@@ -132,15 +132,13 @@ class _QRViewExampleState extends State<QRViewExample> {
     // we need to listen for Flutter SizeChanged notification and update controller
     return QRView(
       key: qrKey,
-      cameraFacing: CameraFacing.front,
       onQRViewCreated: _onQRViewCreated,
-      formatsAllowed: [BarcodeFormat.qrcode],
       overlay: QrScannerOverlayShape(
         borderColor: Colors.red,
         borderRadius: 10,
         borderLength: 30,
         borderWidth: 10,
-        cutOutSize: scanArea,
+        cutOutSize: scanArea
       ),
     );
   }
