@@ -4,40 +4,50 @@ import android.Manifest
 import android.app.Activity
 import android.app.Application
 import android.content.pm.PackageManager
-import android.os.Bundle
-import android.view.View
-import com.google.zxing.ResultPoint
 import android.hardware.Camera.CameraInfo
 import android.os.Build
+import android.os.Bundle
+import android.view.View
 import com.google.zxing.BarcodeFormat
+import com.google.zxing.ResultPoint
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.BarcodeView
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.platform.PlatformView
+
+
 class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<String, Any>) :
-        PlatformView, MethodChannel.MethodCallHandler {
+        PlatformView, MethodChannel.MethodCallHandler, PluginRegistry.RequestPermissionsResultListener {
 
     private var isTorchOn: Boolean = false
     private var isPaused: Boolean = false
     private var barcodeView: BarcodeView? = null
-    private val channel: MethodChannel
+    private val channel: MethodChannel = MethodChannel(messenger, "net.touchcapture.qr.flutterqr/qrview_$id")
+    private var permissionGranted: Boolean = false
 
     init {
-        checkAndRequestPermission(null)
-        channel = MethodChannel(messenger, "net.touchcapture.qr.flutterqr/qrview_$id")
+        if (Shared.binding != null) {
+            Shared.binding!!.addRequestPermissionsResultListener(this)
+        }
+
+        if (Shared.registrar != null) {
+            Shared.registrar!!.addRequestPermissionsResultListener(this)
+        }
+
         channel.setMethodCallHandler(this)
         Shared.activity?.application?.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
             override fun onActivityPaused(p0: Activity) {
-                if (p0 == Shared.activity && !isPaused) {
+                if (p0 == Shared.activity && !isPaused && hasCameraPermission()) {
                     barcodeView?.pause()
                 }
             }
 
             override fun onActivityResumed(p0: Activity) {
-                if (p0 == Shared.activity && !isPaused) {
+                if (p0 == Shared.activity && !isPaused && hasCameraPermission()) {
                     barcodeView?.resume()
                 }
             }
@@ -93,20 +103,22 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
         if (barcodeView == null) {
             return barCodeViewNotSet(result)
         } else if (!hasCameraPermission()) {
-            return cameraPermissionNotSet(result)
+            checkAndRequestPermission(result)
+        } else {
+            barcodeView!!.pause()
+            val settings = barcodeView!!.cameraSettings
+
+            if(settings.requestedCameraId == CameraInfo.CAMERA_FACING_FRONT)
+                settings.requestedCameraId = CameraInfo.CAMERA_FACING_BACK
+            else
+                settings.requestedCameraId = CameraInfo.CAMERA_FACING_FRONT
+
+            barcodeView!!.cameraSettings = settings
+            barcodeView!!.resume()
+            result.success(settings.requestedCameraId)
         }
 
-        barcodeView!!.pause()
-        val settings = barcodeView!!.cameraSettings
 
-        if(settings.requestedCameraId == CameraInfo.CAMERA_FACING_FRONT)
-            settings.requestedCameraId = CameraInfo.CAMERA_FACING_BACK
-        else
-            settings.requestedCameraId = CameraInfo.CAMERA_FACING_FRONT
-
-        barcodeView!!.cameraSettings = settings
-        barcodeView!!.resume()
-        result.success(settings.requestedCameraId)
     }
 
     private fun getFlashInfo(result: MethodChannel.Result) {
@@ -119,8 +131,6 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
     private fun toggleFlash(result: MethodChannel.Result) {
         if (barcodeView == null) {
             return barCodeViewNotSet(result)
-        } else if (!hasCameraPermission()) {
-            return cameraPermissionNotSet(result)
         }
 
         if (hasFlash()) {
@@ -137,28 +147,28 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
         if (barcodeView == null) {
             return barCodeViewNotSet(result)
         } else if (!hasCameraPermission()) {
-            return cameraPermissionNotSet(result)
+            checkAndRequestPermission(result)
+        } else {
+            if (barcodeView!!.isPreviewActive) {
+                isPaused = true
+                barcodeView!!.pause()
+            }
+            result.success(true)
         }
-
-        if (barcodeView!!.isPreviewActive) {
-            isPaused = true
-            barcodeView!!.pause()
-        }
-        result.success(true)
     }
 
     private fun resumeCamera(result: MethodChannel.Result) {
         if (barcodeView == null) {
             return barCodeViewNotSet(result)
         } else if (!hasCameraPermission()) {
-            return cameraPermissionNotSet(result)
+            checkAndRequestPermission(result)
+        } else {
+            if (!barcodeView!!.isPreviewActive) {
+                isPaused = false
+                barcodeView!!.resume()
+            }
+            result.success(true)
         }
-
-        if (!barcodeView!!.isPreviewActive) {
-            isPaused = false
-            barcodeView!!.resume()
-        }
-        result.success(true)
     }
 
     private fun hasFlash(): Boolean {
@@ -182,10 +192,6 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
         result.error("404", "No barcode view found", null)
     }
 
-    private fun cameraPermissionNotSet(result: MethodChannel.Result) {
-         result.error("cameraPermission", " Permission denied to access the camera", null)
-    }
-
     override fun getView(): View {
         return initBarCodeView().apply {}!!
     }
@@ -196,16 +202,17 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
             if (params["cameraFacing"] as Int == 1) {
                 barcodeView?.cameraSettings?.requestedCameraId = CameraInfo.CAMERA_FACING_FRONT
             }
-            barcodeView!!.resume()
+        } else {
+            if (hasCameraPermission()) {
+                if (!isPaused) barcodeView!!.resume()
+            } else {
+                checkAndRequestPermission(null)
+            }
         }
         return barcodeView
     }
 
     private fun startScan(arguments: List<Int>?, result: MethodChannel.Result) {
-        if (!hasCameraPermission()) {
-            return cameraPermissionNotSet(result)
-        }
-
         val allowedBarcodeTypes = mutableListOf<BarcodeFormat>()
         try {
             arguments?.forEach {
@@ -254,7 +261,6 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
 
     private fun checkAndRequestPermission(result: MethodChannel.Result?) {
         when {
-            hasCameraPermission() -> result?.success(true)
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
                 Shared.activity?.requestPermissions(
                         arrayOf(Manifest.permission.CAMERA),
@@ -265,5 +271,20 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
             }
         }
     }
+
+    override fun onRequestPermissionsResult( requestCode: Int,
+                                             permissions: Array<out String>?,
+                                             grantResults: IntArray): Boolean {
+
+        if (requestCode == Shared.CAMERA_REQUEST_ID && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            permissionGranted = true
+            channel.invokeMethod("onPermissionSet", true)
+            return true
+        }
+        permissionGranted = false
+        channel.invokeMethod("onPermissionSet", false)
+        return false
+    }
+
 }
 
