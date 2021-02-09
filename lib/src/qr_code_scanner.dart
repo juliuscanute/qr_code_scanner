@@ -140,7 +140,7 @@ class _QRViewState extends State<QRView> {
 
     // Start scan after creation of the view
     final controller =
-        QRViewController._(_channel, widget.key, widget.onPermissionSet)
+        QRViewController._(_channel, widget.key, widget.onPermissionSet, widget.cameraFacing)
           .._startScan(widget.key, widget.overlay, widget.formatsAllowed);
 
     // Initialize the controller for controlling the QRView
@@ -166,8 +166,8 @@ class _QrCameraSettings {
 
 class QRViewController {
   QRViewController._(MethodChannel channel, GlobalKey qrKey,
-      PermissionSetCallback onPermissionSet)
-      : _channel = channel {
+      PermissionSetCallback onPermissionSet, CameraFacing cameraFacing)
+      : _channel = channel, _cameraFacing = cameraFacing{
     _channel.setMethodCallHandler((call) async {
       switch (call.method) {
         case 'onRecognizeQR':
@@ -204,6 +204,7 @@ class QRViewController {
   }
 
   final MethodChannel _channel;
+  final CameraFacing _cameraFacing;
   final StreamController<Barcode> _scanUpdateController =
       StreamController<Barcode>();
 
@@ -232,6 +233,8 @@ class QRViewController {
   /// Gets information about which camera is active.
   Future<CameraFacing> getCameraInfo() async {
     try {
+      var cameraFacing = await _channel.invokeMethod('getCameraInfo') as int;
+      if (cameraFacing == -1) return _cameraFacing;
       return CameraFacing
           .values[await _channel.invokeMethod('getCameraInfo') as int];
     } on PlatformException catch (e) {

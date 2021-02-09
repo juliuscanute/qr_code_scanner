@@ -21,7 +21,7 @@ class FlutterQrPlugin : FlutterPlugin, ActivityAware {
     }
 
     private fun onAttachedToV1(registrar: PluginRegistry.Registrar) {
-        registrar.addRequestPermissionsResultListener(CameraRequestPermissionsListener())
+        Shared.registrar = registrar
         onAttachedToEngines(registrar.platformViewRegistry(), registrar.messenger(), registrar.activity())
     }
 
@@ -45,27 +45,23 @@ class FlutterQrPlugin : FlutterPlugin, ActivityAware {
 
     override fun onAttachedToActivity(activityPluginBinding: ActivityPluginBinding) {
         Shared.activity = activityPluginBinding.activity
-        activityPluginBinding.addRequestPermissionsResultListener(CameraRequestPermissionsListener())
+        Shared.binding = activityPluginBinding
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
         Shared.activity = null
+        Shared.binding = null
     }
 
     override fun onReattachedToActivityForConfigChanges(activityPluginBinding: ActivityPluginBinding) {
         Shared.activity = activityPluginBinding.activity
+        Shared.binding = activityPluginBinding
     }
 
     override fun onDetachedFromActivity() {
         Shared.activity = null
+        Shared.binding = null
     }
     
-    inner class CameraRequestPermissionsListener : PluginRegistry.RequestPermissionsResultListener {
-        override fun onRequestPermissionsResult(id: Int, permissions: Array<String>, grantResults: IntArray): Boolean {
-            if (id == Shared.CAMERA_REQUEST_ID && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                return true
-            }
-            return false
-        }
-    }
+
 }
