@@ -1,3 +1,9 @@
+## 0.3.3
+#### Bug fixes
+* Fixed updateDimensions not being called causing zoom on iOS. (#250)
+* Fixed Android permission callback not working. (#251) (#252)
+* Fixed null-pointers after declining permission on Android.
+
 ## 0.3.2
 #### Bug fixes
 * Fixed null-pointer when no overlay provided on iOS. (#245)
