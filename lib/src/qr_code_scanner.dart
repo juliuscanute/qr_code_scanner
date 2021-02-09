@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'lifecycle_event_handler.dart';
 import 'qr_scanner_overlay_shape.dart';
 import 'types/barcode.dart';
 import 'types/barcode_format.dart';
@@ -59,6 +60,19 @@ class _QRViewState extends State<QRView> {
   var _channel;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(LifecycleEventHandler(
+        resumeCallBack: () async => {
+              if (_channel != null)
+                {
+                  QRViewController.updateDimensions(widget.key, _channel,
+                      overlay: widget.overlay)
+                }
+            }));
+  }
+
+  @override
   Widget build(BuildContext context) {
     return NotificationListener(
       onNotification: onNotification,
@@ -75,6 +89,7 @@ class _QRViewState extends State<QRView> {
           QRViewController.updateDimensions(widget.key, _channel,
               overlay: widget.overlay)
         });
+
     return false;
   }
 
@@ -124,9 +139,9 @@ class _QRViewState extends State<QRView> {
     _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id');
 
     // Start scan after creation of the view
-    final controller =
-        QRViewController._(_channel, widget.key, widget.onPermissionSet)
-          .._startScan(widget.key, widget.overlay, widget.formatsAllowed);
+    final controller = QRViewController._(
+        _channel, widget.key, widget.onPermissionSet, widget.cameraFacing)
+      .._startScan(widget.key, widget.overlay, widget.formatsAllowed);
 
     // Initialize the controller for controlling the QRView
     if (widget.onQRViewCreated != null) {
@@ -151,8 +166,9 @@ class _QrCameraSettings {
 
 class QRViewController {
   QRViewController._(MethodChannel channel, GlobalKey qrKey,
-      PermissionSetCallback onPermissionSet)
-      : _channel = channel {
+      PermissionSetCallback onPermissionSet, CameraFacing cameraFacing)
+      : _channel = channel,
+        _cameraFacing = cameraFacing {
     _channel.setMethodCallHandler((call) async {
       switch (call.method) {
         case 'onRecognizeQR':
@@ -189,11 +205,13 @@ class QRViewController {
   }
 
   final MethodChannel _channel;
+  final CameraFacing _cameraFacing;
   final StreamController<Barcode> _scanUpdateController =
       StreamController<Barcode>();
 
   Stream<Barcode> get scannedDataStream => _scanUpdateController.stream;
 
+  static bool _firstRun = true;
   SystemFeatures _features;
   bool _hasPermissions;
 
@@ -216,6 +234,8 @@ class QRViewController {
   /// Gets information about which camera is active.
   Future<CameraFacing> getCameraInfo() async {
     try {
+      var cameraFacing = await _channel.invokeMethod('getCameraInfo') as int;
+      if (cameraFacing == -1) return _cameraFacing;
       return CameraFacing
           .values[await _channel.invokeMethod('getCameraInfo') as int];
     } on PlatformException catch (e) {
@@ -299,6 +319,10 @@ class QRViewController {
   static Future<void> updateDimensions(GlobalKey key, MethodChannel channel,
       {QrScannerOverlayShape overlay}) async {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
+      if (_firstRun) {
+        _firstRun = false;
+        await Future.delayed(Duration(milliseconds: 300));
+      }
       final RenderBox renderBox = key.currentContext.findRenderObject();
       try {
         await channel.invokeMethod('setDimensions', {
