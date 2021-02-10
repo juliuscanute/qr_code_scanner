@@ -155,10 +155,10 @@ class _QRViewExampleState extends State<QRViewExample> {
     return QRView(
       key: qrKey,
       // You can choose between CameraFacing.front or CameraFacing.back. Defaults to CameraFacing.back
-      cameraFacing: CameraFacing.front,
+      // cameraFacing: CameraFacing.front,
       onQRViewCreated: _onQRViewCreated,
       // Choose formats you want to scan. Defaults to all formats.
-      formatsAllowed: [BarcodeFormat.qrcode],
+      // formatsAllowed: [BarcodeFormat.qrcode],
       overlay: QrScannerOverlayShape(
         borderColor: Colors.red,
         borderRadius: 10,
