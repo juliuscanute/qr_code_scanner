@@ -3,6 +3,7 @@ enum BarcodeFormat {
   aztec,
 
   /// CODABAR 1D format.
+  /// Not supported in iOS
   codabar,
 
   /// Code 39 1D format.
@@ -27,6 +28,7 @@ enum BarcodeFormat {
   itf,
 
   /// MaxiCode 2D barcode format.
+  /// Not supported in iOS.
   maxicode,
 
   /// PDF417 format.
@@ -36,12 +38,15 @@ enum BarcodeFormat {
   qrcode,
 
   /// RSS 14
+  /// Not supported in iOS.
   rss14,
 
   /// RSS EXPANDED
+  /// Not supported in iOS.
   rssExpanded,
 
   /// UPC-A 1D format.
+  /// Same as ean-13 on iOS.
   upcA,
 
   /// UPC-E 1D format.

@@ -15,8 +15,11 @@ public class QRView:NSObject,FlutterPlatformView {
     var channel: FlutterMethodChannel
     var cameraFacing: MTBCamera
     
+    // Codabar, maxicode, rss14 & rssexpanded not supported. Replaced with qr.
+    // UPCa uses ean13 object.
     var QRCodeTypes = [
           0: AVMetadataObject.ObjectType.aztec,
+          2: AVMetadataObject.ObjectType.qr,
           2: AVMetadataObject.ObjectType.code39,
           3: AVMetadataObject.ObjectType.code93,
           4: AVMetadataObject.ObjectType.code128,
@@ -26,6 +29,9 @@ public class QRView:NSObject,FlutterPlatformView {
           8: AVMetadataObject.ObjectType.interleaved2of5,
           10: AVMetadataObject.ObjectType.pdf417,
           11: AVMetadataObject.ObjectType.qr,
+          12: AVMetadataObject.ObjectType.qr,
+          13: AVMetadataObject.ObjectType.qr,
+          14: AVMetadataObject.ObjectType.ean13,
           15: AVMetadataObject.ObjectType.upce
          ]
     
