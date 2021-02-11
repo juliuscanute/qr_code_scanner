@@ -212,7 +212,6 @@ class QRViewController {
 
   Stream<Barcode> get scannedDataStream => _scanUpdateController.stream;
 
-  static bool _firstRun = true;
   SystemFeatures _features;
   bool _hasPermissions;
 
@@ -320,10 +319,8 @@ class QRViewController {
   static Future<void> updateDimensions(GlobalKey key, MethodChannel channel,
       {QrScannerOverlayShape overlay}) async {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      if (_firstRun) {
-        _firstRun = false;
-        await Future.delayed(Duration(milliseconds: 300));
-      }
+      // Add small delay to ensure the renderbox is loaded
+      await Future.delayed(Duration(milliseconds: 100));
       final RenderBox renderBox = key.currentContext.findRenderObject();
       try {
         await channel.invokeMethod('setDimensions', {
