@@ -1,3 +1,8 @@
+## 0.3.4
+#### Bug fixes
+* Fixed No barcode view found on Android when calling controller.dispose() (#257)
+* Fixed Hot reload not working on Android.
+
 ## 0.3.3
 #### Bug fixes
 * Fixed updateDimensions not being called causing zoom on iOS. (#250)
