@@ -59,18 +59,20 @@ class QRView extends StatefulWidget {
 
 class _QRViewState extends State<QRView> {
   var _channel;
+  var _observer;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(LifecycleEventHandler(
+    _observer = LifecycleEventHandler(
         resumeCallBack: () async => {
               if (_channel != null)
                 {
                   QRViewController.updateDimensions(widget.key, _channel,
                       overlay: widget.overlay)
                 }
-            }));
+            });
+    WidgetsBinding.instance.addObserver(_observer);
   }
 
   @override
@@ -83,6 +85,12 @@ class _QRViewState extends State<QRView> {
             : _getPlatformQrView(),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(_observer);
   }
 
   bool onNotification(notification) {
