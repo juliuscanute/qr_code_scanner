@@ -1,7 +1,7 @@
 ## 0.3.5
 #### Bug fixes
 * Fixed QRView opening zoomed in on some devices by adding small delay to updateDimensions(). (#250)
-* Changed upc-a to EAN13 on iOS. (#262)
+* Changed upc-A to EAN13 on iOS. (#262)
 * Fixed null-pointer on BarcodeFormat array on iOS. (#262)
 * Added LifecycleEventHandler to dispose(). (#265)
 
