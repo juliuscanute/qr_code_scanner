@@ -61,7 +61,7 @@ extension BarcodeTypesExtension on BarcodeFormat {
     return index;
   }
 
-  static BarcodeFormat fromString(String format) {
+  static BarcodeFormat? fromString(String? format) {
     switch (format) {
       case 'AZTEC':
         return BarcodeFormat.aztec;

@@ -8,9 +8,9 @@ import 'barcode_format.dart';
 class Barcode {
   Barcode(this.code, this.format, this.rawBytes);
 
-  final String code;
+  final String? code;
   final BarcodeFormat format;
 
   /// Raw bytes are only supported by Android.
-  final List<int> rawBytes;
+  final List<int>? rawBytes;
 }
