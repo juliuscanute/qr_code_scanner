@@ -11,7 +11,7 @@ class QrScannerOverlayShape extends ShapeBorder {
     this.borderLength = 40,
     this.cutOutSize = 250,
     this.cutOutBottomOffset = 0,
-  }) : assert( borderLength <= cutOutSize / 2 + borderWidth * 2,
+  }) : assert(borderLength <= cutOutSize / 2 + borderWidth * 2,
             "Border can't be larger than ${cutOutSize / 2 + borderWidth * 2}");
 
   final Color borderColor;
@@ -65,9 +65,7 @@ class QrScannerOverlayShape extends ShapeBorder {
     final _borderLength = borderLength > cutOutSize / 2 + borderWidth * 2
         ? borderWidthSize / 2
         : borderLength;
-    final _cutOutSize = cutOutSize < width
-        ? cutOutSize
-        : width - borderOffset;
+    final _cutOutSize = cutOutSize < width ? cutOutSize : width - borderOffset;
 
     final backgroundPaint = Paint()
       ..color = overlayColor
