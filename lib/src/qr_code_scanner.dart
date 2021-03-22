@@ -329,7 +329,7 @@ class QRViewController {
   static Future<void> updateDimensions(GlobalKey key, MethodChannel channel,
       {QrScannerOverlayShape? overlay}) async {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      // Add small delay to ensure the renderbox is loaded
+      // Add small delay to ensure the render box is loaded
       await Future.delayed(Duration(milliseconds: 100));
       final renderBox = key.currentContext!.findRenderObject() as RenderBox;
       try {
