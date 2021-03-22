@@ -98,7 +98,6 @@ class _QRViewState extends State<QRView> {
               widget.key as GlobalKey<State<StatefulWidget>>, _channel,
               overlay: widget.overlay)
         });
-
     return false;
   }
 
@@ -139,7 +138,7 @@ class _QRViewState extends State<QRView> {
         break;
       default:
         throw UnsupportedError(
-            "Trying to use the default webview implementation for $defaultTargetPlatform but there isn't a default one");
+            "Trying to use the default qrview implementation for $defaultTargetPlatform but there isn't a default one");
     }
     return _platformQrView;
   }
@@ -199,7 +198,7 @@ class QRViewController {
           }
           break;
         case 'onPermissionSet':
-          await getSystemFeatures(); // if we have no permission all features will not be avaible
+          await getSystemFeatures(); // if we have no permission all features will not be available
           if (call.arguments != null) {
             if (call.arguments as bool) {
               _hasPermissions = true;
