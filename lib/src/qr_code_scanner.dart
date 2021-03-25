@@ -214,11 +214,8 @@ class QRViewController {
 
   Stream<Barcode> get scannedDataStream => _scanUpdateController.stream;
 
-  SystemFeatures? _features;
-  bool? _hasPermissions;
-
-  SystemFeatures? get systemFeatures => _features;
-  bool? get hasPermissions => _hasPermissions;
+  bool _hasPermissions = false;
+  bool get hasPermissions => _hasPermissions;
 
   /// Starts the barcode scanner
   Future<void> _startScan(GlobalKey key, QrScannerOverlayShape? overlay,
