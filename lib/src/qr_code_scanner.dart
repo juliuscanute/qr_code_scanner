@@ -233,7 +233,7 @@ class QRViewController {
   /// Gets information about which camera is active.
   Future<CameraFacing> getCameraInfo() async {
     try {
-      var cameraFacing = await _channel.invokeMethod('getCameraInfo') as int?;
+      var cameraFacing = await _channel.invokeMethod('getCameraInfo') as int;
       if (cameraFacing == -1) return _cameraFacing;
       return CameraFacing
           .values[await _channel.invokeMethod('getCameraInfo') as int];
