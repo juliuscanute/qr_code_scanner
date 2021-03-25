@@ -3,5 +3,8 @@ enum CameraFacing {
   back,
 
   /// Shows front facing camera.
-  front
+  front,
+
+  /// Unknown camera
+  unknown
 }
