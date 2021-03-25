@@ -207,7 +207,7 @@ class QRViewController {
     });
   }
 
-  late final MethodChannel _channel;
+  final MethodChannel _channel;
   final CameraFacing _cameraFacing;
   final StreamController<Barcode> _scanUpdateController =
       StreamController<Barcode>();
