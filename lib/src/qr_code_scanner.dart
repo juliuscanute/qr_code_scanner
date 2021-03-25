@@ -304,9 +304,11 @@ class QRViewController {
   Future<SystemFeatures> getSystemFeatures() async {
     try {
       var features =
-          await (_channel.invokeMapMethod<String, dynamic>('getSystemFeatures')
-              as FutureOr<Map<String, dynamic>>);
-      return SystemFeatures.fromJson(features);
+          await _channel.invokeMapMethod<String, dynamic>('getSystemFeatures');
+      if (features != null) {
+        return SystemFeatures.fromJson(features);
+      }
+      throw CameraException('Error', 'Could not get system features');
     } on PlatformException catch (e) {
       throw CameraException(e.code, e.message);
     }
