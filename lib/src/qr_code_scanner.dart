@@ -318,11 +318,12 @@ class QRViewController {
   }
 
   /// Updates the view dimensions for iOS.
-  static Future<void> updateDimensions(GlobalKey key, MethodChannel channel,
+  static Future<bool> updateDimensions(GlobalKey key, MethodChannel channel,
       {QrScannerOverlayShape? overlay}) async {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       // Add small delay to ensure the render box is loaded
       await Future.delayed(Duration(milliseconds: 100));
+      if (key.currentContext == null) return false;
       final renderBox = key.currentContext!.findRenderObject() as RenderBox;
       try {
         await channel.invokeMethod('setDimensions', {
@@ -331,9 +332,11 @@ class QRViewController {
           'scanArea': overlay?.cutOutSize ?? 0,
           'scanAreaOffset': overlay?.cutOutBottomOffset ?? 0
         });
+        return true;
       } on PlatformException catch (e) {
         throw CameraException(e.code, e.message);
       }
     }
+    return false;
   }
 }
