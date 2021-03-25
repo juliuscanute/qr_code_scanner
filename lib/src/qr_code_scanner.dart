@@ -156,14 +156,14 @@ class _QRViewState extends State<QRView> {
 
 class _QrCameraSettings {
   _QrCameraSettings({
-    this.cameraFacing,
+    this.cameraFacing = CameraFacing.unknown,
   });
 
-  final CameraFacing? cameraFacing;
+  final CameraFacing cameraFacing;
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'cameraFacing': cameraFacing!.index,
+      'cameraFacing': cameraFacing.index,
     };
   }
 }
