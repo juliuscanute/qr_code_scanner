@@ -14,7 +14,7 @@ import 'types/camera_exception.dart';
 import 'types/features.dart';
 
 typedef QRViewCreatedCallback = void Function(QRViewController);
-typedef PermissionSetCallback = void Function(QRViewController, bool?);
+typedef PermissionSetCallback = void Function(QRViewController, bool);
 
 /// The [QRView] is the view where the camera
 /// and the barcode scanner gets displayed.
@@ -198,15 +198,14 @@ class QRViewController {
           }
           break;
         case 'onPermissionSet':
-          await getSystemFeatures(); // if we have no permission all features will not be available
-          if (call.arguments != null) {
-            if (call.arguments as bool) {
+          if (call.arguments != null && call.arguments is bool) {
+            if (call.arguments) {
               _hasPermissions = true;
             } else {
               _hasPermissions = false;
             }
             if (onPermissionSet != null) {
-              onPermissionSet(this, call.arguments as bool?);
+              onPermissionSet(this, call.arguments);
             }
           }
           break;
