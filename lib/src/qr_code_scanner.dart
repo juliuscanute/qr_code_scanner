@@ -26,7 +26,7 @@ class QRView extends StatefulWidget {
     this.overlayMargin = EdgeInsets.zero,
     this.cameraFacing = CameraFacing.back,
     this.onPermissionSet,
-    this.formatsAllowed,
+    this.formatsAllowed = const <BarcodeFormat>[],
   }) : super(key: key);
 
   /// [onQRViewCreated] gets called when the view is created
@@ -49,7 +49,7 @@ class QRView extends StatefulWidget {
   final PermissionSetCallback? onPermissionSet;
 
   /// Use [formatsAllowed] to specify which formats needs to be scanned.
-  final List<BarcodeFormat>? formatsAllowed;
+  final List<BarcodeFormat> formatsAllowed;
 
   @override
   State<StatefulWidget> createState() => _QRViewState();
