@@ -56,21 +56,13 @@ class QRView extends StatefulWidget {
 }
 
 class _QRViewState extends State<QRView> {
-  var _channel;
-  late var _observer;
+  late MethodChannel _channel;
+  late LifecycleEventHandler _observer;
 
   @override
   void initState() {
     super.initState();
-    _observer = LifecycleEventHandler(
-        resumeCallBack: () async => {
-              if (_channel != null)
-                {
-                  QRViewController.updateDimensions(
-                      widget.key as GlobalKey<State<StatefulWidget>>, _channel,
-                      overlay: widget.overlay)
-                }
-            });
+    _observer = LifecycleEventHandler(resumeCallBack: updateDimensions);
     WidgetsBinding.instance!.addObserver(_observer);
   }
 
@@ -92,12 +84,14 @@ class _QRViewState extends State<QRView> {
     WidgetsBinding.instance!.removeObserver(_observer);
   }
 
+  Future<void> updateDimensions() async {
+    await QRViewController.updateDimensions(
+        widget.key as GlobalKey<State<StatefulWidget>>, _channel,
+        overlay: widget.overlay);
+  }
+
   bool onNotification(notification) {
-    Future.microtask(() => {
-          QRViewController.updateDimensions(
-              widget.key as GlobalKey<State<StatefulWidget>>, _channel,
-              overlay: widget.overlay)
-        });
+    updateDimensions();
     return false;
   }
 
