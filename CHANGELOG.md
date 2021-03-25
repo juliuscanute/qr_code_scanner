@@ -1,3 +1,6 @@
+## 0.4.0
+Stable null-safety support. (#278)
+
 ## 0.3.5
 #### Bug fixes
 * Fixed QRView opening zoomed in on some devices by adding small delay to updateDimensions(). (#250)
