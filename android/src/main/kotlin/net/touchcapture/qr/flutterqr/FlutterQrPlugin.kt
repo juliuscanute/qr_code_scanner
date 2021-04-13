@@ -1,7 +1,6 @@
 package net.touchcapture.qr.flutterqr
 
 import android.app.Activity
-import android.content.pm.PackageManager
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -14,6 +13,8 @@ class FlutterQrPlugin : FlutterPlugin, ActivityAware {
 
     /** Plugin registration embedding v1 */
     companion object {
+        lateinit var methodHandler: QRMethodHandler
+
         @JvmStatic
         fun registerWith(registrar: PluginRegistry.Registrar) {
             FlutterQrPlugin().onAttachedToV1(registrar)
@@ -41,6 +42,7 @@ class FlutterQrPlugin : FlutterPlugin, ActivityAware {
         platformViewRegistry
                 .registerViewFactory(
                         "net.touchcapture.qr.flutterqr/qrview", QRViewFactory(messenger))
+        methodHandler = QRMethodHandler(messenger)
     }
 
     override fun onAttachedToActivity(activityPluginBinding: ActivityPluginBinding) {
@@ -61,7 +63,6 @@ class FlutterQrPlugin : FlutterPlugin, ActivityAware {
     override fun onDetachedFromActivity() {
         Shared.activity = null
         Shared.binding = null
+        methodHandler.onDetach()
     }
-    
-
 }

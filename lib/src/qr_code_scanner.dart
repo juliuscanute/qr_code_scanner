@@ -177,18 +177,8 @@ class QRViewController {
       switch (call.method) {
         case 'onRecognizeQR':
           if (call.arguments != null) {
-            final args = call.arguments as Map;
-            final code = args['code'] as String;
-            final rawType = args['type'] as String;
-            // Raw bytes are only supported by Android.
-            final rawBytes = args['rawBytes'] as List<int>?;
-            final format = BarcodeTypesExtension.fromString(rawType);
-            if (format != BarcodeFormat.unknown) {
-              final barcode = Barcode(code, format, rawBytes);
-              _scanUpdateController.sink.add(barcode);
-            } else {
-              throw Exception('Unexpected barcode type $rawType');
-            }
+            final barcode = Barcode.fromJson(call.arguments as Map);
+            _scanUpdateController.sink.add(barcode);
           }
           break;
         case 'onPermissionSet':
@@ -215,6 +205,7 @@ class QRViewController {
   Stream<Barcode> get scannedDataStream => _scanUpdateController.stream;
 
   bool _hasPermissions = false;
+
   bool get hasPermissions => _hasPermissions;
 
   /// Starts the barcode scanner
@@ -338,5 +329,21 @@ class QRViewController {
       }
     }
     return false;
+  }
+}
+
+class QRScanner {
+  static MethodChannel? _channel;
+
+  static MethodChannel get channel =>
+      _channel ??= MethodChannel('net.touchcapture.qr.flutterqr.qrScan');
+
+  /// decode qr code from image
+  static Future<Barcode?> decodeImage(String path) async {
+    final json = await channel.invokeMethod('scanImage', {
+      'path': path,
+    });
+    if (json == null) return null;
+    return Barcode.fromJson(json as Map);
   }
 }

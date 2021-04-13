@@ -13,4 +13,17 @@ class Barcode {
 
   /// Raw bytes are only supported by Android.
   final List<int>? rawBytes;
+
+  static Barcode fromJson(Map json) {
+    final code = json['code'] as String;
+    final rawType = json['type'] as String;
+    // Raw bytes are only supported by Android.
+    final rawBytes = json['rawBytes'] as List<int>?;
+    final format = BarcodeTypesExtension.fromString(rawType);
+    if (format != BarcodeFormat.unknown) {
+      return Barcode(code, format, rawBytes);
+    } else {
+      throw Exception('Unexpected barcode type $rawType');
+    }
+  }
 }

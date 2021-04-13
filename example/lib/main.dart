@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 void main() => runApp(MaterialApp(home: QRViewExample()));
@@ -15,6 +16,7 @@ class _QRViewExampleState extends State<QRViewExample> {
   Barcode? result;
   QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  final picker = ImagePicker();
 
   // In order to get hot reload to work we need to pause the camera if the platform
   // is android, or resume the camera if the platform is iOS.
@@ -105,6 +107,13 @@ class _QRViewExampleState extends State<QRViewExample> {
                           },
                           child: Text('resume', style: TextStyle(fontSize: 20)),
                         ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.all(8),
+                        child: ElevatedButton(
+                          onPressed: _scanImage,
+                          child: Text('album', style: TextStyle(fontSize: 20)),
+                        ),
                       )
                     ],
                   ),
@@ -115,6 +124,17 @@ class _QRViewExampleState extends State<QRViewExample> {
         ],
       ),
     );
+  }
+
+  Future _scanImage() async {
+    final file = await picker.getImage(source: ImageSource.gallery);
+    if (file == null) return;
+    try {
+      result = await QRScanner.decodeImage(file.path);
+      setState(() {});
+    } catch (e, s) {
+      print('$e\n$s');
+    }
   }
 
   Widget _buildQrView(BuildContext context) {
