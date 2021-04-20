@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +11,9 @@ import 'types/barcode_format.dart';
 import 'types/camera.dart';
 import 'types/camera_exception.dart';
 import 'types/features.dart';
+import 'web/flutter_qr_stub.dart'
+// ignore: uri_does_not_exist
+    if (dart.library.html) 'web/flutter_qr_web.dart';
 
 typedef QRViewCreatedCallback = void Function(QRViewController);
 typedef PermissionSetCallback = void Function(QRViewController, bool);
@@ -111,28 +113,35 @@ class _QRViewState extends State<QRView> {
 
   Widget _getPlatformQrView() {
     Widget _platformQrView;
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        _platformQrView = AndroidView(
-          viewType: 'net.touchcapture.qr.flutterqr/qrview',
-          onPlatformViewCreated: _onPlatformViewCreated,
-          creationParams:
-              _QrCameraSettings(cameraFacing: widget.cameraFacing).toMap(),
-          creationParamsCodec: StandardMessageCodec(),
-        );
-        break;
-      case TargetPlatform.iOS:
-        _platformQrView = UiKitView(
-          viewType: 'net.touchcapture.qr.flutterqr/qrview',
-          onPlatformViewCreated: _onPlatformViewCreated,
-          creationParams:
-              _QrCameraSettings(cameraFacing: widget.cameraFacing).toMap(),
-          creationParamsCodec: StandardMessageCodec(),
-        );
-        break;
-      default:
-        throw UnsupportedError(
-            "Trying to use the default qrview implementation for $defaultTargetPlatform but there isn't a default one");
+    if (kIsWeb) {
+      _platformQrView = createWebQrView(
+        onPlatformViewCreated: widget.onQRViewCreated,
+        cameraFacing: widget.cameraFacing,
+      );
+    } else {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          _platformQrView = AndroidView(
+            viewType: 'net.touchcapture.qr.flutterqr/qrview',
+            onPlatformViewCreated: _onPlatformViewCreated,
+            creationParams:
+                _QrCameraSettings(cameraFacing: widget.cameraFacing).toMap(),
+            creationParamsCodec: StandardMessageCodec(),
+          );
+          break;
+        case TargetPlatform.iOS:
+          _platformQrView = UiKitView(
+            viewType: 'net.touchcapture.qr.flutterqr/qrview',
+            onPlatformViewCreated: _onPlatformViewCreated,
+            creationParams:
+                _QrCameraSettings(cameraFacing: widget.cameraFacing).toMap(),
+            creationParamsCodec: StandardMessageCodec(),
+          );
+          break;
+        default:
+          throw UnsupportedError(
+              "Trying to use the default qrview implementation for $defaultTargetPlatform but there isn't a default one");
+      }
     }
     return _platformQrView;
   }
@@ -313,7 +322,7 @@ class QRViewController {
 
   /// Stops the camera and disposes the barcode stream.
   void dispose() {
-    if (Platform.isIOS) stopCamera();
+    if (defaultTargetPlatform == TargetPlatform.iOS) stopCamera();
     _scanUpdateController.close();
   }
 

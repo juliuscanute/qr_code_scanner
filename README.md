@@ -132,6 +132,20 @@ In order to use this plugin, add the following to your Info.plist file:
 <string>This app needs camera access to scan QR codes</string>
 ```
 
+## Web Integration
+
+Add this to `web/index.html`:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.3.1/dist/jsQR.min.js"></script>
+```
+
+Please note: on web, only QR codes are supported. Other barcodes and 2D codes cannot be scanned.
+
+Web support is in very earlt stage. Features such as flash, pause or resume are not implemented. Moreover, the camera 
+preview does not respect the surrounding constraints. This is not at last due to Flutter's early state of platform views
+on web.
+
 ## Flip Camera (Back/Front)
 The default camera is the back camera.
 ```dart
