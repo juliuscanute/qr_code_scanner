@@ -199,13 +199,9 @@ class QRViewController {
         case 'onPermissionSet':
           await getSystemFeatures(); // if we have no permission all features will not be avaible
           if (call.arguments != null) {
-            if (call.arguments as bool) {
-              _hasPermissions = true;
-            } else {
-              _hasPermissions = false;
-            }
+            _hasPermissions = call.arguments as bool;
             if (onPermissionSet != null) {
-              onPermissionSet(this, call.arguments as bool);
+              onPermissionSet(this, _hasPermissions);
             }
           }
           break;

@@ -125,7 +125,11 @@ public class QRView:NSObject,FlutterPlatformView {
         arguments.forEach { arg in
             allowedBarcodeTypes.append( QRCodeTypes[arg]!)
         }
-        MTBBarcodeScanner.requestCameraPermission(success: { permissionGranted in
+        MTBBarcodeScanner.requestCameraPermission(success: { [weak self] permissionGranted in
+            guard let self = self else { return }
+
+            self.channel.invokeMethod("onPermissionSet", arguments: permissionGranted)
+
             if permissionGranted {
                 do {
                     try self.scanner?.startScanning(with: self.cameraFacing, resultBlock: { [weak self] codes in
@@ -169,8 +173,8 @@ public class QRView:NSObject,FlutterPlatformView {
 
                     })
                 } catch {
-                    let error = FlutterError(code: "unknown-error", message: "Unable to start scanning", details: nil)
-                    return result(error)
+                    let scanError = FlutterError(code: "unknown-error", message: "Unable to start scanning", details: error)
+                    result(scanError)
                 }
             } else {
                 let error = FlutterError(code: "cameraPermission", message: "Permission denied to access the camera", details: nil)
