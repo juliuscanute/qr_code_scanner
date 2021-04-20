@@ -8,18 +8,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - uses: actions/setup-java@v1
-      with:
-        java-version: '12.x'
-    - uses: subosito/flutter-action@v1
-      with:
-        channel: 'stable'
-    - name: Version
-      run: flutter doctor -v
-    - name: Install dependencies
-      run: flutter pub get
-    - name: Format
-      run: dartfmt -n --set-exit-if-changed .
-    - name: Linter
-      run: dartanalyzer . --options=analysis_options.yaml --fatal-hints
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+      - uses: subosito/flutter-action@v1
+      - name: Version
+        run: flutter doctor -v
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Format
+        run: flutter format -n --set-exit-if-changed .
+      - name: Linter
+        run: flutter analyze

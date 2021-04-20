@@ -12,5 +12,5 @@ class Barcode {
   final BarcodeFormat format;
 
   /// Raw bytes are only supported by Android.
-  final List<int> rawBytes;
+  final List<int>? rawBytes;
 }
