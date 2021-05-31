@@ -193,13 +193,9 @@ class QRViewController {
           break;
         case 'onPermissionSet':
           if (call.arguments != null && call.arguments is bool) {
-            if (call.arguments) {
-              _hasPermissions = true;
-            } else {
-              _hasPermissions = false;
-            }
+            _hasPermissions = call.arguments;
             if (onPermissionSet != null) {
-              onPermissionSet(this, call.arguments);
+              onPermissionSet(this, _hasPermissions);
             }
           }
           break;

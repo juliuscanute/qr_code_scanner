@@ -215,6 +215,8 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
     private fun startScan(arguments: List<Int>?, result: MethodChannel.Result) {
         val allowedBarcodeTypes = mutableListOf<BarcodeFormat>()
         try {
+            checkAndRequestPermission(result)
+
             arguments?.forEach {
                 allowedBarcodeTypes.add(BarcodeFormat.values()[it])
             }
@@ -255,16 +257,22 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
     }
 
     private fun hasCameraPermission(): Boolean {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+        return permissionGranted ||
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
                 Shared.activity?.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun checkAndRequestPermission(result: MethodChannel.Result?) {
         when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
-                Shared.activity?.requestPermissions(
-                        arrayOf(Manifest.permission.CAMERA),
-                        Shared.CAMERA_REQUEST_ID)
+                if (Shared.activity?.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    permissionGranted = true
+                    channel.invokeMethod("onPermissionSet", true)
+                } else {
+                    Shared.activity?.requestPermissions(
+                            arrayOf(Manifest.permission.CAMERA),
+                            Shared.CAMERA_REQUEST_ID)
+                }
             }
             else -> {
                 result?.error("cameraPermission", "Platform Version to low for camera permission check", null)
