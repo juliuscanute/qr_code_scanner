@@ -1,3 +1,8 @@
+## 0.5.0
+* Added initial web-support. This function is still under development and not fully tested.
+* Fixed permissions on iOS.
+* Updated dependencies.
+
 ## 0.4.0
 Stable null-safety support. (#278)
 
