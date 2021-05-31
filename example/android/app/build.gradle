@@ -32,10 +32,6 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    lintOptions {
-        disable 'InvalidPackage'
-    }
-
     defaultConfig {
         applicationId "net.touchcapture.qr.flutterqrexample"
         // minSdkVersion is determined by Native View.
