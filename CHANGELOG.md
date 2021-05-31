@@ -1,3 +1,6 @@
+## 0.5.1
+Removed web from library export.
+
 ## 0.5.0
 * Added initial web-support. This function is still under development and not fully tested.
 * Fixed permissions on iOS.
