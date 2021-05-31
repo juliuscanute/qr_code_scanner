@@ -56,7 +56,6 @@ class _WebQrViewState extends State<WebQrView> {
   // html.CanvasElement canvas;
   // html.CanvasRenderingContext2D ctx;
   bool _currentlyProcessing = false;
-  html.MediaRecorder? _mediaRecorder;
 
   QRViewControllerWeb? _controller;
 
@@ -72,10 +71,6 @@ class _WebQrViewState extends State<WebQrView> {
   late CameraFacing facing;
 
   Timer? _frameIntervall;
-
-  final _canvasKey = GlobalKey();
-
-  double _scaleFactor = 1;
 
   @override
   void initState() {
@@ -199,20 +194,6 @@ class _WebQrViewState extends State<WebQrView> {
       _scanUpdateController
           .add(Barcode(code.data, BarcodeFormat.qrcode, code.data.codeUnits));
     }
-  }
-
-  Future<String?> _captureImage() async {
-    if (_localStream == null) {
-      return null;
-    }
-    final canvas =
-        html.CanvasElement(width: video.videoWidth, height: video.videoHeight);
-    final ctx = canvas.context2D;
-    // canvas.width = video.videoWidth;
-    // canvas.height = video.videoHeight;
-    ctx.drawImage(video, 0, 0);
-    var dataUrl = canvas.toDataUrl('image/jpeg', 0.9);
-    return dataUrl;
   }
 
   @override

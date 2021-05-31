@@ -3,7 +3,7 @@ library jsqr;
 
 import 'package:js/js.dart';
 
-@JS("jsQR")
+@JS('jsQR')
 external Code jsQR(var data, int? width, int? height);
 
 @JS()

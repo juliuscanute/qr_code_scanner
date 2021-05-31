@@ -1,12 +1,12 @@
 // This is here because dart doesn't seem to support this properly
 // https://stackoverflow.com/questions/61161135/adding-support-for-navigator-mediadevices-getusermedia-to-dart
 
-@JS("navigator.mediaDevices")
+@JS('navigator.mediaDevices')
 library media_devices;
 
 import 'package:js/js.dart';
 
-@JS("getUserMedia")
+@JS('getUserMedia')
 external Future<dynamic> getUserMedia(UserMediaOptions constraints);
 
 @JS()
