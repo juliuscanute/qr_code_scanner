@@ -1,14 +1,17 @@
-package net.touchcapture.qr.flutterqr
+package net.touchcapture.qr
 
 import android.app.Activity
-import android.content.pm.PackageManager
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.BinaryMessenger
+import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.platform.PlatformViewRegistry
+import net.touchcapture.qr.flutterqr.QRViewFactory
+import net.touchcapture.qr.flutterqr.Shared
+import net.touchcapture.qr.mlkit.MLKitScanner
 
 class FlutterQrPlugin : FlutterPlugin, ActivityAware {
 
@@ -27,7 +30,10 @@ class FlutterQrPlugin : FlutterPlugin, ActivityAware {
 
     /** Plugin registration embedding v2 */
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        onAttachedToEngines(flutterPluginBinding.platformViewRegistry, flutterPluginBinding.binaryMessenger, Shared.activity)
+        Shared.textures = flutterPluginBinding.textureRegistry
+        onAttachedToEngines(flutterPluginBinding.platformViewRegistry, flutterPluginBinding.binaryMessenger,
+            Shared.activity
+        )
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -38,9 +44,12 @@ class FlutterQrPlugin : FlutterPlugin, ActivityAware {
         if (activity != null) {
             Shared.activity = activity
         }
+        Shared.mlkitChannel = MethodChannel(messenger, "net.touchcapture.qr.flutterqr/mlkit")
+        Shared.mlkitChannel!!.setMethodCallHandler(MLKitScanner())
         platformViewRegistry
                 .registerViewFactory(
-                        "net.touchcapture.qr.flutterqr/qrview", QRViewFactory(messenger))
+                        "net.touchcapture.qr.flutterqr/qrview", QRViewFactory(messenger)
+                )
     }
 
     override fun onAttachedToActivity(activityPluginBinding: ActivityPluginBinding) {

@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="net.touchcapture.qr.flutterqr" 
   xmlns:tools="http://schemas.android.com/tools">
   <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
+    <uses-permission android:name="android.permission.CAMERA" />
 </manifest>
