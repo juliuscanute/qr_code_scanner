@@ -123,6 +123,15 @@ class _QRViewExampleState extends State<QRViewExample> {
 
 ```
 
+## Android Integration
+In order to use this plugin, please update the Gradle, Kotlin and Kotlin Gradle Plugin:
+
+In ```android/build.gradle``` change ```ext.kotlin_version = '1.3.50'``` to ```ext.kotlin_version = '1.5.10'```
+
+In ```android/build.gradle``` change ```classpath 'com.android.tools.build:gradle:3.5.0'``` to ```classpath 'com.android.tools.build:gradle:4.2.0'```
+
+In ```android/gradle/wrapper/gradle-wrapper.properties``` change ```distributionUrl=https\://services.gradle.org/distributions/gradle-5.6.2-all.zip``` to ```distributionUrl=https\://services.gradle.org/distributions/gradle-6.9-all.zip```
+
 ## iOS Integration
 In order to use this plugin, add the following to your Info.plist file:
 ```
