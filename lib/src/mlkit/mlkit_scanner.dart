@@ -4,11 +4,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:native_device_orientation/native_device_orientation.dart';
+import 'package:qr_code_scanner/src/mlkit/types/barcode.dart';
+import 'package:qr_code_scanner/src/mlkit/types/barcode_format_mlkit.dart';
+import 'package:qr_code_scanner/src/mlkit/types/enums/barcode_formats.dart';
 
 import 'mlkit.dart';
+import 'types/preview_details.dart';
 
 final WidgetBuilder _defaultNotStartedBuilder = (context) => Text('Camera Loading ...');
 final WidgetBuilder _defaultOffscreenBuilder = (context) => Text('Camera Paused.');
+
 final ErrorCallback _defaultOnError = (BuildContext context, Object error) {
   print('Error reading from camera: $error');
   return Text('Error reading from camera...');
@@ -32,18 +37,23 @@ class MLKitScanner extends StatefulWidget {
         super(key: key);
 
   final BoxFit fit;
-  final ValueChanged<String> qrCodeCallback;
+  final ValueChanged<BarcodeMLKit> qrCodeCallback;
   final Widget? child;
   final WidgetBuilder notStartedBuilder;
   final WidgetBuilder offscreenBuilder;
   final ErrorCallback onError;
-  final List<BarcodeFormats>? formats;
+  final List<BarcodeFormatsMLKit>? formats;
 
   @override
   MLKitScannerState createState() => MLKitScannerState();
 }
 
 class MLKitScannerState extends State<MLKitScanner> with WidgetsBindingObserver {
+
+  final MLKitScanner = MLKit();
+  bool onScreen = true;
+  Future<PreviewDetails>? _previewScreen;
+
   @override
   void initState() {
     super.initState();
@@ -57,25 +67,43 @@ class MLKitScannerState extends State<MLKitScanner> with WidgetsBindingObserver 
   }
 
   @override
+  void deactivate() {
+    super.deactivate();
+    MLKitScanner.stop();
+  }
+
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       setState(() => onScreen = true);
     } else {
-      if (_asyncInitOnce != null && onScreen) {
-        MLKit.stop();
+      if (_previewScreen != null && onScreen) {
+        MLKitScanner.stop();
       }
       setState(() {
         onScreen = false;
-        _asyncInitOnce = null;
+        _previewScreen = null;
       });
     }
   }
 
-  bool onScreen = true;
-  Future<PreviewDetails>? _asyncInitOnce;
+  /// This method can be used to restart scanning
+  ///  the event that it was paused.
+  Future<void> restart() async {
+    await MLKitScanner.stop();
+    setState(() {
+      _previewScreen = null;
+    });
+  }
 
-  Future<PreviewDetails> _asyncInit(num width, num height) async {
-    var previewDetails = await MLKit.start(
+  /// This method can be used to manually stop the
+  /// camera.
+  Future<void> stop() async {
+    await MLKitScanner.stop();
+  }
+
+  Future<PreviewDetails> _initPreviewScreen(num width, num height) async {
+    var previewDetails = await MLKitScanner.start(
       width: width.toInt(),
       height: height.toInt(),
       qrCodeHandler: widget.qrCodeCallback,
@@ -84,42 +112,17 @@ class MLKitScannerState extends State<MLKitScanner> with WidgetsBindingObserver 
     return previewDetails;
   }
 
-  /// This method can be used to restart scanning
-  ///  the event that it was paused.
-  void restart() {
-    (() async {
-      await MLKit.stop();
-      setState(() {
-        _asyncInitOnce = null;
-      });
-    })();
-  }
-
-  /// This method can be used to manually stop the
-  /// camera.
-  void stop() {
-    (() async {
-      await MLKit.stop();
-    })();
-  }
-
-  @override
-  void deactivate() {
-    super.deactivate();
-    MLKit.stop();
-  }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      if (_asyncInitOnce == null && onScreen) {
-        _asyncInitOnce = _asyncInit(constraints.maxWidth, constraints.maxHeight);
+      if (_previewScreen == null && onScreen) {
+        _previewScreen = _initPreviewScreen(constraints.maxWidth, constraints.maxHeight);
       } else if (!onScreen) {
         return widget.offscreenBuilder(context);
       }
 
       return FutureBuilder(
-        future: _asyncInitOnce,
+        future: _previewScreen,
         builder: (BuildContext context, AsyncSnapshot<PreviewDetails> details) {
           switch (details.connectionState) {
             case ConnectionState.none:
@@ -202,10 +205,10 @@ class Preview extends StatelessWidget {
             break;
         }
 
-        int rotationCompensation = ((nativeRotation - sensorOrientation + 450) % 360) ~/ 90;
+        var rotationCompensation = ((nativeRotation - sensorOrientation + 450) % 360) ~/ 90;
 
-        double frameHeight = width;
-        double frameWidth = height;
+        var frameHeight = width;
+        var frameWidth = height;
 
         return ClipRect(
           child: FittedBox(

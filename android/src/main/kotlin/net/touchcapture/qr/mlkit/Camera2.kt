@@ -93,7 +93,7 @@ internal class Camera2(private val targetWidth: Int, private val targetHeight: I
             throw RuntimeException(e)
         }
         if (cameraId == null) {
-            throw Exception(MLKitReader.Exception.Reason.noBackCamera.toString())
+            throw Exception(MLKitReader.Exception.Reason.NoBackCamera.toString())
         }
         try {
             cameraCharacteristics = manager.getCameraCharacteristics(cameraId)
@@ -190,6 +190,7 @@ internal class Camera2(private val targetWidth: Int, private val targetHeight: I
             return
         }
         try {
+            @Suppress("DEPRECATION") // see https://stackoverflow.com/a/67084110/13031778
             cameraDevice!!.createCaptureSession(list, object : CameraCaptureSession.StateCallback() {
                 override fun onConfigured(session: CameraCaptureSession) {
                     previewSession = session

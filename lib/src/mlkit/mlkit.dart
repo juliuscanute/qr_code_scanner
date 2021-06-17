@@ -1,111 +1,126 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-
-class PreviewDetails {
-  num width;
-  num height;
-  num sensorOrientation;
-  int textureId;
-
-  PreviewDetails(
-      this.width, this.height, this.sensorOrientation, this.textureId);
-}
-
-enum BarcodeFormats {
-  ALL_FORMATS,
-  AZTEC,
-  CODE_128,
-  CODE_39,
-  CODE_93,
-  CODABAR,
-  DATA_MATRIX,
-  EAN_13,
-  EAN_8,
-  ITF,
-  PDF417,
-  QR_CODE,
-  UPC_A,
-  UPC_E,
-}
-
-const _defaultBarcodeFormats = [
-  BarcodeFormats.ALL_FORMATS,
-];
+import 'package:qr_code_scanner/src/mlkit/types/barcode.dart';
+import 'package:qr_code_scanner/src/mlkit/types/enums/barcode_value_types.dart';
+import 'types/enums/barcode_formats.dart';
+import 'types/preview_details.dart';
 
 class MLKit {
-  static const MethodChannel _channel = MethodChannel('net.touchcapture.qr.flutterqr/mlkit');
-  static QrChannelReader channelReader = QrChannelReader(_channel);
+
+  final MethodChannel _channel = MethodChannel('net.touchcapture.qr.flutterqr/mlkit');
+  late MLKitController channelReader;
 
   //Set target size before starting
-  static Future<PreviewDetails> start({
+  Future<PreviewDetails> start({
     required int width,
     required int height,
-    required QRCodeHandler qrCodeHandler,
-    List<BarcodeFormats>? formats = _defaultBarcodeFormats,
+    required MLKitCallback qrCodeHandler,
+    List<BarcodeFormatsMLKit>? formats,
   }) async {
-    final _formats = formats ?? _defaultBarcodeFormats;
-    assert(_formats.isNotEmpty);
 
-    var formatStrings = _formats
+    channelReader = MLKitController(channel: _channel,
+        qrCodeHandler: qrCodeHandler);
+
+    formats ??= [BarcodeFormatsMLKit.ALL_FORMATS];
+
+    final formatStrings = formats
         .map((format) => format.toString().split('.')[1])
         .toList(growable: false);
 
-    channelReader.setQrCodeHandler(qrCodeHandler);
     var details = await _channel.invokeMethod('startMLKit', {
       'targetWidth': width,
       'targetHeight': height,
-      'heartbeatTimeout': 0,
       'formats': formatStrings
     });
 
-    // invokeMethod returns Map<dynamic,...> in dart 2.0
     assert(details is Map<dynamic, dynamic>);
 
-    int textureId = details["textureId"];
-    num orientation = details["surfaceOrientation"];
-    num surfaceHeight = details["surfaceHeight"];
-    num surfaceWidth = details["surfaceWidth"];
+    int textureId = details['textureId'];
+    num orientation = details['surfaceOrientation'];
+    num surfaceHeight = details['surfaceHeight'];
+    num surfaceWidth = details['surfaceWidth'];
 
-    return new PreviewDetails(
+    return PreviewDetails(
         surfaceWidth, surfaceHeight, orientation, textureId);
   }
 
-  static Future stop() {
-    channelReader.setQrCodeHandler(null);
+  Future<void> stop() {
     return _channel.invokeMethod('stopMLKit').catchError(print);
   }
 
-  static Future<dynamic> getSupportedSizes() {
+  Future<dynamic> getSupportedSizes() {
     return _channel.invokeMethod('getSupportedSizes').catchError(print);
   }
 }
 
 enum FrameRotation { none, ninetyCC, oneeighty, twoseventyCC }
 
-typedef void QRCodeHandler(String qr);
+typedef MLKitCallback = void Function(BarcodeMLKit qr);
 
-class QrChannelReader {
-  QrChannelReader(this.channel) {
+class MLKitController {
+
+
+  void dispose() {
+    _scanUpdateController.close();
+  }
+
+  MethodChannel channel;
+  MLKitCallback qrCodeHandler;
+
+  final StreamController<BarcodeMLKit> _scanUpdateController =
+  StreamController<BarcodeMLKit>();
+
+  Stream<BarcodeMLKit> get scannedDataStream => _scanUpdateController.stream;
+
+
+  MLKitController({required this.channel, required this.qrCodeHandler}) {
     channel.setMethodCallHandler((MethodCall call) async {
       switch (call.method) {
         case 'qrRead':
-          if (qrCodeHandler != null) {
-            assert(call.arguments is String);
-            qrCodeHandler!(call.arguments);
+          if (call.arguments != null) {
+            final args = call.arguments as Map;
+            final valueType = args['valueType'];
+
+            final format = intToFormat(args['format']);
+            final displayValue = args['displayValue'];
+            final rawValue = args['rawValue'];
+
+            final barcode = BarcodeMLKit(
+                displayValue: displayValue.toString(),
+                rawValue: rawValue.toString(),
+                valueType: BarcodeValueTypesMLKit.values[valueType],
+                format: format);
+
+            _scanUpdateController.sink.add(barcode);
+            qrCodeHandler(barcode);
           }
           break;
         default:
-          print("QrChannelHandler: unknown method call received at "
-              "${call.method}");
+          print('QrChannelHandler: unknown method call received at '
+              '${call.method}');
       }
     });
   }
 
-  void setQrCodeHandler(QRCodeHandler? qrch) {
-    this.qrCodeHandler = qrch;
+  BarcodeFormatsMLKit intToFormat(int code) {
+    if (code == 0xFFFF) return BarcodeFormatsMLKit.ALL_FORMATS;
+    if (code == 0x0001) return BarcodeFormatsMLKit.CODE_128;
+    if (code == 0x0002) return BarcodeFormatsMLKit.CODE_39;
+    if (code == 0x0004) return BarcodeFormatsMLKit.CODE_93;
+    if (code == 0x0008) return BarcodeFormatsMLKit.CODABAR;
+    if (code == 0x0010) return BarcodeFormatsMLKit.DATA_MATRIX;
+    if (code == 0x0020) return BarcodeFormatsMLKit.EAN_13;
+    if (code == 0x0040) return BarcodeFormatsMLKit.EAN_8;
+    if (code == 0x0080) return BarcodeFormatsMLKit.ITF;
+    if (code == 0x0100) return BarcodeFormatsMLKit.QR_CODE;
+    if (code == 0x0200) return BarcodeFormatsMLKit.UPC_A;
+    if (code == 0x0400) return BarcodeFormatsMLKit.UPC_E;
+    if (code == 0x0800) return BarcodeFormatsMLKit.PDF417;
+    if (code == 0x1000) return BarcodeFormatsMLKit.AZTEC;
+    return BarcodeFormatsMLKit.UNKNOWN;
   }
 
-  MethodChannel channel;
-  QRCodeHandler? qrCodeHandler;
+
+
 }

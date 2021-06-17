@@ -1,0 +1,15 @@
+enum BarcodeValueTypesMLKit {
+  UNKNOWN,
+  CONTACT_INFO,
+  EMAIL,
+  ISBN,
+  PHONE,
+  PRODUCT,
+  SMS,
+  TEXT,
+  URL,
+  WIFI,
+  GEO,
+  CALENDAR_EVENT,
+  DRIVER_LICENSE
+}

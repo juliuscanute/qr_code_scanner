@@ -1,6 +1,7 @@
 package net.touchcapture.qr.mlkit
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
@@ -12,20 +13,27 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import java.io.IOException
 
 internal class MLKitReader(width: Int, height: Int, private val context: Activity, options: BarcodeScannerOptions,
-                           private val startedCallback: MLKitStartedCallback, communicator: MLKitCallbacks?,
-                           texture: SurfaceTexture?) {
-    var qrCamera: Camera? = null
+                           private val startedCallback: MLKitStartedCallback, communicator: MLKitCallbacks,
+                           texture: SurfaceTexture) {
 
-    @Throws(IOException::class, NoPermissionException::class, Exception::class)
+    val mlkitCamera: Camera = if (Build.VERSION.SDK_INT >= 21) {
+        Log.i(TAG, "Using new camera API.")
+        Camera2(width, height, texture, context, MLKitDetector(communicator, options))
+    } else {
+        Log.i(TAG, "Using old camera API.")
+        Camera1(width, height, texture, context, MLKitDetector(communicator, options))
+    }
+
+    @Throws(IOException::class, Exception::class)
     fun start() {
         if (!hasCameraHardware(context)) {
-            throw Exception(Exception.Reason.noHardware)
+            throw Exception(Exception.Reason.NoHardware)
         }
         if (!checkCameraPermission(context)) {
-            throw NoPermissionException()
+            throw Exception(Exception.Reason.NoPermissions)
         } else {
             try {
-                qrCamera!!.start()
+                mlkitCamera.start()
                 startedCallback.started()
             } catch (t: Throwable) {
                 startedCallback.startingFailed(t)
@@ -34,9 +42,11 @@ internal class MLKitReader(width: Int, height: Int, private val context: Activit
     }
 
     fun stop() {
-        qrCamera!!.stop()
+        mlkitCamera.stop()
     }
 
+    // Ignore because FEATURE_CAMERA_ANY isn't available on API 16
+    @SuppressLint("UnsupportedChromeOsCameraSystemFeature")
     private fun hasCameraHardware(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
@@ -56,13 +66,13 @@ internal class MLKitReader(width: Int, height: Int, private val context: Activit
         fun startingFailed(t: Throwable?)
     }
 
-    internal class Exception(private val reason: Reason) : java.lang.Exception("QR reader failed because $reason") {
+    internal class Exception(private val reason: Reason) : java.lang.Exception("MLKit reader failed because $reason") {
         fun reason(): Reason {
             return reason
         }
 
         internal enum class Reason {
-            noHardware, noPermissions, noBackCamera
+            NoHardware, NoPermissions, NoBackCamera
         }
     }
 
@@ -70,13 +80,4 @@ internal class MLKitReader(width: Int, height: Int, private val context: Activit
         private const val TAG = "qr.mlkit.reader"
     }
 
-    init {
-        qrCamera = if (Build.VERSION.SDK_INT >= 21) {
-            Log.i(TAG, "Using new camera API.")
-            Camera2(width, height, texture!!, context, MLKitDetector(communicator!!, options))
-        } else {
-            Log.i(TAG, "Using old camera API.")
-            Camera1(width, height, texture!!, context, MLKitDetector(communicator!!, options))
-        }
-    }
 }

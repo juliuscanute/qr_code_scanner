@@ -13,7 +13,11 @@ import com.google.mlkit.vision.common.InputImage
 /**
  * Allows Camera classes to send frames to a Detector
  */
-internal class MLKitDetector(private val communicator: MLKitCallbacks, options: BarcodeScannerOptions) : OnSuccessListener<List<Barcode>>, OnFailureListener {
+internal class MLKitDetector(
+    private val communicator: MLKitCallbacks,
+    options: BarcodeScannerOptions
+) : OnSuccessListener<List<Barcode>>,
+    OnFailureListener {
     private val detector: BarcodeScanner = BarcodeScanning.getClient(options)
 
     interface Frame {
@@ -53,19 +57,19 @@ internal class MLKitDetector(private val communicator: MLKitCallbacks, options: 
             return
         }
         detector.process(image)
-                .addOnSuccessListener(this)
-                .addOnFailureListener(this)
+            .addOnSuccessListener(this)
+            .addOnFailureListener(this)
     }
 
     override fun onSuccess(mlkitVisionBarcodes: List<Barcode>) {
         for (barcode in mlkitVisionBarcodes) {
-            communicator.qrRead(barcode.rawValue)
+            communicator.qrRead(barcode)
         }
         processLatest()
     }
 
     override fun onFailure(e: Exception) {
-        Log.w(TAG, "Barcode Reading Failure: ", e)
+        Log.w(TAG, "MLKit Reading Failure: ", e)
     }
 
     companion object {

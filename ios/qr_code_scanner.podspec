@@ -17,6 +17,14 @@ A new Flutter project.
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
   s.dependency 'MTBBarcodeScanner'
+  s.dependency 'GoogleMLKit/BarcodeScanning'
+  
+  s.static_framework = true
+  
+  # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }
+  # Mobile vision doesn't support 32 bit ios
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphoneos*]' => 'arm64' }
   s.ios.deployment_target = '8.0'
   s.swift_version = '4.0'
 end

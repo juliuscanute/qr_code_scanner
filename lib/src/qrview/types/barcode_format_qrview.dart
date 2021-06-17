@@ -1,4 +1,4 @@
-enum BarcodeFormat {
+enum BarcodeFormatQRView {
   /// Aztec 2D barcode format.
   aztec,
 
@@ -59,87 +59,87 @@ enum BarcodeFormat {
   unknown
 }
 
-extension BarcodeTypesExtension on BarcodeFormat {
+extension BarcodeTypesExtension on BarcodeFormatQRView {
   int asInt() {
     return index;
   }
 
-  static BarcodeFormat fromString(String format) {
+  static BarcodeFormatQRView fromString(String format) {
     switch (format) {
       case 'AZTEC':
-        return BarcodeFormat.aztec;
+        return BarcodeFormatQRView.aztec;
       case 'CODABAR':
-        return BarcodeFormat.codabar;
+        return BarcodeFormatQRView.codabar;
       case 'CODE_39':
-        return BarcodeFormat.code39;
+        return BarcodeFormatQRView.code39;
       case 'CODE_93':
-        return BarcodeFormat.code93;
+        return BarcodeFormatQRView.code93;
       case 'CODE_128':
-        return BarcodeFormat.code128;
+        return BarcodeFormatQRView.code128;
       case 'DATA_MATRIX':
-        return BarcodeFormat.dataMatrix;
+        return BarcodeFormatQRView.dataMatrix;
       case 'EAN_8':
-        return BarcodeFormat.ean8;
+        return BarcodeFormatQRView.ean8;
       case 'EAN_13':
-        return BarcodeFormat.ean13;
+        return BarcodeFormatQRView.ean13;
       case 'ITF':
-        return BarcodeFormat.itf;
+        return BarcodeFormatQRView.itf;
       case 'MAXICODE':
-        return BarcodeFormat.maxicode;
+        return BarcodeFormatQRView.maxicode;
       case 'PDF_417':
-        return BarcodeFormat.pdf417;
+        return BarcodeFormatQRView.pdf417;
       case 'QR_CODE':
-        return BarcodeFormat.qrcode;
+        return BarcodeFormatQRView.qrcode;
       case 'RSS14':
-        return BarcodeFormat.rss14;
+        return BarcodeFormatQRView.rss14;
       case 'RSS_EXPANDED':
-        return BarcodeFormat.rssExpanded;
+        return BarcodeFormatQRView.rssExpanded;
       case 'UPC_A':
-        return BarcodeFormat.upcA;
+        return BarcodeFormatQRView.upcA;
       case 'UPC_E':
-        return BarcodeFormat.upcE;
+        return BarcodeFormatQRView.upcE;
       case 'UPC_EAN_EXTENSION':
-        return BarcodeFormat.upcEanExtension;
+        return BarcodeFormatQRView.upcEanExtension;
       default:
-        return BarcodeFormat.unknown;
+        return BarcodeFormatQRView.unknown;
     }
   }
 
   String get formatName {
     switch (this) {
-      case BarcodeFormat.aztec:
+      case BarcodeFormatQRView.aztec:
         return 'AZTEC';
-      case BarcodeFormat.codabar:
+      case BarcodeFormatQRView.codabar:
         return 'CODABAR';
-      case BarcodeFormat.code39:
+      case BarcodeFormatQRView.code39:
         return 'CODE_39';
-      case BarcodeFormat.code93:
+      case BarcodeFormatQRView.code93:
         return 'CODE_93';
-      case BarcodeFormat.code128:
+      case BarcodeFormatQRView.code128:
         return 'CODE_128';
-      case BarcodeFormat.dataMatrix:
+      case BarcodeFormatQRView.dataMatrix:
         return 'DATA_MATRIX';
-      case BarcodeFormat.ean8:
+      case BarcodeFormatQRView.ean8:
         return 'EAN_8';
-      case BarcodeFormat.ean13:
+      case BarcodeFormatQRView.ean13:
         return 'EAN_13';
-      case BarcodeFormat.itf:
+      case BarcodeFormatQRView.itf:
         return 'ITF';
-      case BarcodeFormat.maxicode:
+      case BarcodeFormatQRView.maxicode:
         return 'MAXICODE';
-      case BarcodeFormat.pdf417:
+      case BarcodeFormatQRView.pdf417:
         return 'PDF_417';
-      case BarcodeFormat.qrcode:
+      case BarcodeFormatQRView.qrcode:
         return 'QR_CODE';
-      case BarcodeFormat.rss14:
+      case BarcodeFormatQRView.rss14:
         return 'RSS14';
-      case BarcodeFormat.rssExpanded:
+      case BarcodeFormatQRView.rssExpanded:
         return 'RSS_EXPANDED';
-      case BarcodeFormat.upcA:
+      case BarcodeFormatQRView.upcA:
         return 'UPC_A';
-      case BarcodeFormat.upcE:
+      case BarcodeFormatQRView.upcE:
         return 'UPC_E';
-      case BarcodeFormat.upcEanExtension:
+      case BarcodeFormatQRView.upcEanExtension:
         return 'UPC_EAN_EXTENSION';
       default:
         return 'UNKNOWN';

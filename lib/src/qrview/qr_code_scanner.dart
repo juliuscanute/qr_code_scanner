@@ -7,11 +7,11 @@ import 'package:flutter/services.dart';
 import 'lifecycle_event_handler.dart';
 import 'qr_scanner_overlay_shape.dart';
 import 'types/barcode.dart';
-import 'types/barcode_format.dart';
+import 'types/barcode_format_qrview.dart';
 import 'types/camera.dart';
-import 'types/camera_exception.dart';
-import 'types/features.dart';
-import 'web/flutter_qr_stub.dart'
+import '../types/camera_exception.dart';
+import '../types/features.dart';
+import '../web/flutter_qr_stub.dart'
 // ignore: uri_does_not_exist
     if (dart.library.html) 'web/flutter_qr_web.dart';
 
@@ -28,7 +28,7 @@ class QRView extends StatefulWidget {
     this.overlayMargin = EdgeInsets.zero,
     this.cameraFacing = CameraFacing.back,
     this.onPermissionSet,
-    this.formatsAllowed = const <BarcodeFormat>[],
+    this.formatsAllowed = const <BarcodeFormatQRView>[],
   }) : super(key: key);
 
   /// [onQRViewCreated] gets called when the view is created
@@ -51,7 +51,7 @@ class QRView extends StatefulWidget {
   final PermissionSetCallback? onPermissionSet;
 
   /// Use [formatsAllowed] to specify which formats needs to be scanned.
-  final List<BarcodeFormat> formatsAllowed;
+  final List<BarcodeFormatQRView> formatsAllowed;
 
   @override
   State<StatefulWidget> createState() => _QRViewState();
@@ -192,7 +192,7 @@ class QRViewController {
             // Raw bytes are only supported by Android.
             final rawBytes = args['rawBytes'] as List<int>?;
             final format = BarcodeTypesExtension.fromString(rawType);
-            if (format != BarcodeFormat.unknown) {
+            if (format != BarcodeFormatQRView.unknown) {
               final barcode = Barcode(code, format, rawBytes);
               _scanUpdateController.sink.add(barcode);
             } else {
@@ -224,7 +224,7 @@ class QRViewController {
 
   /// Starts the barcode scanner
   Future<void> _startScan(GlobalKey key, QrScannerOverlayShape? overlay,
-      List<BarcodeFormat>? barcodeFormats) async {
+      List<BarcodeFormatQRView>? barcodeFormats) async {
     // We need to update the dimension before the scan is started.
     try {
       await QRViewController.updateDimensions(key, _channel, overlay: overlay);

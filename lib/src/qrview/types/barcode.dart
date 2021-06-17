@@ -1,4 +1,4 @@
-import 'barcode_format.dart';
+import 'barcode_format_qrview.dart';
 
 /// The [Barcode] object holds information about the barcode or qr code.
 ///
@@ -9,7 +9,7 @@ class Barcode {
   Barcode(this.code, this.format, this.rawBytes);
 
   final String code;
-  final BarcodeFormat format;
+  final BarcodeFormatQRView format;
 
   /// Raw bytes are only supported by Android.
   final List<int>? rawBytes;

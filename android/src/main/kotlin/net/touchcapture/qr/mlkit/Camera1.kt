@@ -70,7 +70,7 @@ internal class Camera1(private val targetWidth: Int, private val targetHeight: I
             }
         }
         if (camera == null) {
-            throw Exception(MLKitReader.Exception.Reason.noBackCamera.toString())
+            throw Exception(MLKitReader.Exception.Reason.NoBackCamera.toString())
         }
         val parameters = camera!!.parameters
         val focusModes = parameters.supportedFocusModes
@@ -85,6 +85,7 @@ internal class Camera1(private val targetWidth: Int, private val targetHeight: I
         parameters.setPreviewSize(size.width, size.height)
         texture.setDefaultBufferSize(size.width, size.height)
         parameters.previewFormat = IMAGEFORMAT
+
         try {
             camera!!.setPreviewCallback { data, camera ->
                 val previewSize = camera.parameters.previewSize

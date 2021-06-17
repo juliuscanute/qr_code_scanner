@@ -19,7 +19,6 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.platform.PlatformView
 
-
 class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<String, Any>) :
         PlatformView, MethodChannel.MethodCallHandler, PluginRegistry.RequestPermissionsResultListener {
 
@@ -75,6 +74,7 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        @Suppress("UNCHECKED_CAST")
         when(call.method) {
             "startScan" -> startScan(call.arguments as? List<Int>, result)
             "stopScan" -> stopScan()
@@ -176,7 +176,7 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
     }
 
     private fun hasBackCamera(): Boolean {
-        return hasSystemFeature(PackageManager.FEATURE_CAMERA)
+        return hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
     }
 
     private fun hasFrontCamera(): Boolean {

@@ -7,10 +7,11 @@ import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:qr_code_scanner/src/qrview/types/barcode_format_qrview.dart';
 
 import '../../qr_code_scanner.dart';
-import '../qr_code_scanner.dart';
-import '../types/camera.dart';
+import '../qrview/qr_code_scanner.dart';
+import '../qrview/types/camera.dart';
 import 'jsqr.dart';
 import 'media.dart';
 
@@ -192,7 +193,7 @@ class _WebQrViewState extends State<WebQrView> {
     // ignore: unnecessary_null_comparison
     if (code != null) {
       _scanUpdateController
-          .add(Barcode(code.data, BarcodeFormat.qrcode, code.data.codeUnits));
+          .add(Barcode(code.data, BarcodeFormatQRView.qrcode, code.data.codeUnits));
     }
   }
 
