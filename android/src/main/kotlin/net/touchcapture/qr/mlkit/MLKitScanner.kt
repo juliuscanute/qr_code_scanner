@@ -99,13 +99,16 @@ class MLKitScanner : MethodChannel.MethodCallHandler, MLKitCallbacks,
         val displayValue = barcode.displayValue
         val rawValue = barcode.rawValue
 
+        val boundingBox = barcode.boundingBox!!.flattenToString()
+
         // TODO: Other barcode values
 
         val code = mapOf(
             "valueType" to valueType,
             "format" to format,
             "displayValue" to displayValue,
-            "rawValue" to rawValue
+            "rawValue" to rawValue,
+            "boundingBox" to boundingBox
         )
         Shared.mlkitChannel!!.invokeMethod("qrRead", code)
     }

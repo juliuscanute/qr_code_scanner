@@ -1,9 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_code_scanner/src/mlkit/types/barcode.dart';
-import 'package:qr_code_scanner/src/mlkit/types/enums/barcode_value_types.dart';
-import 'types/enums/barcode_formats.dart';
+import 'package:qr_code_scanner/src/mlkit/types/barcode_value_types.dart';
+import 'types/barcode_formats.dart';
 import 'types/preview_details.dart';
 
 class MLKit {
@@ -79,6 +80,7 @@ class MLKitController {
       switch (call.method) {
         case 'qrRead':
           if (call.arguments != null) {
+            // debugPrint('ARGUMENTS: ${call.arguments}');
             final args = call.arguments as Map;
             final valueType = args['valueType'];
 
@@ -86,11 +88,16 @@ class MLKitController {
             final displayValue = args['displayValue'];
             final rawValue = args['rawValue'];
 
+            // final String boundingBox = args['boundingBox'];
+            // final bounding = boundingBox.split(' ');
+
             final barcode = BarcodeMLKit(
                 displayValue: displayValue.toString(),
                 rawValue: rawValue.toString(),
                 valueType: BarcodeValueTypesMLKit.values[valueType],
-                format: format);
+                format: format,
+            // boundingBox: Rect.fromLTRB(double.parse(bounding[1]) / 2, double.parse(bounding[2]) / 2,(1080 - double.parse(bounding[3]) / 2), double.parse(bounding[0]) / 2)
+            );
 
             _scanUpdateController.sink.add(barcode);
             qrCodeHandler(barcode);

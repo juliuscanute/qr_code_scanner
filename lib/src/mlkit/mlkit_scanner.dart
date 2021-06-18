@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:native_device_orientation/native_device_orientation.dart';
 import 'package:qr_code_scanner/src/mlkit/types/barcode.dart';
-import 'package:qr_code_scanner/src/mlkit/types/barcode_format_mlkit.dart';
-import 'package:qr_code_scanner/src/mlkit/types/enums/barcode_formats.dart';
+import 'package:qr_code_scanner/src/mlkit/types/barcode_formats.dart';
 
 import 'mlkit.dart';
 import 'types/preview_details.dart';

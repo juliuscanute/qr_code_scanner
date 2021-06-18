@@ -15,9 +15,10 @@ import com.google.mlkit.vision.common.InputImage
  */
 internal class MLKitDetector(
     private val communicator: MLKitCallbacks,
-    options: BarcodeScannerOptions
+    private val options: BarcodeScannerOptions
 ) : OnSuccessListener<List<Barcode>>,
     OnFailureListener {
+
     private val detector: BarcodeScanner = BarcodeScanning.getClient(options)
 
     interface Frame {

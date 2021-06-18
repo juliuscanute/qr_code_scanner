@@ -9,8 +9,8 @@ import 'qr_scanner_overlay_shape.dart';
 import 'types/barcode.dart';
 import 'types/barcode_format_qrview.dart';
 import 'types/camera.dart';
-import '../types/camera_exception.dart';
-import '../types/features.dart';
+import 'types/camera_exception.dart';
+import 'types/features.dart';
 import '../web/flutter_qr_stub.dart'
 // ignore: uri_does_not_exist
     if (dart.library.html) 'web/flutter_qr_web.dart';

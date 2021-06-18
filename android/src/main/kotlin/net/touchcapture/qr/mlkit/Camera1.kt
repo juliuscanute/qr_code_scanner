@@ -86,6 +86,8 @@ internal class Camera1(private val targetWidth: Int, private val targetHeight: I
         texture.setDefaultBufferSize(size.width, size.height)
         parameters.previewFormat = IMAGEFORMAT
 
+
+
         try {
             camera!!.setPreviewCallback { data, camera ->
                 val previewSize = camera.parameters.previewSize
