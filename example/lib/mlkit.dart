@@ -9,10 +9,7 @@ class MLKit extends StatefulWidget {
 
 class _MLKitState extends State<MLKit> {
   BarcodeMLKit? barcode;
-  String? result;
   int nrScanned = 0;
-  BarcodeValueTypesMLKit valueType = BarcodeValueTypesMLKit.UNKNOWN;
-  BarcodeFormatsMLKit barcodeFormat = BarcodeFormatsMLKit.UNKNOWN;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +19,6 @@ class _MLKitState extends State<MLKit> {
           Expanded(
             flex: 9,
             child: Stack(children: [
-
               MLKitScanner(
                 onError: (context, error) => Text(
                   error.toString(),
@@ -32,9 +28,6 @@ class _MLKitState extends State<MLKit> {
                   setState(() {
                     nrScanned++;
                     barcode = code;
-                    result = code.displayValue;
-                    valueType = code.valueType;
-                    barcodeFormat = code.format;
                   });
                 },
               ),
@@ -48,12 +41,11 @@ class _MLKitState extends State<MLKit> {
               //   ),
             ]),
           ),
-          if (result != null)
-            Expanded(
-              flex: 1,
+          if (barcode != null)
+            Expanded(              flex: 1,
               child: Center(
                   child: Text(
-                      '#$nrScanned Format: ${describeEnum(barcodeFormat)}, Type: ${describeEnum(valueType)}, Value: $result')),
+                      '#$nrScanned Format: ${describeEnum(barcode!.format)}, Type: ${describeEnum(barcode!.valueType)}, Value: ${barcode!.displayValue}')),
             )
           else
             Expanded(
@@ -68,6 +60,7 @@ class _MLKitState extends State<MLKit> {
   }
 }
 
+// TODO: Fix scanning rectangular based on
 // class YourRect extends CustomPainter {
 //   final Rect barcodeRect;
 //
