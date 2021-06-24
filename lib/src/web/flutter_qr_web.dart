@@ -192,8 +192,8 @@ class _WebQrViewState extends State<WebQrView> {
     final code = jsQR(imgData.data, canvas.width, canvas.height);
     // ignore: unnecessary_null_comparison
     if (code != null) {
-      _scanUpdateController
-          .add(Barcode(code.data, BarcodeFormatQRView.qrcode, code.data.codeUnits));
+      _scanUpdateController.add(
+          Barcode(code.data, BarcodeFormatQRView.qrcode, code.data.codeUnits));
     }
   }
 

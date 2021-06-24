@@ -17,7 +17,6 @@ enum BarcodeFormatsMLKit {
 }
 
 extension BarcodeFormatsMLKitExtension on BarcodeFormatsMLKit {
-
   int get value {
     switch (this) {
       case BarcodeFormatsMLKit.UNKNOWN:
@@ -52,5 +51,4 @@ extension BarcodeFormatsMLKitExtension on BarcodeFormatsMLKit {
         return 0x1000;
     }
   }
-
 }

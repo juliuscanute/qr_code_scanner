@@ -10,8 +10,10 @@ import 'package:qr_code_scanner/src/mlkit/types/barcode_formats.dart';
 import 'mlkit.dart';
 import 'types/preview_details.dart';
 
-final WidgetBuilder _defaultNotStartedBuilder = (context) => Text('Camera Loading ...');
-final WidgetBuilder _defaultOffscreenBuilder = (context) => Text('Camera Paused.');
+final WidgetBuilder _defaultNotStartedBuilder =
+    (context) => Text('Camera Loading ...');
+final WidgetBuilder _defaultOffscreenBuilder =
+    (context) => Text('Camera Paused.');
 
 final ErrorCallback _defaultOnError = (BuildContext context, Object error) {
   print('Error reading from camera: $error');
@@ -31,7 +33,8 @@ class MLKitScanner extends StatefulWidget {
     ErrorCallback? onError,
     this.formats,
   })  : notStartedBuilder = notStartedBuilder ?? _defaultNotStartedBuilder,
-        offscreenBuilder = offscreenBuilder ?? notStartedBuilder ?? _defaultOffscreenBuilder,
+        offscreenBuilder =
+            offscreenBuilder ?? notStartedBuilder ?? _defaultOffscreenBuilder,
         onError = onError ?? _defaultOnError,
         super(key: key);
 
@@ -47,8 +50,8 @@ class MLKitScanner extends StatefulWidget {
   MLKitScannerState createState() => MLKitScannerState();
 }
 
-class MLKitScannerState extends State<MLKitScanner> with WidgetsBindingObserver {
-
+class MLKitScannerState extends State<MLKitScanner>
+    with WidgetsBindingObserver {
   final MLKitScanner = MLKit();
   bool onScreen = true;
   Future<PreviewDetails>? _previewScreen;
@@ -115,7 +118,8 @@ class MLKitScannerState extends State<MLKitScanner> with WidgetsBindingObserver 
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       if (_previewScreen == null && onScreen) {
-        _previewScreen = _initPreviewScreen(constraints.maxWidth, constraints.maxHeight);
+        _previewScreen =
+            _initPreviewScreen(constraints.maxWidth, constraints.maxHeight);
       } else if (!onScreen) {
         return widget.offscreenBuilder(context);
       }
@@ -183,7 +187,8 @@ class Preview extends StatelessWidget {
   Widget build(BuildContext context) {
     return NativeDeviceOrientationReader(
       builder: (context) {
-        var nativeOrientation = NativeDeviceOrientationReader.orientation(context);
+        var nativeOrientation =
+            NativeDeviceOrientationReader.orientation(context);
 
         var nativeRotation = 0;
         switch (nativeOrientation) {
@@ -204,7 +209,8 @@ class Preview extends StatelessWidget {
             break;
         }
 
-        var rotationCompensation = ((nativeRotation - sensorOrientation + 450) % 360) ~/ 90;
+        var rotationCompensation =
+            ((nativeRotation - sensorOrientation + 450) % 360) ~/ 90;
 
         var frameHeight = width;
         var frameWidth = height;

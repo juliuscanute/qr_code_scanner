@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner_example/mlkit.dart';
 import 'package:qr_code_scanner_example/qrview.dart';
+
 void main() {
   runApp(QrCodeScannerExample());
 }
@@ -11,12 +12,8 @@ class QrCodeScannerExample extends StatefulWidget {
 }
 
 class _QrCodeScannerExampleState extends State<QrCodeScannerExample> {
-
   int _currentIndex = 0;
-  final List<Widget> _children = [
-    QRViewExample(),
-    MLKit()
-  ];
+  final List<Widget> _children = [QRViewExample(), MLKit()];
 
   @override
   void initState() {
@@ -55,5 +52,3 @@ class _QrCodeScannerExampleState extends State<QrCodeScannerExample> {
     );
   }
 }
-
-

@@ -42,7 +42,8 @@ class _MLKitState extends State<MLKit> {
             ]),
           ),
           if (barcode != null)
-            Expanded(              flex: 1,
+            Expanded(
+              flex: 1,
               child: Center(
                   child: Text(
                       '#$nrScanned Format: ${describeEnum(barcode!.format)}, Type: ${describeEnum(barcode!.valueType)}, Value: ${barcode!.displayValue}')),
