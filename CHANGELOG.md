@@ -1,3 +1,8 @@
+## 1.0.0-alpha.1
+First alpha release of MLKit support.
+
+This is an Alpha release which means that class names can be changed in later versions!
+
 ## 0.5.1
 Removed web from library export.
 
