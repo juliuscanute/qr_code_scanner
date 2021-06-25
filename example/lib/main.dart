@@ -1,10 +1,32 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
-void main() => runApp(MaterialApp(home: QRViewExample()));
+void main() => runApp(MaterialApp(home: MyHome()));
+
+class MyHome extends StatelessWidget {
+  const MyHome({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Flutter Demo Home Page')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => QRViewExample(),
+            ));
+          },
+          child: Text('qrView'),
+        ),
+      ),
+    );
+  }
+}
 
 class QRViewExample extends StatefulWidget {
   @override
@@ -134,6 +156,7 @@ class _QRViewExampleState extends State<QRViewExample> {
           borderLength: 30,
           borderWidth: 10,
           cutOutSize: scanArea),
+      onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),
     );
   }
 
@@ -146,6 +169,15 @@ class _QRViewExampleState extends State<QRViewExample> {
         result = scanData;
       });
     });
+  }
+
+  void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
+    log('${DateTime.now().toIso8601String()}_onPermissionSet $p');
+    if (!p) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('no Permission')),
+      );
+    }
   }
 
   @override
