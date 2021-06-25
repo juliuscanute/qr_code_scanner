@@ -273,14 +273,17 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
     override fun onRequestPermissionsResult( requestCode: Int,
                                              permissions: Array<out String>?,
                                              grantResults: IntArray): Boolean {
-
-        if (requestCode == Shared.CAMERA_REQUEST_ID && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            permissionGranted = true
-            channel.invokeMethod("onPermissionSet", true)
-            return true
+        if(requestCode == Shared.CAMERA_REQUEST_ID) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                permissionGranted = true
+                channel.invokeMethod("onPermissionSet", true)
+                return true
+            } else {
+                permissionGranted = false
+                channel.invokeMethod("onPermissionSet", false)
+                return false
+            }
         }
-        permissionGranted = false
-        channel.invokeMethod("onPermissionSet", false)
         return false
     }
 
