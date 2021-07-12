@@ -151,7 +151,7 @@ Add this to `web/index.html`:
 
 Please note: on web, only QR codes are supported. Other barcodes and 2D codes cannot be scanned.
 
-Web support is in very earlt stage. Features such as flash, pause or resume are not implemented. Moreover, the camera 
+Web support is in very early stage. Features such as flash, pause or resume are not implemented. Moreover, the camera 
 preview does not respect the surrounding constraints. This is not at last due to Flutter's early state of platform views
 on web.
 
