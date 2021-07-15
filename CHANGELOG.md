@@ -1,6 +1,6 @@
 ## 0.5.2
 #### Bugfixes
-* Increased delay to fixed QRView opening zoomed in on some devices by adding small delay to updateDimensions(). (#250)
+* Increased delay to fix QRView opening zoomed in on some devices by adding small delay to updateDimensions(). (#250)
 
 ## 0.5.1
 Removed web from library export.
