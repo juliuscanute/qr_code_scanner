@@ -1,6 +1,8 @@
 ## 0.5.2
 #### Bugfixes
 * Increased delay to fix QRView opening zoomed in on some devices by adding small delay to updateDimensions(). (#250)
+* Updated ZXING from 3.3.0 to 3.4.1 (#369)
+* Fixed permission not being called correctly on Android (#351)
 
 ## 0.5.1
 Removed web from library export.
