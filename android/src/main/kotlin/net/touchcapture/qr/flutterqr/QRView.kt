@@ -20,7 +20,7 @@ import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.platform.PlatformView
 
 
-class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<String, Any>) :
+class QRView(messenger: BinaryMessenger,private val id: Int, private val params: HashMap<String, Any>) :
         PlatformView, MethodChannel.MethodCallHandler, PluginRegistry.RequestPermissionsResultListener {
 
     private var isTorchOn: Boolean = false
@@ -261,7 +261,7 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
                 } else {
                     Shared.activity?.requestPermissions(
                             arrayOf(Manifest.permission.CAMERA),
-                            Shared.CAMERA_REQUEST_ID)
+                            Shared.CAMERA_REQUEST_ID + this.id)
                 }
             }
             else -> {
@@ -273,7 +273,7 @@ class QRView(messenger: BinaryMessenger, id: Int, private val params: HashMap<St
     override fun onRequestPermissionsResult( requestCode: Int,
                                              permissions: Array<out String>?,
                                              grantResults: IntArray): Boolean {
-        if(requestCode == Shared.CAMERA_REQUEST_ID) {
+        if(requestCode == Shared.CAMERA_REQUEST_ID + this.id) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 permissionGranted = true
                 channel.invokeMethod("onPermissionSet", true)
