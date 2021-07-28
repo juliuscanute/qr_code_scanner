@@ -13,9 +13,8 @@ import com.google.zxing.ResultPoint
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.BarcodeView
-import com.journeyapps.barcodescanner.DecoratedBarcodeView
-import io.flutter.plugin.common.BinaryMessenger
 import com.journeyapps.barcodescanner.Size
+import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
