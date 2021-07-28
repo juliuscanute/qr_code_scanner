@@ -15,6 +15,7 @@ import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.BarcodeView
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import io.flutter.plugin.common.BinaryMessenger
+import com.journeyapps.barcodescanner.Size
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
@@ -89,6 +90,7 @@ class QRView(messenger: BinaryMessenger,private val id: Int, private val params:
             "getCameraInfo" -> getCameraInfo(result)
             "getFlashInfo" -> getFlashInfo(result)
             "getSystemFeatures" -> getSystemFeatures(result)
+            "changeScanArea" -> changeScanArea(call.arguments as Double, result)
             else -> result.notImplemented()
         }
     }
@@ -246,6 +248,17 @@ class QRView(messenger: BinaryMessenger,private val id: Int, private val params:
             result.error(null, null, null)
         }
     }
+
+    private fun changeScanArea(newSize: Double, result: MethodChannel.Result) {
+        setScanAreaSize(newSize, newSize)
+        result.success(true)
+    }
+
+    private fun setScanAreaSize(dpScanAreaWidth: Double, dpScanAreaHeight: Double) {
+        barcodeView?.barcodeView?.framingRectSize = Size(convertDpToPixels(dpScanAreaWidth), convertDpToPixels(dpScanAreaHeight))
+    }
+
+    private fun convertDpToPixels(dp: Double) = (dp * barcodeView!!.context.resources.displayMetrics.density).toInt()
 
     private fun hasCameraPermission(): Boolean {
         return permissionGranted ||
