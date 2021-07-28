@@ -27,7 +27,7 @@ class QRView(messenger: BinaryMessenger,private val id: Int, private val params:
 
     private var isTorchOn: Boolean = false
     private var isPaused: Boolean = false
-    private var barcodeView: DecoratedBarcodeView? = null
+    private var barcodeView: BarcodeView? = null
     private val channel: MethodChannel = MethodChannel(messenger, "net.touchcapture.qr.flutterqr/qrview_$id")
     private var permissionGranted: Boolean = false
 
@@ -135,7 +135,7 @@ class QRView(messenger: BinaryMessenger,private val id: Int, private val params:
         }
 
         if (hasFlash()) {
-            barcodeView!!.barcodeView.setTorch(!isTorchOn)
+            barcodeView!!.setTorch(!isTorchOn)
             isTorchOn = !isTorchOn
             result.success(isTorchOn)
         } else {
@@ -148,7 +148,7 @@ class QRView(messenger: BinaryMessenger,private val id: Int, private val params:
         if (barcodeView == null) {
             return barCodeViewNotSet(result)
         } else {
-            if (barcodeView!!.barcodeView.isPreviewActive) {
+            if (barcodeView!!.isPreviewActive) {
                 isPaused = true
                 barcodeView!!.pause()
             }
@@ -160,7 +160,7 @@ class QRView(messenger: BinaryMessenger,private val id: Int, private val params:
         if (barcodeView == null) {
             return barCodeViewNotSet(result)
         } else {
-            if (!barcodeView!!.barcodeView.isPreviewActive) {
+            if (!barcodeView!!.isPreviewActive) {
                 isPaused = false
                 barcodeView!!.resume()
             }
@@ -193,9 +193,9 @@ class QRView(messenger: BinaryMessenger,private val id: Int, private val params:
         return initBarCodeView().apply {}!!
     }
 
-    private fun initBarCodeView(): DecoratedBarcodeView? {
+    private fun initBarCodeView(): BarcodeView? {
         if (barcodeView == null) {
-            barcodeView = DecoratedBarcodeView(Shared.activity)
+            barcodeView = BarcodeView(Shared.activity)
             if (params["cameraFacing"] as Int == 1) {
                 barcodeView?.cameraSettings?.requestedCameraId = CameraInfo.CAMERA_FACING_FRONT
             }
@@ -236,7 +236,7 @@ class QRView(messenger: BinaryMessenger,private val id: Int, private val params:
     }
 
     private fun stopScan() {
-        barcodeView?.barcodeView?.stopDecoding()
+        barcodeView?.stopDecoding()
     }
 
     private fun getSystemFeatures(result: MethodChannel.Result) {
@@ -255,7 +255,7 @@ class QRView(messenger: BinaryMessenger,private val id: Int, private val params:
     }
 
     private fun setScanAreaSize(dpScanAreaWidth: Double, dpScanAreaHeight: Double) {
-        barcodeView?.barcodeView?.framingRectSize = Size(convertDpToPixels(dpScanAreaWidth), convertDpToPixels(dpScanAreaHeight))
+        barcodeView?.framingRectSize = Size(convertDpToPixels(dpScanAreaWidth), convertDpToPixels(dpScanAreaHeight))
     }
 
     private fun convertDpToPixels(dp: Double) = (dp * barcodeView!!.context.resources.displayMetrics.density).toInt()
