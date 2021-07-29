@@ -3,6 +3,7 @@ package net.touchcapture.qr.flutterqr
 import android.Manifest
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.Camera.CameraInfo
 import android.os.Build
@@ -21,7 +22,7 @@ import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.platform.PlatformView
 
 
-class QRView(messenger: BinaryMessenger,private val id: Int, private val params: HashMap<String, Any>) :
+class QRView(private val context: Context, messenger: BinaryMessenger, private val id: Int, private val params: HashMap<String, Any>) :
         PlatformView, MethodChannel.MethodCallHandler, PluginRegistry.RequestPermissionsResultListener {
 
     private var isTorchOn: Boolean = false
@@ -257,7 +258,7 @@ class QRView(messenger: BinaryMessenger,private val id: Int, private val params:
         barcodeView?.framingRectSize = Size(convertDpToPixels(dpScanAreaWidth), convertDpToPixels(dpScanAreaHeight))
     }
 
-    private fun convertDpToPixels(dp: Double) = (dp * barcodeView!!.context.resources.displayMetrics.density).toInt()
+    private fun convertDpToPixels(dp: Double) = (dp * context.resources.displayMetrics.density).toInt()
 
     private fun hasCameraPermission(): Boolean {
         return permissionGranted ||
