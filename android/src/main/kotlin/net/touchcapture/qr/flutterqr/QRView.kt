@@ -88,7 +88,11 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
             "getCameraInfo" -> getCameraInfo(result)
             "getFlashInfo" -> getFlashInfo(result)
             "getSystemFeatures" -> getSystemFeatures(result)
-            "changeScanArea" -> changeScanArea(call.arguments as Double, result)
+            "changeScanArea" -> changeScanArea(
+                call.argument<Double>("cutOutSize")!!,
+                call.argument<Double>("cutOutBottomOffset")!!,
+                result,
+            )
             else -> result.notImplemented()
         }
     }
@@ -248,16 +252,29 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
         }
     }
 
-    private fun changeScanArea(newSize: Double, result: MethodChannel.Result) {
-        setScanAreaSize(newSize, newSize)
+    private fun changeScanArea(
+        cutOutSize: Double,
+        cutOutBottomOffset: Double,
+        result: MethodChannel.Result
+    ) {
+        setScanAreaSize(cutOutSize, cutOutSize, cutOutBottomOffset)
         result.success(true)
     }
 
-    private fun setScanAreaSize(dpScanAreaWidth: Double, dpScanAreaHeight: Double) {
-        barcodeView?.setFramingRect (convertDpToPixels(dpScanAreaWidth), convertDpToPixels(dpScanAreaHeight), convertDpToPixels(150.0))
+    private fun setScanAreaSize(
+        dpScanAreaWidth: Double,
+        dpScanAreaHeight: Double,
+        dpCutOutBottomOffset: Double
+    ) {
+        barcodeView?.setFramingRect(
+            convertDpToPixels(dpScanAreaWidth),
+            convertDpToPixels(dpScanAreaHeight),
+            convertDpToPixels(dpCutOutBottomOffset),
+        )
     }
 
-    private fun convertDpToPixels(dp: Double) = (dp * context.resources.displayMetrics.density).toInt()
+    private fun convertDpToPixels(dp: Double) =
+        (dp * context.resources.displayMetrics.density).toInt()
 
     private fun hasCameraPermission(): Boolean {
         return permissionGranted ||

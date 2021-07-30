@@ -342,13 +342,14 @@ class QRViewController {
         throw CameraException(e.code, e.message);
       }
     } else if (defaultTargetPlatform == TargetPlatform.android) {
-      final cutOutSize = overlay?.cutOutSize;
-      if (cutOutSize != null) {
-        await channel.invokeMethod(
-          'changeScanArea',
-          cutOutSize,
-        );
+      if (overlay == null) {
+        return false;
       }
+      await channel.invokeMethod('changeScanArea', {
+        'cutOutSize': overlay.cutOutSize,
+        'cutOutBottomOffset': overlay.cutOutBottomOffset
+      });
+      return true;
     }
     return false;
   }
