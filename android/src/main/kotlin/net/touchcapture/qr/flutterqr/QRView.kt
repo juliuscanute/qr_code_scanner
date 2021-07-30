@@ -13,8 +13,6 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.ResultPoint
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
-import com.journeyapps.barcodescanner.BarcodeView
-import com.journeyapps.barcodescanner.Size
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -27,7 +25,7 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
 
     private var isTorchOn: Boolean = false
     private var isPaused: Boolean = false
-    private var barcodeView: BarcodeView? = null
+    private var barcodeView: CustomFramingRectBarcodeView? = null
     private val channel: MethodChannel = MethodChannel(messenger, "net.touchcapture.qr.flutterqr/qrview_$id")
     private var permissionGranted: Boolean = false
 
@@ -193,9 +191,10 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
         return initBarCodeView().apply {}!!
     }
 
-    private fun initBarCodeView(): BarcodeView? {
+    private fun initBarCodeView(): CustomFramingRectBarcodeView? {
         if (barcodeView == null) {
-            barcodeView = BarcodeView(Shared.activity)
+            barcodeView =
+                CustomFramingRectBarcodeView(Shared.activity)
             if (params["cameraFacing"] as Int == 1) {
                 barcodeView?.cameraSettings?.requestedCameraId = CameraInfo.CAMERA_FACING_FRONT
             }
@@ -255,7 +254,7 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
     }
 
     private fun setScanAreaSize(dpScanAreaWidth: Double, dpScanAreaHeight: Double) {
-        barcodeView?.framingRectSize = Size(convertDpToPixels(dpScanAreaWidth), convertDpToPixels(dpScanAreaHeight))
+        barcodeView?.setFramingRect (convertDpToPixels(dpScanAreaWidth), convertDpToPixels(dpScanAreaHeight), convertDpToPixels(150.0))
     }
 
     private fun convertDpToPixels(dp: Double) = (dp * context.resources.displayMetrics.density).toInt()
