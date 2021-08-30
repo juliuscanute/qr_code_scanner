@@ -3,6 +3,7 @@ package net.touchcapture.qr.flutterqr
 import android.Manifest
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.Camera.CameraInfo
 import android.os.Build
@@ -12,7 +13,6 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.ResultPoint
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
-import com.journeyapps.barcodescanner.BarcodeView
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -20,12 +20,12 @@ import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.platform.PlatformView
 
 
-class QRView(messenger: BinaryMessenger,private val id: Int, private val params: HashMap<String, Any>) :
+class QRView(private val context: Context, messenger: BinaryMessenger, private val id: Int, private val params: HashMap<String, Any>) :
         PlatformView, MethodChannel.MethodCallHandler, PluginRegistry.RequestPermissionsResultListener {
 
     private var isTorchOn: Boolean = false
     private var isPaused: Boolean = false
-    private var barcodeView: BarcodeView? = null
+    private var barcodeView: CustomFramingRectBarcodeView? = null
     private val channel: MethodChannel = MethodChannel(messenger, "net.touchcapture.qr.flutterqr/qrview_$id")
     private var permissionGranted: Boolean = false
 
@@ -88,6 +88,11 @@ class QRView(messenger: BinaryMessenger,private val id: Int, private val params:
             "getCameraInfo" -> getCameraInfo(result)
             "getFlashInfo" -> getFlashInfo(result)
             "getSystemFeatures" -> getSystemFeatures(result)
+            "changeScanArea" -> changeScanArea(
+                call.argument<Double>("cutOutSize")!!,
+                call.argument<Double>("cutOutBottomOffset")!!,
+                result,
+            )
             else -> result.notImplemented()
         }
     }
@@ -190,9 +195,10 @@ class QRView(messenger: BinaryMessenger,private val id: Int, private val params:
         return initBarCodeView().apply {}!!
     }
 
-    private fun initBarCodeView(): BarcodeView? {
+    private fun initBarCodeView(): CustomFramingRectBarcodeView? {
         if (barcodeView == null) {
-            barcodeView = BarcodeView(Shared.activity)
+            barcodeView =
+                CustomFramingRectBarcodeView(Shared.activity)
             if (params["cameraFacing"] as Int == 1) {
                 barcodeView?.cameraSettings?.requestedCameraId = CameraInfo.CAMERA_FACING_FRONT
             }
@@ -245,6 +251,30 @@ class QRView(messenger: BinaryMessenger,private val id: Int, private val params:
             result.error(null, null, null)
         }
     }
+
+    private fun changeScanArea(
+        cutOutSize: Double,
+        cutOutBottomOffset: Double,
+        result: MethodChannel.Result
+    ) {
+        setScanAreaSize(cutOutSize, cutOutSize, cutOutBottomOffset)
+        result.success(true)
+    }
+
+    private fun setScanAreaSize(
+        dpScanAreaWidth: Double,
+        dpScanAreaHeight: Double,
+        dpCutOutBottomOffset: Double
+    ) {
+        barcodeView?.setFramingRect(
+            convertDpToPixels(dpScanAreaWidth),
+            convertDpToPixels(dpScanAreaHeight),
+            convertDpToPixels(dpCutOutBottomOffset),
+        )
+    }
+
+    private fun convertDpToPixels(dp: Double) =
+        (dp * context.resources.displayMetrics.density).toInt()
 
     private fun hasCameraPermission(): Boolean {
         return permissionGranted ||

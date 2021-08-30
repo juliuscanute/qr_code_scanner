@@ -12,7 +12,7 @@ class QRViewFactory(private val messenger: BinaryMessenger) :
 
     override fun create(context: Context, id: Int, args: Any?): PlatformView {
         val params = args as HashMap<String, Any>
-        return QRView(messenger, id, params)
+        return QRView(context, messenger, id, params)
     }
 
 }
