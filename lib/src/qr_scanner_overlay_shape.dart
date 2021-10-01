@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -9,10 +10,20 @@ class QrScannerOverlayShape extends ShapeBorder {
     this.overlayColor = const Color.fromRGBO(0, 0, 0, 80),
     this.borderRadius = 0,
     this.borderLength = 40,
-    double cutOutSize = 250,
+    double? cutOutSize,
+    double? cutOutWidth,
+    double? cutOutHeight,
     this.cutOutBottomOffset = 0,
-  }) : cutOutWidth = cutOutSize, cutOutHeight = cutOutSize, assert(borderLength <= cutOutSize / 2 + borderWidth * 2,
-            "Border can't be larger than ${cutOutSize / 2 + borderWidth * 2}");
+  }): cutOutWidth = cutOutWidth ?? cutOutSize ?? 250,
+      cutOutHeight = cutOutHeight ?? cutOutSize ?? 250 {
+    assert(
+      borderLength <= min(this.cutOutWidth, this.cutOutHeight) / 2 + borderWidth * 2,
+      "Border can't be larger than ${min(this.cutOutWidth, this.cutOutHeight) / 2 + borderWidth * 2}",
+    );
+    assert((cutOutSize != null && cutOutWidth == null && cutOutHeight == null) || (cutOutSize == null && cutOutWidth != null && cutOutHeight != null),
+    'Use only cutOutWidth and cutOutHeight or only cutOutSize'
+    );
+  }
 
   final Color borderColor;
   final double borderWidth;
