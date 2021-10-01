@@ -151,7 +151,8 @@ public class QRView:NSObject,FlutterPlatformView {
                                         typeString = "EAN_8"
                                     case AVMetadataObject.ObjectType.ean13:
                                         typeString = "EAN_13"
-                                    case AVMetadataObject.ObjectType.itf14:
+                                    case AVMetadataObject.ObjectType.itf14,
+                                         AVMetadataObject.ObjectType.interleaved2of5:
                                         typeString = "ITF"
                                     case AVMetadataObject.ObjectType.pdf417:
                                         typeString = "PDF_417"
