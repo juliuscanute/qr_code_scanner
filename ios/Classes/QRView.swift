@@ -162,8 +162,33 @@ public class QRView:NSObject,FlutterPlatformView {
                                     default:
                                         return
                                 }
-                                guard let stringValue = code.stringValue else { continue }
-                               let result = ["code": stringValue, "type": typeString]
+                                let bytes = { () -> Data? in
+                                    switch (code.descriptor) {
+                                    case let qrDescriptor as CIQRCodeDescriptor:
+                                        return qrDescriptor.errorCorrectedPayload
+                                    case let aztecDescriptor as CIAztecCodeDescriptor:
+                                        return aztecDescriptor.errorCorrectedPayload
+                                    case let pdf417Descriptor as CIPDF417CodeDescriptor:
+                                        return pdf417Descriptor.errorCorrectedPayload
+                                    case let dataMatrixDescriptor as CIDataMatrixCodeDescriptor:
+                                        return dataMatrixDescriptor.errorCorrectedPayload
+                                    default:
+                                        return nil
+                                    }
+                                }()
+                                let result = { () -> [String : Any]? in
+                                    guard let stringValue = code.stringValue else {
+                                        guard let safeBytes = bytes else {
+                                            return nil
+                                        }
+                                        return ["type": typeString, "rawBytes": safeBytes]
+                                    }
+                                    guard let safeBytes = bytes else {
+                                        return ["code": stringValue, "type": typeString]
+                                    }
+                                    return ["code": stringValue, "type": typeString, "rawBytes": safeBytes]
+                                }()
+                                guard let safeResult = result else { continue }
                                 if allowedBarcodeTypes.count == 0 || allowedBarcodeTypes.contains(code.type) {
                                     self?.channel.invokeMethod("onRecognizeQR", arguments: result)
                                 }

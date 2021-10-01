@@ -187,7 +187,7 @@ class QRViewController {
         case 'onRecognizeQR':
           if (call.arguments != null) {
             final args = call.arguments as Map;
-            final code = args['code'] as String;
+            final code = args['code'] as String?;
             final rawType = args['type'] as String;
             // Raw bytes are only supported by Android.
             final rawBytes = args['rawBytes'] as List<int>?;
