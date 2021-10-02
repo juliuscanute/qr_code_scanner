@@ -55,8 +55,8 @@ When a QR code is recognized, the text identified will be set in 'result' of typ
 ```dart
 class _QRViewExampleState extends State<QRViewExample> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  Barcode result;
-  QRViewController controller;
+  Barcode? result;
+  QRViewController? controller;
 
   // In order to get hot reload to work we need to pause the camera if the platform
   // is android, or resume the camera if the platform is iOS.
@@ -64,9 +64,9 @@ class _QRViewExampleState extends State<QRViewExample> {
   void reassemble() {
     super.reassemble();
     if (Platform.isAndroid) {
-      controller.pauseCamera();
+      controller!.pauseCamera();
     } else if (Platform.isIOS) {
-      controller.resumeCamera();
+      controller!.resumeCamera();
     }
   }
 
@@ -87,7 +87,7 @@ class _QRViewExampleState extends State<QRViewExample> {
             child: Center(
               child: (result != null)
                   ? Text(
-                      'Barcode Type: ${describeEnum(result.format)}   Data: ${result.code}')
+                      'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
                   : Text('Scan a code'),
             ),
           )
@@ -122,6 +122,16 @@ In ```android/build.gradle``` change ```ext.kotlin_version = '1.3.50'``` to ```e
 In ```android/build.gradle``` change ```classpath 'com.android.tools.build:gradle:3.5.0'``` to ```classpath 'com.android.tools.build:gradle:4.2.0'```
 
 In ```android/gradle/wrapper/gradle-wrapper.properties``` change ```distributionUrl=https\://services.gradle.org/distributions/gradle-5.6.2-all.zip``` to ```distributionUrl=https\://services.gradle.org/distributions/gradle-6.9-all.zip```
+
+In ```android/app/build.gradle``` change 
+```defaultConfig{```
+  ```...```
+  ```minSdkVersion 16```
+```}``` to 
+```defaultConfig{```
+  ```...```
+  ```minSdkVersion 20```
+```}```
 
 ### *Warning*
 If you are using Flutter Beta or Dev channel (1.25 or 1.26) you can get the following error:
@@ -179,7 +189,7 @@ await controller.resumeCamera();
 
 
 # SDK
-Requires at least SDK 21 (Android 5.0).
+Requires at least SDK 20.
 Requires at least iOS 8.
 
 # TODOs
