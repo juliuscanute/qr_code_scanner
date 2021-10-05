@@ -56,8 +56,8 @@ public class QRView:NSObject,FlutterPlatformView {
                     self?.setDimensions(result,
                                         width: arguments["width"] ?? 0,
                                         height: arguments["height"] ?? 0,
-                                        scanArea: arguments["scanAreaWidth"] ?? 0,
-                                        scanArea: arguments["scanAreaHeight"] ?? 0,
+                                        scanAreaWidth: arguments["scanAreaWidth"] ?? 0,
+                                        scanAreaHeight: arguments["scanAreaHeight"] ?? 0,
                                         scanAreaOffset: arguments["scanAreaOffset"] ?? 0)
                 case "startScan":
                     self?.startScan(call.arguments as! Array<Int>, result)
