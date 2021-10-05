@@ -334,7 +334,7 @@ class QRViewController {
         await channel.invokeMethod('setDimensions', {
           'width': renderBox.size.width,
           'height': renderBox.size.height,
-          'scanArea': overlay?.cutOutWidth ?? 0,//Todo
+          'scanArea': overlay?.cutOutWidth ?? 0, //Todo
           'scanAreaOffset': overlay?.cutOutBottomOffset ?? 0
         });
         return true;
