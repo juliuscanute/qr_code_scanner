@@ -89,7 +89,8 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
             "getFlashInfo" -> getFlashInfo(result)
             "getSystemFeatures" -> getSystemFeatures(result)
             "changeScanArea" -> changeScanArea(
-                call.argument<Double>("cutOutSize")!!,
+                call.argument<Double>("scanAreaWidth")!!,
+                call.argument<Double>("scanAreaHeight")!!,
                 call.argument<Double>("cutOutBottomOffset")!!,
                 result,
             )
@@ -253,11 +254,12 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
     }
 
     private fun changeScanArea(
-        cutOutSize: Double,
+        dpScanAreaWidth: Double,
+        dpScanAreaHeight: Double,
         cutOutBottomOffset: Double,
         result: MethodChannel.Result
     ) {
-        setScanAreaSize(cutOutSize, cutOutSize, cutOutBottomOffset)
+        setScanAreaSize(dpScanAreaWidth, dpScanAreaHeight, cutOutBottomOffset)
         result.success(true)
     }
 

@@ -346,7 +346,8 @@ class QRViewController {
         return false;
       }
       await channel.invokeMethod('changeScanArea', {
-        'cutOutSize': overlay.cutOutWidth,//Todo
+        'scanAreaWidth': overlay.cutOutWidth,
+        'scanAreaHeight': overlay.cutOutHeight,
         'cutOutBottomOffset': overlay.cutOutBottomOffset
       });
       return true;
