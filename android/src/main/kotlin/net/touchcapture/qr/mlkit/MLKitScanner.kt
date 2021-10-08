@@ -89,6 +89,7 @@ class MLKitScanner : MethodChannel.MethodCallHandler, MLKitCallbacks,
                 }
                 result.success(null)
             }
+//            "flipCamera" -> flipCamera(result)
             else -> result.notImplemented()
         }
     }

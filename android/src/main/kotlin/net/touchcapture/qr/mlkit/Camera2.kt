@@ -13,7 +13,16 @@ import android.util.SparseIntArray
 import android.view.Surface
 import androidx.annotation.RequiresApi
 import com.google.mlkit.vision.common.InputImage
+import io.flutter.plugin.common.MethodChannel
 import java.util.*
+import android.hardware.camera2.CameraAccessException
+
+import android.hardware.camera2.CameraCharacteristics
+
+import android.os.Build
+
+
+
 
 /**
  * Implements QrCamera using Camera2 API
@@ -44,6 +53,8 @@ internal class Camera2(private val targetWidth: Int, private val targetHeight: I
     private var cameraDevice: CameraDevice? = null
     private var cameraCharacteristics: CameraCharacteristics? = null
     private var latestFrame: Frame? = null
+    private var manager: CameraManager? = null
+    private var cameraId: String? = null
     override val width: Int
         get() = size!!.width
     override val height: Int
@@ -75,17 +86,30 @@ internal class Camera2(private val targetWidth: Int, private val targetHeight: I
         }
 
     @Throws(MLKitReader.Exception::class)
-    override fun start() {
-        val manager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
-        var cameraId: String? = null
+    override fun start(params: HashMap<String, Any>) {
+        manager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         try {
-            val cameraIdList = manager.cameraIdList
+            val cameraIdList = manager!!.cameraIdList
             for (id in cameraIdList) {
-                val cameraCharacteristics = manager.getCameraCharacteristics(id!!)
+                val cameraCharacteristics = manager!!.getCameraCharacteristics(id!!)
                 val integer = cameraCharacteristics.get(CameraCharacteristics.LENS_FACING)
-                if (integer != null && integer == CameraMetadata.LENS_FACING_BACK) {
+                // First check if a front camera is available
+                if (integer != null && params["cameraFacing"] as Int == 1 && integer == CameraMetadata.LENS_FACING_FRONT) {
+                    cameraId = id
+                } else if (integer != null && params["cameraFacing"] as Int != 1 && integer == CameraMetadata.LENS_FACING_BACK) {
                     cameraId = id
                     break
+                }
+            }
+            // If no front camera is available, fall back to rear camera
+            if (params["cameraFacing"] as Int == 1 && cameraId == null) {
+                for (id in cameraIdList) {
+                    val cameraCharacteristics = manager!!.getCameraCharacteristics(id!!)
+                    val integer = cameraCharacteristics.get(CameraCharacteristics.LENS_FACING)
+                        if (integer != null && integer == CameraMetadata.LENS_FACING_BACK) {
+                        cameraId = id
+                        break
+                    }
                 }
             }
         } catch (e: CameraAccessException) {
@@ -96,13 +120,13 @@ internal class Camera2(private val targetWidth: Int, private val targetHeight: I
             throw Exception(MLKitReader.Exception.Reason.NoBackCamera.toString())
         }
         try {
-            cameraCharacteristics = manager.getCameraCharacteristics(cameraId)
+            cameraCharacteristics = manager!!.getCameraCharacteristics(cameraId!!)
             val map = cameraCharacteristics!!.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
             val sensorOrientationInteger = cameraCharacteristics!!.get(CameraCharacteristics.SENSOR_ORIENTATION)
             sensorOrientation = sensorOrientationInteger ?: 0
             size = getAppropriateSize(map!!.getOutputSizes(SurfaceTexture::class.java))
             jpegSizes = map.getOutputSizes(ImageFormat.JPEG)
-            manager.openCamera(cameraId, object : CameraDevice.StateCallback() {
+            manager!!.openCamera(cameraId!!, object : CameraDevice.StateCallback() {
                 override fun onOpened(device: CameraDevice) {
                     cameraDevice = device
                     startCamera()
@@ -223,6 +247,77 @@ internal class Camera2(private val targetWidth: Int, private val targetHeight: I
             if (latestFrame != null) latestFrame!!.close()
             latestFrame = null
             reader!!.close()
+        }
+    }
+
+    private var isTorchOn: Boolean = false
+
+    private fun toggleFlash(result: MethodChannel.Result) {
+
+//            val mCameraManager = context.getSystemService(Context.CAMERA_SERVICE)
+//            try {
+//                var mCameraId = ""
+//                for (camID in mCameraManager.cameraIdList) {
+//                    val cameraCharacteristics: CameraCharacteristics =
+//                        mCameraManager.getCameraCharacteristics(camID)
+//                    val lensFacing =
+//                        cameraCharacteristics.get(CameraCharacteristics.LENS_FACING)!!
+//                    if (lensFacing == CameraCharacteristics.LENS_FACING_FRONT && cameraCharacteristics.get(
+//                            CameraCharacteristics.FLASH_INFO_AVAILABLE
+//                        )!!
+//                    ) {
+//                        mCameraId = camID
+//                        break
+//                    } else if (lensFacing == CameraCharacteristics.LENS_FACING_BACK && cameraCharacteristics.get(
+//                            CameraCharacteristics.FLASH_INFO_AVAILABLE
+//                        )!!
+//                    ) {
+//                        mCameraId = camID
+//                    }
+//                }
+//                if (mCameraId != "") {
+//                    mCameraManager.get
+//                    mCameraManager.setTorchMode(mCameraId, true)
+//                }
+//            } catch (e: CameraAccessException) {
+//                e.printStackTrace()
+//            }
+
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            val camera = android.hardware.Camera.open()
+            val parameters = camera.parameters
+
+            val modes: List<String> = parameters.supportedFlashModes
+            when {
+                modes.contains(android.hardware.Camera.Parameters.FLASH_MODE_TORCH) -> {
+                    parameters.flashMode = android.hardware.Camera.Parameters.FLASH_MODE_TORCH
+                }
+                modes.contains(android.hardware.Camera.Parameters.FLASH_MODE_ON) -> {
+                    parameters.flashMode = android.hardware.Camera.Parameters.FLASH_MODE_ON
+                }
+                else -> {
+                    //No flash available
+                }
+            }
+            camera.parameters = parameters
+            isTorchOn = !isTorchOn
+//            if (getFlashlightState) {
+//                Objects.requireNonNull(camera).startPreview()
+//            } else {
+//                Objects.requireNonNull(camera).stopPreview()
+//            }
+        } else {
+//            isFlashlightOn()
+            if (manager == null) {
+                manager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+            }
+            try {
+                manager!!.setTorchMode(cameraId!!, !isTorchOn)
+                isTorchOn = !isTorchOn
+            } catch (e: CameraAccessException) {
+                e.printStackTrace()
+            }
         }
     }
 

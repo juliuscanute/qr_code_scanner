@@ -59,17 +59,31 @@ internal class Camera1(private val targetWidth: Int, private val targetHeight: I
         }
 
     @Throws(MLKitReader.Exception::class)
-    override fun start() {
+    override fun start(params: HashMap<String, Any>) {
         val numberOfCameras = Camera.getNumberOfCameras()
         info = Camera.CameraInfo()
         for (i in 0 until numberOfCameras) {
             Camera.getCameraInfo(i, info)
-            if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+            // First check if a front camera is available
+            if (params["cameraFacing"] as Int == 1 && info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                camera = Camera.open(i)
+                break
+            } else if (params["cameraFacing"] as Int != 1 && info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
                 camera = Camera.open(i)
                 break
             }
         }
-        if (camera == null) {
+        // If no front camera is available, fall back to rear camera
+        if (camera == null && params["cameraFacing"] as Int == 1) {
+            for (i in 0 until numberOfCameras) {
+                Camera.getCameraInfo(i, info)
+                if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+                    camera = Camera.open(i)
+                    break
+                }
+            }
+        }
+        if (camera == null && params["cameraFacing"] as Int != 1) {
             throw Exception(MLKitReader.Exception.Reason.NoBackCamera.toString())
         }
         val parameters = camera!!.parameters
@@ -130,6 +144,10 @@ internal class Camera1(private val targetWidth: Int, private val targetHeight: I
             camera!!.release()
             camera = null
         }
+    }
+
+    override fun flip() {
+        TODO("Not yet implemented")
     }
 
     //Size here is Camera.Size, not android.util.Size as in the Camera2 version of this method
