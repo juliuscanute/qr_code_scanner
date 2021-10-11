@@ -56,7 +56,8 @@ public class QRView:NSObject,FlutterPlatformView {
                     self?.setDimensions(result,
                                         width: arguments["width"] ?? 0,
                                         height: arguments["height"] ?? 0,
-                                        scanArea: arguments["scanArea"] ?? 0,
+                                        scanAreaWidth: arguments["scanAreaWidth"] ?? 0,
+                                        scanAreaHeight: arguments["scanAreaHeight"] ?? 0,
                                         scanAreaOffset: arguments["scanAreaOffset"] ?? 0)
                 case "startScan":
                     self?.startScan(call.arguments as! Array<Int>, result)
@@ -84,7 +85,7 @@ public class QRView:NSObject,FlutterPlatformView {
         return previewView
     }
     
-    func setDimensions(_ result: @escaping FlutterResult, width: Double, height: Double, scanArea: Double, scanAreaOffset: Double) {
+    func setDimensions(_ result: @escaping FlutterResult, width: Double, height: Double, scanAreaWidth: Double, scanAreaHeight: Double, scanAreaOffset: Double) {
         // Then set the size of the preview area.
         previewView.frame = CGRect(x: 0, y: 0, width: width, height: height)
         
@@ -103,9 +104,9 @@ public class QRView:NSObject,FlutterPlatformView {
         }
 
         // Set scanArea if provided.
-        if (scanArea != 0) {
+        if (scanAreaWidth != 0 && scanAreaHeight != 0) {
             scanner?.didStartScanningBlock = {
-                self.scanner?.scanRect = CGRect(x: Double(midX) - (scanArea / 2), y: Double(midY) - (scanArea / 2), width: scanArea, height: scanArea)
+                self.scanner?.scanRect = CGRect(x: Double(midX) - (scanAreaWidth / 2), y: Double(midY) - (scanAreaHeight / 2), width: scanAreaWidth, height: scanAreaHeight)
 
                 // Set offset if provided.
                 if (scanAreaOffset != 0) {
