@@ -101,10 +101,12 @@ class _QRViewState extends State<QRView> {
     return Stack(
       children: [
         _getPlatformQrView(),
-        Container(
+        Padding(
           padding: widget.overlayMargin,
-          decoration: ShapeDecoration(
-            shape: widget.overlay!,
+          child: Container(
+            decoration: ShapeDecoration(
+              shape: widget.overlay!,
+            ),
           ),
         )
       ],
