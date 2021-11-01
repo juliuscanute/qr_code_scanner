@@ -34,10 +34,6 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
             Shared.binding!!.addRequestPermissionsResultListener(this)
         }
 
-        if (Shared.registrar != null) {
-            Shared.registrar!!.addRequestPermissionsResultListener(this)
-        }
-
         channel.setMethodCallHandler(this)
         Shared.activity?.application?.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
             override fun onActivityPaused(p0: Activity) {
@@ -306,14 +302,14 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
                                              permissions: Array<out String>?,
                                              grantResults: IntArray): Boolean {
         if(requestCode == Shared.CAMERA_REQUEST_ID + this.id) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            return if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 permissionGranted = true
                 channel.invokeMethod("onPermissionSet", true)
-                return true
+                true
             } else {
                 permissionGranted = false
                 channel.invokeMethod("onPermissionSet", false)
-                return false
+                false
             }
         }
         return false

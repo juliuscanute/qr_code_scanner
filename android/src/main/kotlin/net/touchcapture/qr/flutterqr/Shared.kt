@@ -8,5 +8,4 @@ object Shared {
     const val CAMERA_REQUEST_ID = 513469796
     var activity: Activity? = null
     var binding: ActivityPluginBinding? = null
-    var registrar: PluginRegistry.Registrar? = null
 }

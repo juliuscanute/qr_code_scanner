@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
-void main() => runApp(MaterialApp(home: MyHome()));
+void main() => runApp(const MaterialApp(home: MyHome()));
 
 class MyHome extends StatelessWidget {
   const MyHome({Key? key}) : super(key: key);
@@ -13,15 +13,15 @@ class MyHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Flutter Demo Home Page')),
+      appBar: AppBar(title: const Text('Flutter Demo Home Page')),
       body: Center(
         child: ElevatedButton(
           onPressed: () {
             Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => QRViewExample(),
+              builder: (context) => const QRViewExample(),
             ));
           },
-          child: Text('qrView'),
+          child: const Text('qrView'),
         ),
       ),
     );
@@ -29,6 +29,8 @@ class MyHome extends StatelessWidget {
 }
 
 class QRViewExample extends StatefulWidget {
+  const QRViewExample({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _QRViewExampleState();
 }
@@ -66,13 +68,13 @@ class _QRViewExampleState extends State<QRViewExample> {
                     Text(
                         'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
                   else
-                    Text('Scan a code'),
+                    const Text('Scan a code'),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Container(
-                        margin: EdgeInsets.all(8),
+                        margin: const EdgeInsets.all(8),
                         child: ElevatedButton(
                             onPressed: () async {
                               await controller?.toggleFlash();
@@ -86,7 +88,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                             )),
                       ),
                       Container(
-                        margin: EdgeInsets.all(8),
+                        margin: const EdgeInsets.all(8),
                         child: ElevatedButton(
                             onPressed: () async {
                               await controller?.flipCamera();
@@ -99,7 +101,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                                   return Text(
                                       'Camera facing ${describeEnum(snapshot.data!)}');
                                 } else {
-                                  return Text('loading');
+                                  return const Text('loading');
                                 }
                               },
                             )),
@@ -111,21 +113,23 @@ class _QRViewExampleState extends State<QRViewExample> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Container(
-                        margin: EdgeInsets.all(8),
+                        margin: const EdgeInsets.all(8),
                         child: ElevatedButton(
                           onPressed: () async {
                             await controller?.pauseCamera();
                           },
-                          child: Text('pause', style: TextStyle(fontSize: 20)),
+                          child: const Text('pause',
+                              style: TextStyle(fontSize: 20)),
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.all(8),
+                        margin: const EdgeInsets.all(8),
                         child: ElevatedButton(
                           onPressed: () async {
                             await controller?.resumeCamera();
                           },
-                          child: Text('resume', style: TextStyle(fontSize: 20)),
+                          child: const Text('resume',
+                              style: TextStyle(fontSize: 20)),
                         ),
                       )
                     ],
@@ -175,7 +179,7 @@ class _QRViewExampleState extends State<QRViewExample> {
     log('${DateTime.now().toIso8601String()}_onPermissionSet $p');
     if (!p) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('no Permission')),
+        const SnackBar(content: Text('no Permission')),
       );
     }
   }
