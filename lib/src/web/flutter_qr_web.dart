@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_web_libraries_in_flutter
+
 import 'dart:async';
 import 'dart:core';
 import 'dart:html' as html;
@@ -59,11 +61,11 @@ class _WebQrViewState extends State<WebQrView> {
 
   QRViewControllerWeb? _controller;
 
-  late Size _size = Size(0, 0);
+  late Size _size = const Size(0, 0);
   Timer? timer;
   String? code;
   String? _errorMsg;
-  var video;
+  html.VideoElement video = html.VideoElement();
   String viewID = 'QRVIEW-' + DateTime.now().millisecondsSinceEpoch.toString();
 
   final StreamController<Barcode> _scanUpdateController =
@@ -78,13 +80,13 @@ class _WebQrViewState extends State<WebQrView> {
 
     facing = widget.cameraFacing ?? CameraFacing.front;
 
-    video = html.VideoElement();
+    // video = html.VideoElement();
     WebQrView.vidDiv.children = [video];
     // ignore: UNDEFINED_PREFIXED_NAME
     ui.platformViewRegistry
         .registerViewFactory(viewID, (int id) => WebQrView.vidDiv);
     // giving JavaScipt some time to process the DOM changes
-    Timer(Duration(milliseconds: 500), () {
+    Timer(const Duration(milliseconds: 500), () {
       start();
     });
   }
@@ -92,7 +94,8 @@ class _WebQrViewState extends State<WebQrView> {
   Future start() async {
     await _makeCall();
     _frameIntervall?.cancel();
-    _frameIntervall = Timer.periodic(Duration(milliseconds: 200), (timer) {
+    _frameIntervall =
+        Timer.periodic(const Duration(milliseconds: 200), (timer) {
       _captureFrame2();
     });
   }
@@ -202,7 +205,7 @@ class _WebQrViewState extends State<WebQrView> {
       return Center(child: Text(_errorMsg!));
     }
     if (_localStream == null) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     }
     return LayoutBuilder(
       builder: (context, constraints) {

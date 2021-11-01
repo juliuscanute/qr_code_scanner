@@ -1,1 +1,1 @@
-include: package:flutter_lints/flutter.dart
+include: package:flutter_lints/flutter.yaml
