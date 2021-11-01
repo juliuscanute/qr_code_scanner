@@ -1,3 +1,13 @@
+## 0.6.0
+#### Features
+* Add support for raw bytes on iOS. (#421)
+* Add custom cutout width and height next to cutout size. (#432)
+
+#### Bugfixes
+* Fix for calling permission multiple times. (#381)
+* Fix for QRView Overlay cutoutbottomoffset. (#383)
+* Multiple minor improvements
+
 ## 0.5.2
 #### Bugfixes
 * Increased delay to fix QRView opening zoomed in on some devices by adding small delay to updateDimensions(). (#250)
