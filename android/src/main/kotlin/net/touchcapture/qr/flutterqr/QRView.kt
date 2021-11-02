@@ -293,7 +293,9 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
                 }
             }
             else -> {
-                result?.error("cameraPermission", "Platform Version to low for camera permission check", null)
+                // We should have permissions on older OS versions
+                permissionGranted = true
+                channel.invokeMethod("onPermissionSet", true)
             }
         }
     }
