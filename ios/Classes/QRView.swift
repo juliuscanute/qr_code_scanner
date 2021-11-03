@@ -165,16 +165,20 @@ public class QRView:NSObject,FlutterPlatformView {
                                         return
                                 }
                                 let bytes = { () -> Data? in
-                                    switch (code.descriptor) {
-                                    case let qrDescriptor as CIQRCodeDescriptor:
-                                        return qrDescriptor.errorCorrectedPayload
-                                    case let aztecDescriptor as CIAztecCodeDescriptor:
-                                        return aztecDescriptor.errorCorrectedPayload
-                                    case let pdf417Descriptor as CIPDF417CodeDescriptor:
-                                        return pdf417Descriptor.errorCorrectedPayload
-                                    case let dataMatrixDescriptor as CIDataMatrixCodeDescriptor:
-                                        return dataMatrixDescriptor.errorCorrectedPayload
-                                    default:
+                                    if #available(iOS 11.0, *) {
+                                        switch (code.descriptor) {
+                                        case let qrDescriptor as CIQRCodeDescriptor:
+                                            return qrDescriptor.errorCorrectedPayload
+                                        case let aztecDescriptor as CIAztecCodeDescriptor:
+                                            return aztecDescriptor.errorCorrectedPayload
+                                        case let pdf417Descriptor as CIPDF417CodeDescriptor:
+                                            return pdf417Descriptor.errorCorrectedPayload
+                                        case let dataMatrixDescriptor as CIDataMatrixCodeDescriptor:
+                                            return dataMatrixDescriptor.errorCorrectedPayload
+                                        default:
+                                            return nil
+                                        }
+                                    } else {
                                         return nil
                                     }
                                 }()
@@ -190,7 +194,7 @@ public class QRView:NSObject,FlutterPlatformView {
                                     }
                                     return ["code": stringValue, "type": typeString, "rawBytes": safeBytes]
                                 }()
-                                guard let safeResult = result else { continue }
+                                guard result != nil else { continue }
                                 if allowedBarcodeTypes.count == 0 || allowedBarcodeTypes.contains(code.type) {
                                     self?.channel.invokeMethod("onRecognizeQR", arguments: result)
                                 }
