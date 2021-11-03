@@ -1,3 +1,6 @@
+## 0.6.1
+* Fix bug which caused build to fail for iOS. (#452)
+
 ## 0.6.0
 #### Features
 * Add support for raw bytes on iOS. (#421)
