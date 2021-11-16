@@ -117,8 +117,6 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
             barcodeView!!.resume()
             result.success(settings.requestedCameraId)
         }
-
-
     }
 
     private fun getFlashInfo(result: MethodChannel.Result) {
