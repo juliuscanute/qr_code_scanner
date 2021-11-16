@@ -357,4 +357,16 @@ class QRViewController {
     }
     return false;
   }
+
+  //Starts/Stops invert scanning.
+  Future<void> scanInvert(bool isScanInvert) async {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      try {
+        await _channel
+            .invokeMethod('invertScan', {"isInvertScan": isScanInvert});
+      } on PlatformException catch (e) {
+        throw CameraException(e.code, e.message);
+      }
+    }
+  }
 }

@@ -90,6 +90,7 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
                 call.argument<Double>("cutOutBottomOffset")!!,
                 result,
             )
+            "invertScan" -> setInvertScan(call.argument<Boolean>("isInvertScan")!!, result)
             else -> result.notImplemented()
         }
     }
@@ -257,6 +258,14 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
     ) {
         setScanAreaSize(dpScanAreaWidth, dpScanAreaHeight, cutOutBottomOffset)
         result.success(true)
+    }
+
+    private fun setInvertScan(isInvert: Boolean, result: MethodChannel.Result) {
+        barcodeView!!.pause()
+        val settings = barcodeView!!.cameraSettings
+        settings.isScanInverted = isInvert
+        barcodeView!!.cameraSettings = settings
+        barcodeView!!.resume();
     }
 
     private fun setScanAreaSize(
