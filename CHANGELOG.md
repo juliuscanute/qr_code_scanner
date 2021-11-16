@@ -1,3 +1,7 @@
+## 0.6.2
+* Fixed permission error on devices running Android 7 or lower.
+* Updated dependencies
+
 ## 0.6.1
 * Fix bug which caused build to fail for iOS. (#452)
 
