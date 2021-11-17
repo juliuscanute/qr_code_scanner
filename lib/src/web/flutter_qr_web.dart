@@ -309,6 +309,12 @@ class QRViewControllerWeb implements QRViewController {
     // TODO: flash is simply not supported by JavaScipt
     return;
   }
+
+  @override
+  Future<void> scanInvert(bool isScanInvert) {
+    // TODO: implement scanInvert
+    throw UnimplementedError();
+  }
 }
 
 Widget createWebQrView({onPlatformViewCreated, CameraFacing? cameraFacing}) =>
