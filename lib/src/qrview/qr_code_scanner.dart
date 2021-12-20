@@ -13,7 +13,7 @@ import 'types/camera_exception.dart';
 import 'types/features.dart';
 import '../web/flutter_qr_stub.dart'
 // ignore: uri_does_not_exist
-    if (dart.library.html) 'web/flutter_qr_web.dart';
+    if (dart.library.html) '../web/flutter_qr_web.dart';
 
 typedef QRViewCreatedCallback = void Function(QRViewController);
 typedef PermissionSetCallback = void Function(QRViewController, bool);
