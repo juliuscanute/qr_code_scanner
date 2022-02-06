@@ -233,7 +233,9 @@ class QRViewController {
       return await _channel.invokeMethod(
           'startScan', barcodeFormats?.map((e) => e.asInt()).toList() ?? []);
     } on PlatformException catch (e) {
-      throw CameraException(e.code, e.message);
+      if(e.code != "cameraPermission") {
+        throw CameraException(e.code, e.message);
+      }
     }
   }
 
