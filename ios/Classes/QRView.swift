@@ -207,9 +207,6 @@ public class QRView:NSObject,FlutterPlatformView {
                     let scanError = FlutterError(code: "unknown-error", message: "Unable to start scanning", details: error)
                     result(scanError)
                 }
-            } else {
-                let error = FlutterError(code: "cameraPermission", message: "Permission denied to access the camera", details: nil)
-                result(error)
             }
         })
     }
