@@ -6,13 +6,9 @@ import 'dart:html' as html;
 import 'dart:js_util';
 import 'dart:ui' as ui;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import '../../qr_code_scanner.dart';
-import '../qr_code_scanner.dart';
-import '../types/camera.dart';
 import 'jsqr.dart';
 import 'media.dart';
 
