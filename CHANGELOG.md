@@ -1,5 +1,10 @@
-## 0.6.2
+## 0.7.0
+#### Features
+* Add inverted feature for Android. See https://github.com/juliuscanute/qr_code_scanner/issues/403
+
+#### Bugfixes
 * Fixed permission error on devices running Android 7 or lower.
+* Fixed error being thrown when user declines permission on iOS.
 * Updated dependencies
 
 ## 0.6.1
