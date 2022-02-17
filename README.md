@@ -1,3 +1,9 @@
+# Project in Maintenance Mode Only
+
+Since the underlying frameworks of this package, [zxing for android](https://github.com/zxing/zxing) and [MTBBarcodescanner for iOS](https://github.com/mikebuss/MTBBarcodeScanner) are both not longer maintaned, this plugin is no longer up to date and in maintenance mode only. Only bug fixes and minor enhancements will be considered.
+
+I am developing a new plugin [mobile_scanner](https://pub.dev/packages/mobile_scanner) that uses the latest version of MLKit for detecting barcodes and QR codes. On Android it also uses the latest version of CameraX, and on iOS the native AVFoundation for best camera performance. 
+
 # QR Code Scanner
 
 [![pub package](https://img.shields.io/pub/v/qr_code_scanner?include_prereleases)](https://pub.dartlang.org/packages/qr_code_scanner)
