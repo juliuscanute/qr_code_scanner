@@ -17,6 +17,7 @@ import 'web/flutter_qr_stub.dart'
 
 typedef QRViewCreatedCallback = void Function(QRViewController);
 typedef PermissionSetCallback = void Function(QRViewController, bool);
+typedef OnCameraStartedCallback = void Function();
 
 /// The [QRView] is the view where the camera
 /// and the barcode scanner gets displayed.
@@ -28,6 +29,7 @@ class QRView extends StatefulWidget {
     this.overlayMargin = EdgeInsets.zero,
     this.cameraFacing = CameraFacing.back,
     this.onPermissionSet,
+    this.onCameraStarted,
     this.formatsAllowed = const <BarcodeFormat>[],
   }) : super(key: key);
 
@@ -49,6 +51,8 @@ class QRView extends StatefulWidget {
 
   /// Calls the provided [onPermissionSet] callback when the permission is set.
   final PermissionSetCallback? onPermissionSet;
+
+  final OnCameraStartedCallback? onCameraStarted;
 
   /// Use [formatsAllowed] to specify which formats needs to be scanned.
   final List<BarcodeFormat> formatsAllowed;
@@ -117,7 +121,10 @@ class _QRViewState extends State<QRView> {
     Widget _platformQrView;
     if (kIsWeb) {
       _platformQrView = createWebQrView(
-        onPlatformViewCreated: widget.onQRViewCreated,
+        onPlatformViewCreated: (controller) {
+          widget.onQRViewCreated(controller);
+          widget.onCameraStarted?.call();
+        },
         cameraFacing: widget.cameraFacing,
       );
     } else {
@@ -153,12 +160,13 @@ class _QRViewState extends State<QRView> {
 
     // Start scan after creation of the view
     final controller = QRViewController._(
-        _channel,
-        widget.key as GlobalKey<State<StatefulWidget>>?,
-        widget.onPermissionSet,
-        widget.cameraFacing)
-      .._startScan(widget.key as GlobalKey<State<StatefulWidget>>,
-          widget.overlay, widget.formatsAllowed);
+      _channel,
+      widget.key as GlobalKey<State<StatefulWidget>>?,
+      widget.onPermissionSet,
+      widget.cameraFacing,
+      widget.onCameraStarted,
+    ).._startScan(widget.key as GlobalKey<State<StatefulWidget>>,
+        widget.overlay, widget.formatsAllowed);
 
     // Initialize the controller for controlling the QRView
     widget.onQRViewCreated(controller);
@@ -180,8 +188,12 @@ class _QrCameraSettings {
 }
 
 class QRViewController {
-  QRViewController._(MethodChannel channel, GlobalKey? qrKey,
-      PermissionSetCallback? onPermissionSet, CameraFacing cameraFacing)
+  QRViewController._(
+      MethodChannel channel,
+      GlobalKey? qrKey,
+      PermissionSetCallback? onPermissionSet,
+      CameraFacing cameraFacing,
+      OnCameraStartedCallback? onCameraStarted)
       : _channel = channel,
         _cameraFacing = cameraFacing {
     _channel.setMethodCallHandler((call) async {
@@ -210,6 +222,8 @@ class QRViewController {
             }
           }
           break;
+        case 'onCameraStarted':
+          onCameraStarted?.call();
       }
     });
   }

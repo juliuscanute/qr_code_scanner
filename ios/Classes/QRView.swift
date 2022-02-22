@@ -107,6 +107,7 @@ public class QRView:NSObject,FlutterPlatformView {
         if (scanAreaWidth != 0 && scanAreaHeight != 0) {
             scanner?.didStartScanningBlock = {
                 self.scanner?.scanRect = CGRect(x: Double(midX) - (scanAreaWidth / 2), y: Double(midY) - (scanAreaHeight / 2), width: scanAreaWidth, height: scanAreaHeight)
+                self.channel.invokeMethod("onCameraStarted", arguments: nil)
 
                 // Set offset if provided.
                 if (scanAreaOffset != 0) {
