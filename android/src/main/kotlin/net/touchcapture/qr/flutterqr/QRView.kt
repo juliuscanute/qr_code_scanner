@@ -71,7 +71,7 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        when(call.method) {
+        when (call.method) {
             "startScan" -> startScan(call.arguments as? List<Int>, result)
             "stopScan" -> stopScan()
             "flipCamera" -> flipCamera(result)
@@ -85,10 +85,10 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
             "getFlashInfo" -> getFlashInfo(result)
             "getSystemFeatures" -> getSystemFeatures(result)
             "changeScanArea" -> changeScanArea(
-                call.argument<Double>("scanAreaWidth")!!,
-                call.argument<Double>("scanAreaHeight")!!,
-                call.argument<Double>("cutOutBottomOffset")!!,
-                result,
+                    call.argument<Double>("scanAreaWidth")!!,
+                    call.argument<Double>("scanAreaHeight")!!,
+                    call.argument<Double>("cutOutBottomOffset")!!,
+                    result,
             )
             "invertScan" -> setInvertScan(call.argument<Boolean>("isInvertScan")!!, result)
             else -> result.notImplemented()
@@ -109,7 +109,7 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
             barcodeView!!.pause()
             val settings = barcodeView!!.cameraSettings
 
-            if(settings.requestedCameraId == CameraInfo.CAMERA_FACING_FRONT)
+            if (settings.requestedCameraId == CameraInfo.CAMERA_FACING_FRONT)
                 settings.requestedCameraId = CameraInfo.CAMERA_FACING_BACK
             else
                 settings.requestedCameraId = CameraInfo.CAMERA_FACING_FRONT
@@ -194,7 +194,7 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
     private fun initBarCodeView(): CustomFramingRectBarcodeView? {
         if (barcodeView == null) {
             barcodeView =
-                CustomFramingRectBarcodeView(Shared.activity)
+                    CustomFramingRectBarcodeView(Shared.activity)
             if (params["cameraFacing"] as Int == 1) {
                 barcodeView?.cameraSettings?.requestedCameraId = CameraInfo.CAMERA_FACING_FRONT
             }
@@ -213,7 +213,7 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
                 allowedBarcodeTypes.add(BarcodeFormat.values()[it])
             }
         } catch (e: java.lang.Exception) {
-            result.error(null, null, null)
+            result.error("null", e.message, "null")
         }
 
         barcodeView?.decodeContinuous(
@@ -244,15 +244,15 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
                     "hasBackCamera" to hasBackCamera(), "hasFlash" to hasFlash(),
                     "activeCamera" to barcodeView?.cameraSettings?.requestedCameraId))
         } catch (e: Exception) {
-            result.error(null, null, null)
+            result.error("Error", e.message, null)
         }
     }
 
     private fun changeScanArea(
-        dpScanAreaWidth: Double,
-        dpScanAreaHeight: Double,
-        cutOutBottomOffset: Double,
-        result: MethodChannel.Result
+            dpScanAreaWidth: Double,
+            dpScanAreaHeight: Double,
+            cutOutBottomOffset: Double,
+            result: MethodChannel.Result
     ) {
         setScanAreaSize(dpScanAreaWidth, dpScanAreaHeight, cutOutBottomOffset)
         result.success(true)
@@ -267,19 +267,19 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
     }
 
     private fun setScanAreaSize(
-        dpScanAreaWidth: Double,
-        dpScanAreaHeight: Double,
-        dpCutOutBottomOffset: Double
+            dpScanAreaWidth: Double,
+            dpScanAreaHeight: Double,
+            dpCutOutBottomOffset: Double
     ) {
         barcodeView?.setFramingRect(
-            convertDpToPixels(dpScanAreaWidth),
-            convertDpToPixels(dpScanAreaHeight),
-            convertDpToPixels(dpCutOutBottomOffset),
+                convertDpToPixels(dpScanAreaWidth),
+                convertDpToPixels(dpScanAreaHeight),
+                convertDpToPixels(dpCutOutBottomOffset),
         )
     }
 
     private fun convertDpToPixels(dp: Double) =
-        (dp * context.resources.displayMetrics.density).toInt()
+            (dp * context.resources.displayMetrics.density).toInt()
 
     private fun hasCameraPermission(): Boolean {
         return permissionGranted ||
@@ -307,10 +307,10 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
         }
     }
 
-    override fun onRequestPermissionsResult( requestCode: Int,
-                                             permissions: Array<out String>?,
-                                             grantResults: IntArray): Boolean {
-        if(requestCode == Shared.CAMERA_REQUEST_ID + this.id) {
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<out String>,
+                                            grantResults: IntArray): Boolean {
+        if (requestCode == Shared.CAMERA_REQUEST_ID + this.id) {
             return if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 permissionGranted = true
                 channel.invokeMethod("onPermissionSet", true)
@@ -323,6 +323,7 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
         }
         return false
     }
+
 
 }
 
