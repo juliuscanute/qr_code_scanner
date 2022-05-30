@@ -212,8 +212,8 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
             arguments?.forEach {
                 allowedBarcodeTypes.add(BarcodeFormat.values()[it])
             }
-        } catch (e: java.lang.Exception) {
-            result.error(null, null, null)
+        } catch (e: Exception) {
+            result.error("", e.message, null)
         }
 
         barcodeView?.decodeContinuous(
@@ -244,7 +244,7 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
                     "hasBackCamera" to hasBackCamera(), "hasFlash" to hasFlash(),
                     "activeCamera" to barcodeView?.cameraSettings?.requestedCameraId))
         } catch (e: Exception) {
-            result.error(null, null, null)
+            result.error("", e.message, null)
         }
     }
 
@@ -307,9 +307,11 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
         }
     }
 
-    override fun onRequestPermissionsResult( requestCode: Int,
-                                             permissions: Array<out String>?,
-                                             grantResults: IntArray): Boolean {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ): Boolean {
         if(requestCode == Shared.CAMERA_REQUEST_ID + this.id) {
             return if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 permissionGranted = true
