@@ -118,6 +118,8 @@ class QRView(
                 this.barcodeView = it
             }
 
+            barcodeView.decoderFactory = DefaultDecoderFactory(null, null, null, 2)
+
             if (params[PARAMS_CAMERA_FACING] as Int == 1) {
                 barcodeView.cameraSettings?.requestedCameraId = CameraInfo.CAMERA_FACING_FRONT
             }
