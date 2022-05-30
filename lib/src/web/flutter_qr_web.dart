@@ -134,7 +134,7 @@ class _WebQrViewState extends State<WebQrView> {
         widget.onPlatformViewCreated(_controller!);
       }
       var stream = await promiseToFuture(getUserMedia(constraints));
-      widget.onPermissionSet?.call(_controller!, true);      
+      widget.onPermissionSet?.call(_controller!, true);
       _localStream = stream;
       video.srcObject = _localStream;
       video.setAttribute('playsinline',
@@ -142,7 +142,7 @@ class _WebQrViewState extends State<WebQrView> {
       await video.play();
     } catch (e) {
       cancel();
-      if(e.toString().contains("NotAllowedError")){
+      if (e.toString().contains("NotAllowedError")) {
         widget.onPermissionSet?.call(_controller!, false);
       }
       setState(() {
@@ -319,7 +319,8 @@ class QRViewControllerWeb implements QRViewController {
   }
 }
 
-Widget createWebQrView({onPlatformViewCreated, onPermissionSet, CameraFacing? cameraFacing}) =>
+Widget createWebQrView(
+        {onPlatformViewCreated, onPermissionSet, CameraFacing? cameraFacing}) =>
     WebQrView(
       onPlatformViewCreated: onPlatformViewCreated,
       onPermissionSet: onPermissionSet,
