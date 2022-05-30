@@ -20,11 +20,13 @@ import 'media.dart';
 
 class WebQrView extends StatefulWidget {
   final QRViewCreatedCallback onPlatformViewCreated;
+  final PermissionSetCallback? onPermissionSet;
   final CameraFacing? cameraFacing;
 
   const WebQrView(
       {Key? key,
       required this.onPlatformViewCreated,
+      this.onPermissionSet,
       this.cameraFacing = CameraFacing.front})
       : super(key: key);
 
@@ -127,18 +129,22 @@ class _WebQrViewState extends State<WebQrView> {
       // var stream =
       //     await html.window.navigator.mediaDevices.getUserMedia(constraints);
       // straight JS:
-      var stream = await promiseToFuture(getUserMedia(constraints));
-      _localStream = stream;
-      video.srcObject = _localStream;
-      video.setAttribute('playsinline',
-          'true'); // required to tell iOS safari we don't want fullscreen
       if (_controller == null) {
         _controller = QRViewControllerWeb(this);
         widget.onPlatformViewCreated(_controller!);
       }
+      var stream = await promiseToFuture(getUserMedia(constraints));
+      widget.onPermissionSet?.call(_controller!, true);
+      _localStream = stream;
+      video.srcObject = _localStream;
+      video.setAttribute('playsinline',
+          'true'); // required to tell iOS safari we don't want fullscreen
       await video.play();
     } catch (e) {
       cancel();
+      if (e.toString().contains("NotAllowedError")) {
+        widget.onPermissionSet?.call(_controller!, false);
+      }
       setState(() {
         _errorMsg = e.toString();
       });
@@ -313,8 +319,10 @@ class QRViewControllerWeb implements QRViewController {
   }
 }
 
-Widget createWebQrView({onPlatformViewCreated, CameraFacing? cameraFacing}) =>
+Widget createWebQrView(
+        {onPlatformViewCreated, onPermissionSet, CameraFacing? cameraFacing}) =>
     WebQrView(
       onPlatformViewCreated: onPlatformViewCreated,
+      onPermissionSet: onPermissionSet,
       cameraFacing: cameraFacing,
     );
