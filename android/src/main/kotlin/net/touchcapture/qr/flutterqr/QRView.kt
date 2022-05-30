@@ -13,6 +13,7 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.ResultPoint
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
+import com.journeyapps.barcodescanner.DefaultDecoderFactory
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -195,6 +196,7 @@ class QRView(private val context: Context, messenger: BinaryMessenger, private v
         if (barcodeView == null) {
             barcodeView =
                 CustomFramingRectBarcodeView(Shared.activity)
+            barcodeView?.setDecoderFactory(DefaultDecoderFactory(null, null, null, 2))
             if (params["cameraFacing"] as Int == 1) {
                 barcodeView?.cameraSettings?.requestedCameraId = CameraInfo.CAMERA_FACING_FRONT
             }
