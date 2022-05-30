@@ -118,6 +118,7 @@ class _QRViewState extends State<QRView> {
     if (kIsWeb) {
       _platformQrView = createWebQrView(
         onPlatformViewCreated: widget.onQRViewCreated,
+        onPermissionSet: widget.onPermissionSet,
         cameraFacing: widget.cameraFacing,
       );
     } else {
