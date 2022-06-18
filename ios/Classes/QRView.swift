@@ -122,8 +122,9 @@ public class QRView:NSObject,FlutterPlatformView {
     
     func startScan(_ arguments: Array<Int>, _ result: @escaping FlutterResult) {
         // Check for allowed barcodes
+        let arr = arguments[0...15]
         var allowedBarcodeTypes: Array<AVMetadataObject.ObjectType> = []
-        arguments.forEach { arg in
+        arr.forEach { arg in
             allowedBarcodeTypes.append( QRCodeTypes[arg]!)
         }
         MTBBarcodeScanner.requestCameraPermission(success: { [weak self] permissionGranted in
