@@ -136,6 +136,7 @@ public class QRView:NSObject,FlutterPlatformView {
                     try self.scanner?.startScanning(with: self.cameraFacing, resultBlock: { [weak self] codes in
                         if let codes = codes {
                             for code in codes {
+                                guard code.stringValue != nil else { continue }
                                 var typeString: String;
                                 switch(code.type) {
                                     case AVMetadataObject.ObjectType.aztec:
