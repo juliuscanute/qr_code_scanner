@@ -17,8 +17,8 @@ class FlutterQrPlugin : FlutterPlugin, ActivityAware {
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        QrShared.activity = null
-        QrShared.binding = null
+        // Leave empty
+        // Nullifying QrShared.activity and QrShared.binding here will cause errors if plugin is detached by another plugin
     }
 
     override fun onAttachedToActivity(activityPluginBinding: ActivityPluginBinding) {
