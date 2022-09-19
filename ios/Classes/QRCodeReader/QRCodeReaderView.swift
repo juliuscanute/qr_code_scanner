@@ -38,11 +38,18 @@ struct QRCodeReaderView: UIViewRepresentable {
                 metadataOutput.metadataObjectTypes = supportedBarcodeTypes
                 metadataOutput.setMetadataObjectsDelegate(delegate, queue: DispatchQueue.main)
             }
-            session.startRunning()
         } catch {
             // Configuration failed. Handle error.
             delegate.onError(QRCodeReaderError.someReason)
         }
+    }
+    
+    func startSession() {
+        session.startRunning()
+    }
+    
+    func stopSession() {
+        session.stopRunning()
     }
     
     func makeUIView(context: UIViewRepresentableContext<QRCodeReaderView>) -> QRCodeReaderView.UIViewType {
@@ -52,11 +59,13 @@ struct QRCodeReaderView: UIViewRepresentable {
         let cameraAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
         if cameraAuthorizationStatus == .authorized {
             setupSession()
+            startSession（）
         } else {
             AVCaptureDevice.requestAccess(for: .video) { granted in
                 DispatchQueue.main.sync {
                     if granted {
                         self.setupSession()
+                        self.startSession()
                     }
                 }
             }
@@ -87,7 +96,10 @@ extension QRCodeReaderView {
     }
     
     func found(completion: @escaping (QRCode) -> Void) -> QRCodeReaderView {
-        delegate.onResult = completion
+        delegate.onResult = { qrcode in
+            completion(qrcode)
+            startSession()
+        }
         return self
     }
     
