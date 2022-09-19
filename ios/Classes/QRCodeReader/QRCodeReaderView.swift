@@ -59,7 +59,7 @@ struct QRCodeReaderView: UIViewRepresentable {
         let cameraAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
         if cameraAuthorizationStatus == .authorized {
             setupSession()
-            startSession（）
+            startSession()
         } else {
             AVCaptureDevice.requestAccess(for: .video) { granted in
                 DispatchQueue.main.sync {
