@@ -16,7 +16,7 @@ public class QRView: NSObject, FlutterPlatformView {
     var registrar: FlutterPluginRegistrar
     var channel: FlutterMethodChannel
     var previewView: UIView!
-    var qrView: QRCodeReaderView!
+    var qrView: ZXingSwiftUIView!
     //    var cameraFacing: MTBCamera
     
     // Codabar, maxicode, rss14 & rssexpanded not supported. Replaced with qr.
@@ -45,7 +45,7 @@ public class QRView: NSObject, FlutterPlatformView {
         // previewView = UIView(frame: frame)
         // cameraFacing = MTBCamera.init(rawValue: UInt(Int(params["cameraFacing"] as! Double))) ?? MTBCamera.back
         
-        qrView = QRCodeReaderView()
+        qrView = ZXingSwiftUIView()
         let childViewController = UIHostingController(rootView: qrView)
         childViewController.view.translatesAutoresizingMaskIntoConstraints = false
         //        addSubview(childViewController.view)
@@ -61,7 +61,6 @@ public class QRView: NSObject, FlutterPlatformView {
     public func view() -> UIView {
         
         qrView
-            .interval(delay: 1)
             .found(completion: { [weak self] r in
             print(r)
 self?.channel.invokeMethod("onRecognizeQR", arguments:
