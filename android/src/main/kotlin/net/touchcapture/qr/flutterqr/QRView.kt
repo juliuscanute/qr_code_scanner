@@ -52,8 +52,9 @@ class QRView(
 
             },
             onResume = {
-                if (!hasCameraPermission) checkAndRequestPermission()
-                else if (!isPaused && hasCameraPermission) barcodeView?.resume()
+                // if (!hasCameraPermission) checkAndRequestPermission()
+                // else 
+                if (!isPaused && hasCameraPermission) barcodeView?.resume()
             }
         )
     }
