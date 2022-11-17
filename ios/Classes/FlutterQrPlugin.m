@@ -8,6 +8,8 @@
 
 @implementation FlutterQrPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    [SwiftFlutterQrPlugin registerWithRegistrar:registrar];
+    if (registrar) {
+        [SwiftFlutterQrPlugin registerWithRegistrar:registrar];
+    }
 }
 @end
