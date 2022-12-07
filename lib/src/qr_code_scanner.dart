@@ -238,6 +238,12 @@ class QRViewController {
     }
   }
 
+  /// Get the qrcode data from photo album
+  Future<List<String>> scanQrcodeFromImage(String path) async {
+    var qrResult = await _channel.invokeMethod("scanQrcodeFromGallery", path);
+    return List<String>.from(qrResult);
+  }
+
   /// Gets information about which camera is active.
   Future<CameraFacing> getCameraInfo() async {
     try {

@@ -323,6 +323,12 @@ class QRViewControllerWeb implements QRViewController {
     // TODO: implement scanInvert
     throw UnimplementedError();
   }
+  
+  @override
+  Future<List<String>> scanQrcodeFromImage(String path) {
+    // TODO: implement getQrCodeByImagePath
+    throw UnimplementedError();
+  }
 }
 
 Widget createWebQrView(

@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-
+import 'package:image_picker/image_picker.dart';
 void main() => runApp(const MaterialApp(home: MyHome()));
 
 class MyHome extends StatelessWidget {
@@ -130,6 +130,17 @@ class _QRViewExampleState extends State<QRViewExample> {
                           },
                           child: const Text('resume',
                               style: TextStyle(fontSize: 20)),
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.all(8),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            final photoFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                            final res = await controller?.scanQrcodeFromImage(photoFile!.path);
+                            print('res====$res');
+                          },
+                          child: const Text('pic', style: TextStyle(fontSize: 20)),
                         ),
                       )
                     ],

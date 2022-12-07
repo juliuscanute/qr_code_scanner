@@ -10,6 +10,12 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.ResultPoint
+import android.graphics.BitmapFactory
+import com.google.zxing.BinaryBitmap
+import com.google.zxing.DecodeHintType
+import com.google.zxing.RGBLuminanceSource
+import com.google.zxing.common.HybridBinarizer
+import com.google.zxing.qrcode.QRCodeReader
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
@@ -18,7 +24,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.platform.PlatformView
-
+import java.util.*
 
 class QRView(
     private val context: Context,
@@ -106,7 +112,35 @@ class QRView(
                 isInvert = call.argument<Boolean>("isInvertScan") ?: false,
             )
 
+            "scanQrcodeFromGallery" -> scanQrcodeFromGallery(call.arguments as? String, result)
+
             else -> result.notImplemented()
+        }
+    }
+
+    private fun scanQrcodeFromGallery(path: String?, result: MethodChannel.Result) {
+        // val path = call.arguments as String
+        // DecodeHintType 和EncodeHintType
+        val options = BitmapFactory.Options()
+        options.inJustDecodeBounds = true
+        BitmapFactory.decodeFile(path, options)
+        options.inJustDecodeBounds = false
+        options.inSampleSize = 1
+        val bitmap = BitmapFactory.decodeFile(path, options)
+        val width = bitmap.width
+        val height = bitmap.height
+        val pixels = IntArray(width * height)
+        bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
+        val source = RGBLuminanceSource(width, height, pixels)
+        val hints: Hashtable<DecodeHintType, String> = Hashtable<DecodeHintType, String>()
+        hints[DecodeHintType.CHARACTER_SET] = "utf-8" // 设置二维码内容的编码
+        try {
+            val result1 = QRCodeReader().decode(BinaryBitmap(HybridBinarizer(source)), hints)
+            result.success(listOf(result1.text))
+        } catch (e: Exception) {
+            // nothing qrcode found
+            val list: List<String> = listOf()
+            result.success(list)
         }
     }
 

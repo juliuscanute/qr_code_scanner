@@ -77,6 +77,9 @@ public class QRView:NSObject,FlutterPlatformView {
                     self?.getFlashInfo(result)
                 case "getSystemFeatures":
                     self?.getSystemFeatures(result)
+                case "scanQrcodeFromGallery":
+                    let imagePath = call.arguments as! String
+                    self?.scanQrcodeFromGallery(imagePath,result)
                 default:
                     result(FlutterMethodNotImplemented)
                     return
@@ -118,6 +121,30 @@ public class QRView:NSObject,FlutterPlatformView {
         }
         return result(width)
         
+    }
+    
+    func scanQrcodeFromGallery(_ path: String, _ result: @escaping FlutterResult) {
+        let image = UIImage.init(contentsOfFile: path)
+        let array = self.readQRCodeFrom(image!) as NSArray
+        var res = [String]()
+        array.enumerateObjects({object, index, stop in
+            let tmp = object as? CIQRCodeFeature
+            if (tmp != nil) {
+                res.append(tmp!.messageString ?? "")
+            }
+        })
+        return result(res)
+    }
+    
+    func readQRCodeFrom(_ image: UIImage) -> Array<Any>  {
+        let ciImage = CIImage(cgImage: image.cgImage!, options: nil)
+        let context = CIContext.init(options: [kCIContextUseSoftwareRenderer:true])
+        let detector = CIDetector.init(ofType: CIDetectorTypeQRCode, context: context,options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])
+        let features = detector?.features(in: ciImage)
+        for f in features ?? [] {
+            print("qr message: \((f as? CIQRCodeFeature)?.messageString ?? "")")
+        }
+        return features ?? []
     }
     
     func startScan(_ arguments: Array<Int>, _ result: @escaping FlutterResult) {
