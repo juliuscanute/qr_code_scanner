@@ -25,7 +25,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -33,7 +33,7 @@ android {
     defaultConfig {
         // minSdkVersion is determined by Native View.
         minSdkVersion 20
-        targetSdkVersion 32
+        targetSdkVersion 33
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -52,5 +52,5 @@ dependencies {
     implementation('com.journeyapps:zxing-android-embedded:4.3.0') { transitive = false }
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'com.google.zxing:core:3.5.1'
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.0'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
 }
