@@ -137,8 +137,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                         child: ElevatedButton(
                           onPressed: () async {
                             final photoFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-                            final res = await controller?.scanQrcodeFromImage(photoFile!.path);
-                            print('res====$res');
+                            await controller?.scanQrcodeFromImage(photoFile!.path);
                           },
                           child: const Text('pic', style: TextStyle(fontSize: 20)),
                         ),
