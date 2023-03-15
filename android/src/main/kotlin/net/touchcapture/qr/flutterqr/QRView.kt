@@ -231,6 +231,12 @@ class QRView(
 
         val allowedBarcodeTypes = getAllowedBarcodeTypes(arguments, result)
 
+        if (arguments == null) {
+            barcodeView?.decoderFactory = DefaultDecoderFactory(null, null, null, 2)
+        } else {
+            barcodeView?.decoderFactory = DefaultDecoderFactory(allowedBarcodeTypes, null, null, 2)
+        }
+
         barcodeView?.decodeContinuous(
             object : BarcodeCallback {
                 override fun barcodeResult(result: BarcodeResult) {
