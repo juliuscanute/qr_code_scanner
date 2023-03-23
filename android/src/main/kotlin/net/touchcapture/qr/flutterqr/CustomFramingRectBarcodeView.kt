@@ -9,8 +9,8 @@ import com.journeyapps.barcodescanner.Size
 class CustomFramingRectBarcodeView : BarcodeView {
     private var bottomOffset = BOTTOM_OFFSET_NOT_SET_VALUE
 
-    constructor(context: Context?) : super(context) {}
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
+    constructor(context: Context?) : super(context)
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,

@@ -1,5 +1,21 @@
-## 0.6.2
+## 1.0.0
+Breaking changes:
+Minimum Flutter version is now Flutter 3.0.0 (Dart 2.17.0).
+
+#### Features
+* Inverted is now mixed with normal scanning.
+* onPermissionSet now works on web aswell.
+* [Android] zxing core is updated to 3.5.0.
+* [Android] Several code improvements.
+* [Android] Several dependencies updated.
+
+## 0.7.0
+#### Features
+* Add inverted feature for Android. See https://github.com/juliuscanute/qr_code_scanner/issues/403
+
+#### Bugfixes
 * Fixed permission error on devices running Android 7 or lower.
+* Fixed error being thrown when user declines permission on iOS.
 * Updated dependencies
 
 ## 0.6.1
