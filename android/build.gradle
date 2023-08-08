@@ -45,6 +45,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    if (project.android.hasProperty('namespace')) {
+        namespace 'net.touchcapture.qr.flutterqr'
+    }
 }
 
 dependencies {
