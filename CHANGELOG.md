@@ -1,3 +1,9 @@
+## 1.0.1
+- Fixing null errors resulting from detachment from engine
+- Upgraded gradle to version 8
+- `QRView.kt`: the allowed barcode types are enforced at the start of `startScan`, and not just filtered afterwards
+- Upgraded ZXING
+
 ## 1.0.0
 Breaking changes:
 Minimum Flutter version is now Flutter 3.0.0 (Dart 2.17.0).

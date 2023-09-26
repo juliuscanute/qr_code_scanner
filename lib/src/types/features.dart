@@ -5,7 +5,7 @@ class SystemFeatures {
       SystemFeatures(
           features['hasFlash'] ?? false,
           features['hasBackCamera'] ?? false,
-          features['hasFrontCamera'] ?? false);
+          features['hasFrontCamera'] ?? false,);
 
   final bool hasFlash;
   final bool hasFrontCamera;

@@ -19,7 +19,7 @@ class MyHome extends StatelessWidget {
           onPressed: () {
             Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => const QRViewExample(),
-            ));
+            ),);
           },
           child: const Text('qrView'),
         ),
@@ -58,20 +58,17 @@ class _QRViewExampleState extends State<QRViewExample> {
         children: <Widget>[
           Expanded(flex: 4, child: _buildQrView(context)),
           Expanded(
-            flex: 1,
             child: FittedBox(
-              fit: BoxFit.contain,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   if (result != null)
                     Text(
-                        'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
+                        'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}',)
                   else
                     const Text('Scan a code'),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Container(
                         margin: const EdgeInsets.all(8),
@@ -85,7 +82,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                               builder: (context, snapshot) {
                                 return Text('Flash: ${snapshot.data}');
                               },
-                            )),
+                            ),),
                       ),
                       Container(
                         margin: const EdgeInsets.all(8),
@@ -99,18 +96,17 @@ class _QRViewExampleState extends State<QRViewExample> {
                               builder: (context, snapshot) {
                                 if (snapshot.data != null) {
                                   return Text(
-                                      'Camera facing ${describeEnum(snapshot.data!)}');
+                                      'Camera facing ${describeEnum(snapshot.data!)}',);
                                 } else {
                                   return const Text('loading');
                                 }
                               },
-                            )),
+                            ),),
                       )
                     ],
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Container(
                         margin: const EdgeInsets.all(8),
@@ -119,7 +115,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                             await controller?.pauseCamera();
                           },
                           child: const Text('pause',
-                              style: TextStyle(fontSize: 20)),
+                              style: TextStyle(fontSize: 20),),
                         ),
                       ),
                       Container(
@@ -129,7 +125,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                             await controller?.resumeCamera();
                           },
                           child: const Text('resume',
-                              style: TextStyle(fontSize: 20)),
+                              style: TextStyle(fontSize: 20),),
                         ),
                       )
                     ],
@@ -145,7 +141,7 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   Widget _buildQrView(BuildContext context) {
     // For this example we check how width or tall the device is and change the scanArea and overlay accordingly.
-    var scanArea = (MediaQuery.of(context).size.width < 400 ||
+    final scanArea = (MediaQuery.of(context).size.width < 400 ||
             MediaQuery.of(context).size.height < 400)
         ? 150.0
         : 300.0;
@@ -155,11 +151,10 @@ class _QRViewExampleState extends State<QRViewExample> {
       key: qrKey,
       onQRViewCreated: _onQRViewCreated,
       overlay: QrScannerOverlayShape(
-          borderColor: Colors.red,
           borderRadius: 10,
           borderLength: 30,
           borderWidth: 10,
-          cutOutSize: scanArea),
+          cutOutSize: scanArea,),
       onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),
     );
   }

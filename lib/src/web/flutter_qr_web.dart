@@ -8,9 +8,9 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import '../../qr_code_scanner.dart';
-import 'jsqr.dart';
-import 'media.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qr_code_scanner/src/web/jsqr.dart';
+import 'package:qr_code_scanner/src/web/media.dart';
 
 /// Even though it has been highly modified, the origial implementation has been
 /// adopted from https://github.com:treeder/jsqr_flutter
@@ -24,11 +24,10 @@ class WebQrView extends StatefulWidget {
   final CameraFacing? cameraFacing;
 
   const WebQrView(
-      {Key? key,
+      {super.key,
       required this.onPlatformViewCreated,
       this.onPermissionSet,
-      this.cameraFacing = CameraFacing.front})
-      : super(key: key);
+      this.cameraFacing = CameraFacing.front,});
 
   @override
   _WebQrViewState createState() => _WebQrViewState();
@@ -64,7 +63,7 @@ class _WebQrViewState extends State<WebQrView> {
   String? code;
   String? _errorMsg;
   html.VideoElement video = html.VideoElement();
-  String viewID = 'QRVIEW-' + DateTime.now().millisecondsSinceEpoch.toString();
+  String viewID = 'QRVIEW-${DateTime.now().millisecondsSinceEpoch}';
 
   final StreamController<Barcode> _scanUpdateController =
       StreamController<Barcode>();
@@ -121,10 +120,10 @@ class _WebQrViewState extends State<WebQrView> {
     }
 
     try {
-      var constraints = UserMediaOptions(
+      final constraints = UserMediaOptions(
           video: VideoOptions(
         facingMode: (facing == CameraFacing.front ? 'user' : 'environment'),
-      ));
+      ),);
       // dart style, not working properly:
       // var stream =
       //     await html.window.navigator.mediaDevices.getUserMedia(constraints);
@@ -133,12 +132,12 @@ class _WebQrViewState extends State<WebQrView> {
         _controller = QRViewControllerWeb(this);
         widget.onPlatformViewCreated(_controller!);
       }
-      var stream = await promiseToFuture(getUserMedia(constraints));
+      final stream = await promiseToFuture(getUserMedia(constraints));
       widget.onPermissionSet?.call(_controller!, true);
       _localStream = stream;
       video.srcObject = _localStream;
       video.setAttribute('playsinline',
-          'true'); // required to tell iOS safari we don't want fullscreen
+          'true',); // required to tell iOS safari we don't want fullscreen
       await video.play();
     } catch (e) {
       cancel();
@@ -235,7 +234,6 @@ class _WebQrViewState extends State<WebQrView> {
             child: SizedBox.fromSize(
               size: _size,
               child: Transform.scale(
-                alignment: Alignment.center,
                 scale: zoom,
                 child: HtmlElementView(viewType: viewID),
               ),
@@ -326,7 +324,7 @@ class QRViewControllerWeb implements QRViewController {
 }
 
 Widget createWebQrView(
-        {onPlatformViewCreated, onPermissionSet, CameraFacing? cameraFacing}) =>
+        {onPlatformViewCreated, onPermissionSet, CameraFacing? cameraFacing,}) =>
     WebQrView(
       onPlatformViewCreated: onPlatformViewCreated,
       onPermissionSet: onPermissionSet,

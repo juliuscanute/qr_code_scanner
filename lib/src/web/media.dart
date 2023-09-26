@@ -24,7 +24,7 @@ class VideoOptions {
   // external DeviceIdOptions get deviceId;
 
   external factory VideoOptions(
-      {String? facingMode, DeviceIdOptions? deviceId});
+      {String? facingMode, DeviceIdOptions? deviceId,});
 }
 
 @JS()
