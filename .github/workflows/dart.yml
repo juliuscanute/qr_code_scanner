@@ -13,7 +13,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-      - uses: subosito/flutter-action@v2.10.0
+      - uses: subosito/flutter-action@v2.12.0
       - name: Version
         run: flutter doctor -v
       - name: Install dependencies
