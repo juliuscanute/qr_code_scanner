@@ -25,6 +25,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
+    namespace 'net.touchcapture.qr.flutterqr'
     compileSdkVersion 33
 
     sourceSets {
