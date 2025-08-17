@@ -5,6 +5,7 @@ import 'dart:core';
 import 'dart:html' as html;
 import 'dart:js_util';
 import 'dart:ui' as ui;
+import 'dart:ui' as ui_web;
 
 import 'package:flutter/material.dart';
 
