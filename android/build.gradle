@@ -26,31 +26,27 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdk 33
+    namespace 'net.touchcapture.qr.flutterqr' // ✅ Place it here
 
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
     defaultConfig {
-        // minSdkVersion is determined by Native View.
         minSdkVersion 20
         targetSdkVersion 33
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
 
-    kotlinOptions {
-        jvmTarget = '11'
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
     }
 
     compileOptions {
-        // Flag to enable support for the new language APIs
-        coreLibraryDesugaringEnabled true
-        // Sets Java compatibility to Java 11
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
+        coreLibraryDesugaringEnabled true
     }
-    if (project.android.hasProperty('namespace')) {
-        namespace 'net.touchcapture.qr.flutterqr'
+
+    kotlinOptions {
+        jvmTarget = '11'
     }
 }
 
@@ -59,5 +55,5 @@ dependencies {
     implementation('com.journeyapps:zxing-android-embedded:4.3.0') { transitive = false }
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.zxing:core:3.5.2'
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4' // ✅ latest stable
 }
